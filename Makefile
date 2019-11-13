@@ -54,6 +54,12 @@ all:
 	@make $(NAME)
 	$(END)
 
+init:
+	$(START)
+	@printf $(CYAN)"create pre-commit\n"$(NORMAL)
+	@cp .pre-commit .git/hooks/pre-commit
+	$(END)
+
 $(NAME): $(OBJS_DIR) $(OBJS)
 	@printf $(CYAN)"-> create program : $(NAME)\n"$(NORMAL)
 	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LIBS_FLAGS)
@@ -107,6 +113,7 @@ check:
 
 help:
 	@printf $(YELLOW)$(BOLD)"HELP\n--------------------\n"$(NORMAL)
+	@printf $(NORMAL)"-> make "$(BOLD)"init"$(NORMAL)": init the project\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"all"$(NORMAL)": build the project and create $(NAME)\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"clean"$(NORMAL)": remove all .o files\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"fclean"$(NORMAL)": make clean and remove executable\n"
@@ -119,4 +126,4 @@ help:
 	@printf $(NORMAL)"-> make "$(BOLD)"... DEBUG=1"$(NORMAL)": use debug mode\n"
 	@printf $(YELLOW)$(BOLD)"--------------------\n"$(NORMAL)
 
-.PHONY: all clean fclean re exec-nolint exec lint check help
+.PHONY: init all clean fclean re exec-nolint exec lint check help
