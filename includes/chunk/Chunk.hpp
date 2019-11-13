@@ -10,7 +10,7 @@ class Chunk : public AChunk {
 
 		Chunk &operator=(Chunk const &rhs);
 
-		virtual ChunkData	* createChunk() const;
+		virtual void	createChunk();
 	protected:
 	private:
 };

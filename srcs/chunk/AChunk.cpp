@@ -1,6 +1,6 @@
 #include "AChunk.hpp"
 
-AChunk::AChunk() {
+AChunk::AChunk() : _data() {
 }
 
 AChunk::AChunk(AChunk const &src) {
@@ -16,9 +16,11 @@ AChunk &AChunk::operator=(AChunk const &rhs) {
 	return *this;
 }
 
-void AChunk::updateBlock(ChunkData * chunk, chunkVec3 pos, uint8_t value) const {
-	if (chunk->data[pos.x][pos.y][pos.z] == value)
+void AChunk::updateBlock(chunkVec3 pos, uint8_t value) {
+	if (_data.data[pos.x][pos.y][pos.z] == value)
 		return;  // unchanged chunk
-	chunk->data[pos.x][pos.y][pos.z] = value;
-	chunk->isModified = true;
+	_data.data[pos.x][pos.y][pos.z] = value;
+	_data.isModified = true;
 }
+
+AChunk::ChunkData const	&AChunk::getData() const { return _data; }
