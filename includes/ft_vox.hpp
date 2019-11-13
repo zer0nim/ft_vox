@@ -1,6 +1,6 @@
-#ifndef FT_VOX_HPP
-# define FT_VOX_HPP
+#ifndef INCLUDES_FT_VOX_HPP_
+#define INCLUDES_FT_VOX_HPP_
 
-# include "commonInclude.hpp"
+#include "commonInclude.hpp"
 
-#endif
+#endif  // INCLUDES_FT_VOX_HPP_
