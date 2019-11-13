@@ -7,10 +7,14 @@ SRCS_DIR	= srcs
 OBJS_DIR	= objs
 INC_DIR		= includes
 
-SRC =	main.cpp
+SRC =	main.cpp \
+		chunk/AChunk.cpp \
+		chunk/Chunk.cpp \
 
 HEAD =	commonInclude.hpp \
-		ft_vox.hpp
+		ft_vox.hpp \
+		chunk/AChunk.hpp \
+		chunk/Chunk.hpp \
 
 
 # download the cpp linter (https://github.com/isocpp/CppCoreGuidelines)

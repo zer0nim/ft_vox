@@ -6,10 +6,14 @@
 #define SCREEN_H 600  // [px] type: int -> height of the screen in pixels
 #define FPS 30  // [Hz] type: int -> fps of the main loop
 
+// glfw
 #define GLFW_INCLUDE_GLCOREARB
 #include <GLFW/glfw3.h>
 
 #include <string>
 #include <iostream>
+
+// glm
+#include <glm/glm.hpp>
 
 #endif  // INCLUDES_COMMONINCLUDE_HPP_
