@@ -16,6 +16,10 @@ and `glm` to manage matrix/vector/quaternion.
 
 	```brew install glm```
 
+- Add precommit rules
+
+	```make init```
+
 - Compile the project
 
 	```make -j8```
