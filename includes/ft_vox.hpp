@@ -1,5 +1,5 @@
-#ifndef INCLUDES_FT_VOX_HPP_
-#define INCLUDES_FT_VOX_HPP_
+#ifndef FT_VOX_HPP_
+#define FT_VOX_HPP_
 
 #include "commonInclude.hpp"
 
@@ -9,4 +9,4 @@
 
 typedef glm::tvec3<uint8_t> chunkVec3;
 
-#endif  // INCLUDES_FT_VOX_HPP_
+#endif  // FT_VOX_HPP_

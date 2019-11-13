@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ACHUNK_HPP_
+#define ACHUNK_HPP_
 
 #include "commonInclude.hpp"
 #include "ft_vox.hpp"
@@ -27,3 +28,5 @@ class AChunk {
 		ChunkData	_data;
 	private:
 };
+
+#endif  // ACHUNK_HPP_

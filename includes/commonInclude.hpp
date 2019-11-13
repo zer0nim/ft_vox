@@ -1,5 +1,5 @@
-#ifndef INCLUDES_COMMONINCLUDE_HPP_
-#define INCLUDES_COMMONINCLUDE_HPP_
+#ifndef COMMONINCLUDE_HPP_
+#define COMMONINCLUDE_HPP_
 
 #define DEBUG false  // type: bool -> enable / disable the debug mode
 #define SCREEN_W 800  // [px] type: int ->width of the screen in pixels
@@ -16,4 +16,4 @@
 // glm
 #include <glm/glm.hpp>
 
-#endif  // INCLUDES_COMMONINCLUDE_HPP_
+#endif  // COMMONINCLUDE_HPP_
