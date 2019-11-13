@@ -8,17 +8,23 @@ OBJS_DIR	= objs
 INC_DIR		= includes
 
 SRC =	main.cpp \
+\
 		chunk/AChunk.cpp \
 		chunk/Chunk.cpp \
+\
 		utils/Texture.cpp \
 		utils/Shader.cpp \
+		utils/Camera.cpp \
 
 HEAD =	commonInclude.hpp \
 		ft_vox.hpp \
+\
 		chunk/AChunk.hpp \
 		chunk/Chunk.hpp \
+\
 		utils/Texture.hpp \
 		utils/Shader.hpp \
+		utils/Camera.hpp \
 
 
 # download the cpp linter (https://github.com/isocpp/CppCoreGuidelines)
