@@ -1,5 +1,5 @@
 NAME = ft_vox
-PROJECT_NAME = $(shell echo $(NAME) | tr a-z A-Z)# name in MAJUSCULE
+PROJECT_NAME = $(shell echo $(NAME) | tr a-z A-Z)  # name in MAJUSCULE
 
 ARGS =
 
@@ -12,14 +12,26 @@ SRC =	main.cpp
 HEAD =	commonInclude.hpp \
 		ft_vox.hpp
 
+
+# download the cpp linter (https://github.com/isocpp/CppCoreGuidelines)
+# set command to launch linter on LINTER
+# add rules for linter in LINTER_RULES
+LINTER = $(CPPLINT)
+LINTER_RULES = --filter=-whitespace/tab,-legal/copyright,-build/c++11 --linelength=120
+
 CC = g++
 DEBUG_FLAGS = -g3 -fsanitize=address
-LIBS_FLAGS	= -L ~/.brew/lib -framework OpenGL -lglfw -lassimp
-CFLAGS = -Wno-deprecated -Ofast -Wall -Wextra -std=c++0x -Werror
+LIBS_FLAGS	= -L ~/.brew/lib -framework OpenGL -lglfw
+LIBS_INC	= ~/.brew/include
+CFLAGS		= -Ofast -std=c++11 -Wall -Wextra -Werror
+
+ifneq ($(DEBUG),)
+	CFLAGS := $(CFLAGS) $(DEBUG_FLAGS)
+endif
 
 HEADS	= $(addprefix $(INC_DIR)/, $(HEAD))
 OBJS	= $(addprefix $(OBJS_DIR)/, $(SRC:.cpp=.o))
-INC		= -I $(INC_DIR) $(addprefix -I , $(addprefix $(INC_DIR)/, $(dir $(HEAD)))) -I ~/.brew/include
+INC		= -I $(INC_DIR) $(addprefix -I , $(addprefix $(INC_DIR)/, $(dir $(HEAD)))) $(addprefix -I , $(LIBS_INC))
 
 NORMAL = "\x1B[0m"
 RED = "\x1B[31m"
@@ -69,10 +81,42 @@ fclean: clean
 re: fclean
 	@make
 
-exec:
+exec-nolint:
 	@make
 	@printf $(MAGENTA)$(BOLD)"EXEC $(PROJECT_NAME)\n--------------------\n"$(NORMAL)
 	@./$(NAME) $(ARGS)
 	@printf $(MAGENTA)$(BOLD)"--------------------\n"$(NORMAL)
 
-.PHONY: all clean fclean re exec
+exec:
+	@make lint ; true
+	@make exec-nolint ; true
+
+lint:
+	@printf $(BLUE)$(BOLD)"LINTER ON $(PROJECT_NAME)\n--------------------\n"$(NORMAL)
+	@if [ "$(LINTER)" = "" ]; then\
+		printf $(RED)$(BOLD)"Error:"$(NORMAL)" env var CPPLINT is not set\n"; \
+	else \
+		$(LINTER) $(LINTER_RULES) $(HEADS) $(addprefix $(SRCS_DIR)/, $(SRC)); \
+    fi
+	@printf $(BLUE)$(BOLD)"--------------------\n"$(NORMAL)
+
+check:
+	@make fclean
+	@make lint
+	@make exec-nolint
+
+help:
+	@printf $(YELLOW)$(BOLD)"HELP\n--------------------\n"$(NORMAL)
+	@printf $(NORMAL)"-> make "$(BOLD)"all"$(NORMAL)": build the project and create $(NAME)\n"
+	@printf $(NORMAL)"-> make "$(BOLD)"clean"$(NORMAL)": remove all .o files\n"
+	@printf $(NORMAL)"-> make "$(BOLD)"fclean"$(NORMAL)": make clean and remove executable\n"
+	@printf $(NORMAL)"-> make "$(BOLD)"re"$(NORMAL)": make fclean and make all\n"
+	@printf $(NORMAL)"-> make "$(BOLD)"lint"$(NORMAL)": exec linter on project (use env var CPPLINT)\n"
+	@printf $(NORMAL)"-> make "$(BOLD)"exec"$(NORMAL)": make lint, make all and exec the program with ARGS='$(ARGS)'\n"
+	@printf $(NORMAL)"-> make "$(BOLD)"exec-nolint"$(NORMAL)": make all and exec the program with ARGS='$(ARGS)'\n"
+	@printf $(NORMAL)"-> make "$(BOLD)"check"$(NORMAL)": make fclean, make lint, make exec-nolint -> stop if there is an error\n"
+	@printf $(NORMAL)"-> make "$(BOLD)"help"$(NORMAL)": show the help\n"
+	@printf $(NORMAL)"-> make "$(BOLD)"... DEBUG=1"$(NORMAL)": use debug mode\n"
+	@printf $(YELLOW)$(BOLD)"--------------------\n"$(NORMAL)
+
+.PHONY: all clean fclean re exec-nolint exec lint check help
