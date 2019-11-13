@@ -9,11 +9,13 @@ INC_DIR		= includes
 
 SRC =	main.cpp \
 		chunk/AChunk.cpp \
+		chunk/ChunkManager.cpp \
 		chunk/Chunk.cpp \
 
 HEAD =	commonInclude.hpp \
 		ft_vox.hpp \
 		chunk/AChunk.hpp \
+		chunk/ChunkManager.hpp \
 		chunk/Chunk.hpp \
 
 
