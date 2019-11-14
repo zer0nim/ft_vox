@@ -8,13 +8,16 @@ OBJS_DIR	= objs
 INC_DIR		= includes
 
 SRC =	main.cpp \
+		windowEvents.cpp \
 \
 		chunk/AChunk.cpp \
 		chunk/Chunk.cpp \
 \
 		utils/Texture.cpp \
 		utils/Shader.cpp \
+		utils/Skybox.cpp \
 		utils/Camera.cpp \
+		utils/debug.cpp \
 
 HEAD =	commonInclude.hpp \
 		ft_vox.hpp \
@@ -24,14 +27,15 @@ HEAD =	commonInclude.hpp \
 \
 		utils/Texture.hpp \
 		utils/Shader.hpp \
+		utils/Skybox.hpp \
 		utils/Camera.hpp \
-
+		utils/debug.hpp \
 
 # download the cpp linter (https://github.com/isocpp/CppCoreGuidelines)
 # set command to launch linter on LINTER
 # add rules for linter in LINTER_RULES
 LINTER = $(CPPLINT)
-LINTER_RULES = --filter=-whitespace/tab,-legal/copyright,-build/c++11,-whitespace/newline,-readability/braces,-whitespace/indent,-build/include_what_you_use,-build/header_guard --linelength=120 --quiet
+LINTER_RULES = --filter=-whitespace/tab,-legal/copyright,-build/c++11,-whitespace/newline,-readability/braces,-whitespace/indent,-build/include_what_you_use,-build/header_guard,-runtime/references --linelength=120 --quiet
 
 CC = g++
 DEBUG_FLAGS = -g3 -fsanitize=address
