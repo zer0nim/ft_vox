@@ -1,4 +1,4 @@
-# ft_vox [[42](https://www.42.fr/) project]
+# ft_vox [[42](https://www.42.fr/) project] ![](https://github.com/zer0nim/ft_vox/workflows/.github/workflows/ccpp.yml/badge.svg)
 
 ## Project
 A little Opengl Voxel World engine
