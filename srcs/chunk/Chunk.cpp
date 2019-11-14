@@ -29,5 +29,6 @@ void	Chunk::createChunk() {
 void	Chunk::update() {
 	if (_data.isModified == false)
 		return;  // chunk not modified -> don't update it
-	std::cout << "update chunk" << std::endl;
+	_data.isModified = false;
+	// update
 }

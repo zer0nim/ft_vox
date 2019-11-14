@@ -31,7 +31,7 @@ LINTER_RULES = --filter=-whitespace/tab,-legal/copyright,-build/c++11,-whitespac
 
 CC = g++
 DEBUG_FLAGS = -g3 -fsanitize=address
-LIBS_FLAGS	= -L ~/.brew/lib -framework OpenGL -lglfw
+LIBS_FLAGS	= -L ~/.brew/lib -framework OpenGL -lglfw -lboost_filesystem
 LIBS_INC	= ~/.brew/include
 CFLAGS		= -Ofast -std=c++11 -Wall -Wextra -Wno-deprecated
 

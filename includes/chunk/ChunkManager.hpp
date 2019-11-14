@@ -28,26 +28,36 @@ fonction de destruction de chunk
 ? load chunk from file (in AChunk) ?
 */
 
-std::string vecToString(wordIVec3 vec);
+std::string	vecToString(const wordIVec3 &vec);  // vec to string -> "x_y_z"
+wordIVec3	stringToVec(const std::string &s);  // string "x_y_z" to vec
 
 class ChunkManager {
 	public:
-		ChunkManager();
-		ChunkManager(ChunkManager const &src);
+		explicit ChunkManager(std::string const &mapName);
+		explicit ChunkManager(ChunkManager const &src);
 		virtual ~ChunkManager();
 
 		ChunkManager &operator=(ChunkManager const &rhs);
 
 		void	init(wordFVec3 camPos);  // load the firsts chunks
 		void	update(wordFVec3 camPos);  // global update (call each frame)
-	protected:
-	private:
-		void	_updateChunkPos(wordFVec3 pos);  // update the chunk pos (call each frame)
-		void	_updateChunkPos(wordIVec3 pos);  // update the chunk pos (call each frame)
-		void	_insertChunk(wordIVec3 chunkPos, AChunk * newChunk);
-		/*
-		key: vec3 -> pos x y & z of the chunk (real pos: 0, 16, 32, ...)
 
+		std::string const &getMapName() const;
+		std::map<std::string, AChunk*>			&getChunkMap();
+		std::map<std::string, AChunk*> const	&getChunkMap() const;
+
+	private:
+		ChunkManager();
+		void	_updateChunkPos(wordFVec3 const &pos);  // update the chunk pos (call each frame)
+		void	_updateChunkPos(wordIVec3 const &pos);  // update the chunk pos (call each frame)
+		void	_insertChunk(wordIVec3 chunkPos, AChunk * newChunk);
+		bool	_isInChunkLoaded(wordIVec3 const &chunkPos) const;  // return true if the chunk is loaded
+		bool	_isChunkExist(std::string const &chunkPos) const;  // return true if the chunk exist
+		bool	_isChunkExist(wordIVec3 const &chunkPos) const;
+
+		std::string const	&_mapName;
+		/*
+		key: string -> "x_y_z" of the chunk (real pos: 0, 16, 32, ...)
 		the value is the chunk
 		*/
 		std::map<std::string, AChunk*>	_chunkMap;  // map with all chunks
