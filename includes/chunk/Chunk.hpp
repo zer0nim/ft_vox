@@ -11,6 +11,7 @@ class Chunk : public AChunk {
 		Chunk &operator=(Chunk const &rhs);
 
 		virtual void	createChunk();
+		virtual void	update();
 	protected:
 	private:
 };

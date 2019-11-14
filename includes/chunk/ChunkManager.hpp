@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include "ft_vox.hpp"
 #include "AChunk.hpp"
 
@@ -27,6 +28,8 @@ fonction de destruction de chunk
 ? load chunk from file (in AChunk) ?
 */
 
+std::string vecToString(wordIVec3 vec);
+
 class ChunkManager {
 	public:
 		ChunkManager();
@@ -34,6 +37,19 @@ class ChunkManager {
 		virtual ~ChunkManager();
 
 		ChunkManager &operator=(ChunkManager const &rhs);
+
+		void	init(wordFVec3 camPos);  // load the firsts chunks
+		void	update(wordFVec3 camPos);  // global update (call each frame)
 	protected:
 	private:
+		void	_updateChunkPos(wordFVec3 pos);  // update the chunk pos (call each frame)
+		void	_updateChunkPos(wordIVec3 pos);  // update the chunk pos (call each frame)
+		void	_insertChunk(wordIVec3 chunkPos, AChunk * newChunk);
+		/*
+		key: vec3 -> pos x y & z of the chunk (real pos: 0, 16, 32, ...)
+
+		the value is the chunk
+		*/
+		std::map<std::string, AChunk*>	_chunkMap;  // map with all chunks
+		wordIVec3						_chunkActPos;  // actual chunk position
 };

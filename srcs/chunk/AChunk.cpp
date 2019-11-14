@@ -1,4 +1,10 @@
 #include "AChunk.hpp"
+#include "Chunk.hpp"
+
+AChunk * instanciateNewChunk() {
+	AChunk * newChunk = new Chunk;
+	return newChunk;
+}
 
 AChunk::AChunk() : _data() {
 }

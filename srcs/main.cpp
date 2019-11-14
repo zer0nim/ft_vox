@@ -1,16 +1,13 @@
 #include "ft_vox.hpp"
 #include "AChunk.hpp"
 #include "Chunk.hpp"
+#include "ChunkManager.hpp"
 
 int		main() {
-	AChunk * chunk = new Chunk;
+	ChunkManager * chunkManager = new ChunkManager;
 
-	chunk->createChunk();
+	chunkManager->init(wordFVec3(12.3, 4, -2.3));
 
-	chunk->updateBlock(chunkVec3(2, 3, 4), 3);
-
-	std::cout << "-> " << static_cast<uint16_t>(chunk->getData().data[2][3][4]) << std::endl;
-
-	delete chunk;
+	delete chunkManager;
 	return 0;
 }

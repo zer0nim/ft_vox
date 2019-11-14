@@ -29,7 +29,7 @@ CC = g++
 DEBUG_FLAGS = -g3 -fsanitize=address
 LIBS_FLAGS	= -L ~/.brew/lib -framework OpenGL -lglfw
 LIBS_INC	= ~/.brew/include
-CFLAGS		= -Ofast -std=c++11 -Wall -Wextra -Werror
+CFLAGS		= -Ofast -std=c++11 -Wall -Wextra
 
 ifneq ($(DEBUG),)
 	CFLAGS := $(CFLAGS) $(DEBUG_FLAGS)
