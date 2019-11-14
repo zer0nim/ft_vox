@@ -1,4 +1,4 @@
-name: ft_vox
+name: linter
 
 on: [push]
 
@@ -13,7 +13,5 @@ jobs:
       run: brew install zsh
     - name: linter_install
       run: ./install_linter.sh ; source ~/.zshrc
-    - name: configure
-      run: ./configure
-    - name: make check
-      run: make check
+    - name: lint
+      run: make lint
