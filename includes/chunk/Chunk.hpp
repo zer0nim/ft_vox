@@ -12,8 +12,12 @@ class Chunk : public AChunk {
 		Chunk &operator=(Chunk const &rhs);
 
 		virtual void	createChunk();
+		virtual void	draw();
 	protected:
 	private:
+		void	_update();
+
+		static const float	_cubeData[];
 };
 
 #endif  // CHUNK_HPP_

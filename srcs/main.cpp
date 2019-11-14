@@ -6,7 +6,7 @@
 #include "utils/Shader.hpp"
 #include "utils/Skybox.hpp"
 
-void	gameLoop(GLFWwindow *window, Camera const &cam, Shader &skyboxSh, Skybox &skybox) {
+void	gameLoop(GLFWwindow *window, Camera const &cam, Shader &skyboxSh, Skybox &skybox, AChunk &chunk) {
 	tWinUser	*winU;
 	std::chrono::milliseconds time_start;
 	bool firstLoop = true;
@@ -39,6 +39,8 @@ void	gameLoop(GLFWwindow *window, Camera const &cam, Shader &skyboxSh, Skybox &s
 		skyboxSh.setMat4("view", skyView);
 
 		// draw here
+
+		chunk.draw();
 
 		skybox.draw();  // draw shader
 
@@ -90,9 +92,16 @@ int		main() {
 
 		chunk = new Chunk;
 		chunk->createChunk();
-		chunk->updateBlock(chunkVec3(2, 3, 4), 3);
+		chunk->updateBlock(chunkVec3(0, 0, 0), 1);
+		chunk->updateBlock(chunkVec3(15, 0, 0), 1);
+		chunk->updateBlock(chunkVec3(15, 0, 15), 1);
+		chunk->updateBlock(chunkVec3(0, 0, 15), 1);
+		chunk->updateBlock(chunkVec3(0, 15, 0), 1);
+		chunk->updateBlock(chunkVec3(15, 15, 0), 1);
+		chunk->updateBlock(chunkVec3(15, 15, 15), 1);
+		chunk->updateBlock(chunkVec3(0, 15, 15), 1);
 
-		gameLoop(window, cam, skyboxShader, skybox);
+		gameLoop(window, cam, skyboxShader, skybox, *chunk);
 
 		delete chunk;
 	}

@@ -21,6 +21,7 @@ class AChunk {
 		AChunk &operator=(AChunk const &rhs);
 
 		virtual void	createChunk() = 0;
+		virtual void	draw() = 0;
 
 		void		updateBlock(chunkVec3 pos, uint8_t value);
 		AChunk::ChunkData const	&getData() const;
