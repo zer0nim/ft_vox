@@ -11,10 +11,10 @@ class Chunk : public AChunk {
 
 		Chunk &operator=(Chunk const &rhs);
 
-		virtual void	createChunk();
 		virtual void	update();
+
 	protected:
-	private:
+		virtual void	_createChunk();
 };
 
 #endif  // CHUNK_HPP_

@@ -16,7 +16,7 @@ Chunk &Chunk::operator=(Chunk const &rhs) {
 	return *this;
 }
 
-void	Chunk::createChunk() {
+void	Chunk::_createChunk() {
 	for (uint8_t x = 0; x < CHUNK_SZ_X; x++) {
 		for (uint8_t y = 0; y < CHUNK_SZ_Y; y++) {
 			for (uint8_t z = 0; z < CHUNK_SZ_Z; z++) {

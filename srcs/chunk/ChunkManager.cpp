@@ -26,7 +26,7 @@ wordIVec3 stringToVec(const std::string &s) {
 ChunkManager::ChunkManager(std::string const &mapName) :
 _mapName(mapName),
 _chunkMap(),
-_chunkActPos(0, 0, 0) {}
+_chunkActPos(-1, -1, -1) {}
 
 ChunkManager::ChunkManager(ChunkManager const &src) :
 _mapName(src.getMapName()) {
@@ -34,6 +34,17 @@ _mapName(src.getMapName()) {
 }
 
 ChunkManager::~ChunkManager() {
+	std::vector<std::string> toDelete;
+
+	// update all chunks
+	for (auto it = _chunkMap.begin(); it != _chunkMap.end(); it++) {
+		toDelete.push_back(it->first);
+	}
+	// delete all old chunks
+	for (auto it = toDelete.begin(); it != toDelete.end(); it++) {
+		delete _chunkMap[*it];  // this line auto save chunk
+		_chunkMap.erase(*it);
+	}
 }
 
 ChunkManager &ChunkManager::operator=(ChunkManager const &rhs) {
@@ -43,8 +54,6 @@ ChunkManager &ChunkManager::operator=(ChunkManager const &rhs) {
 }
 
 void ChunkManager::init(wordFVec3 camPos) {
-	// create map directory (if don't exist)
-
 	update(camPos);  // call update once to create the chunks
 }
 
@@ -65,7 +74,7 @@ void ChunkManager::update(wordFVec3 camPos) {
 					wordIVec3 chunkPos(x, y, z);  // this is the position of the chunk
 					if (_isChunkExist(chunkPos) == false) {  // if the chunk doesnt exist (for now)
 						newChunk = instanciateNewChunk();  // create a chunk with the rihgt type
-						newChunk->createChunk();  // init the chunk with the right values
+						newChunk->createChunk(_mapName, chunkPos);  // init the chunk with the right values
 						_insertChunk(chunkPos, newChunk);
 					}
 				}

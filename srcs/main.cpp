@@ -57,6 +57,8 @@ void	gameLoop(ChunkManager *chunkManager) {
 
 		chunkManager->update(pos);  // camera pos
 
+		break;
+
 		// fps
 		std::chrono::milliseconds time_loop = getMs() - time_start;
 		if (time_loop.count() > LOOP_TIME) {
@@ -75,7 +77,7 @@ void	gameLoop(ChunkManager *chunkManager) {
 int		main(int ac, char **av) {
 	if (ac != 2) {
 		std::cout << "Usage: ./ft_vox <map_name>" << std::endl;
-		return 1;
+		return 0;
 	}
 	std::string mapName = std::string(MAPS_PATH) + av[1];
 	if (createMapFiles(mapName) == false) {

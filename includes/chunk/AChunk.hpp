@@ -19,15 +19,20 @@ class AChunk {
 
 		AChunk &operator=(AChunk const &rhs);
 
-		virtual void	createChunk() = 0;
 		virtual void	update() = 0;
+		void			createChunk(std::string const &mapName, wordIVec3 const &chunkPos);
+		void			createChunk(std::string const &mapName, std::string const &chunkPos);
 		void			updateBlock(chunkVec3 pos, uint8_t value);
-
+		void			save();
 
 		AChunk::ChunkData const	&getData() const;
+
 	protected:
-		ChunkData	_data;
-	private:
+		bool			_createChunkFromFile();
+		virtual void	_createChunk() = 0;
+		ChunkData		_data;
+		std::string		_filename;
+		bool			_isModifiedFromBegining;  // true if the chunk was modified
 };
 
 AChunk * instanciateNewChunk();
