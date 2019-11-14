@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CHUNK_HPP_
+#define CHUNK_HPP_
 
 #include "AChunk.hpp"
 
@@ -15,3 +16,5 @@ class Chunk : public AChunk {
 	protected:
 	private:
 };
+
+#endif  // CHUNK_HPP_

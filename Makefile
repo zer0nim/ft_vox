@@ -11,25 +11,29 @@ SRC =	main.cpp \
 		chunk/AChunk.cpp \
 		chunk/ChunkManager.cpp \
 		chunk/Chunk.cpp \
+		utils/Texture.cpp \
+		utils/Shader.cpp \
 
 HEAD =	commonInclude.hpp \
 		ft_vox.hpp \
 		chunk/AChunk.hpp \
 		chunk/ChunkManager.hpp \
 		chunk/Chunk.hpp \
+		utils/Texture.hpp \
+		utils/Shader.hpp \
 
 
 # download the cpp linter (https://github.com/isocpp/CppCoreGuidelines)
 # set command to launch linter on LINTER
 # add rules for linter in LINTER_RULES
 LINTER = $(CPPLINT)
-LINTER_RULES = --filter=-whitespace/tab,-legal/copyright,-build/c++11 --linelength=120
+LINTER_RULES = --filter=-whitespace/tab,-legal/copyright,-build/c++11,-whitespace/newline,-readability/braces,-whitespace/indent,-build/include_what_you_use,-build/header_guard --linelength=120 --quiet
 
 CC = g++
 DEBUG_FLAGS = -g3 -fsanitize=address
 LIBS_FLAGS	= -L ~/.brew/lib -framework OpenGL -lglfw
 LIBS_INC	= ~/.brew/include
-CFLAGS		= -Ofast -std=c++11 -Wall -Wextra
+CFLAGS		= -Ofast -std=c++11 -Wall -Wextra -Wno-deprecated
 
 ifneq ($(DEBUG),)
 	CFLAGS := $(CFLAGS) $(DEBUG_FLAGS)

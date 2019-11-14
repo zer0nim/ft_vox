@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ACHUNK_HPP_
+#define ACHUNK_HPP_
 
 #include "commonInclude.hpp"
 #include "ft_vox.hpp"
@@ -30,3 +31,5 @@ class AChunk {
 };
 
 AChunk * instanciateNewChunk();
+
+#endif  // ACHUNK_HPP_
