@@ -127,7 +127,7 @@ lint:
 check:
 	@make fclean
 	@make lint
-	@make exec-nolint
+	@make
 
 help:
 	@printf $(YELLOW)$(BOLD)"HELP\n--------------------\n"$(NORMAL)
