@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: ft_vox
 
 on: [push]
 
