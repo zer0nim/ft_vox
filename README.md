@@ -1,5 +1,7 @@
 # ft_vox [[42](https://www.42.fr/) project] ![](https://github.com/zer0nim/ft_vox/workflows/make/badge.svg) ![](https://github.com/zer0nim/ft_vox/workflows/linter/badge.svg) ![](https://github.com/zer0nim/ft_vox/workflows/ft_vox/badge.svg)
 
+## ⚠️ NOT WORKING ! WORK IN PROGRESS ⚠️
+
 ## Project
 A little Opengl Voxel World engine
 
