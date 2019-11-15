@@ -1,0 +1,18 @@
+{
+	"blocks": {
+		"dirt": {
+			"default": "./assets/textures/block/dirt.png"
+		},
+		"stone": {
+			"default": "./assets/textures/block/stone.png"
+		},
+		"grass": {
+			"default": "./assets/textures/block/grass_side.png",
+			"top": "./assets/textures/block/grass_top.png",
+			"bottom": "./assets/textures/block/dirt.png"
+		},
+		"sand": {
+			"default": "./assets/textures/block/sand.png"
+		}
+	}
+}

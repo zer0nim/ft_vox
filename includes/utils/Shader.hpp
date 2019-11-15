@@ -39,13 +39,21 @@ class Shader {
 		void	setMat3(const std::string &name, const glm::mat3 &mat) const;
 		void	setMat4(const std::string &name, const glm::mat4 &mat) const;
 
-		class ShaderCompileException : public std::exception {
+		class ShaderError : public std::exception {
 			public:
-				 virtual const char* what() const throw();
+				virtual const char* what() const throw() = 0;
 		};
-		class ShaderLinkingException : public std::exception {
+		class ShaderCompileException : public ShaderError {
 			public:
-				virtual const char* what() const throw();
+				virtual const char* what() const throw() {
+					return ("Shader failed to compile!");
+				}
+		};
+		class ShaderLinkingException : public ShaderError {
+			public:
+				virtual const char* what() const throw() {
+					return ("Shader program failed to link!");
+				}
 		};
 
 		u_int32_t	id;

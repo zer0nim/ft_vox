@@ -38,6 +38,7 @@ std::string *vsCode, std::string *fsCode, std::string *gsCode
 	}
 	catch (std::ifstream::failure e) {
 		std::cerr << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+		throw Shader::ShaderCompileException();
 	}
 }
 
@@ -176,12 +177,4 @@ void	Shader::checkCompileErrors(u_int32_t shader, std::string type) {
 			throw Shader::ShaderCompileException();
 		}
 	}
-}
-
-const char* Shader::ShaderCompileException::what() const throw() {
-    return ("Shader failed to compile!");
-}
-
-const char* Shader::ShaderLinkingException::what() const throw() {
-    return ("Shader program failed to link!");
 }

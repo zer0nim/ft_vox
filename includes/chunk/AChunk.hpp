@@ -19,7 +19,9 @@ class AChunk {
 
 		AChunk &operator=(AChunk const &rhs);
 
+		virtual void	draw() = 0;
 		virtual void	update() = 0;
+		virtual void	oldCreateChunk() = 0;  // TODO(zer0nim): remove
 		void			createChunk(std::string const &mapName, wordIVec3 const &chunkPos);
 		void			createChunk(std::string const &mapName, std::string const &chunkPos);
 		void			updateBlock(chunkVec3 pos, uint8_t value);

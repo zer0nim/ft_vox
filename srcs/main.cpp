@@ -1,14 +1,17 @@
 #include <unistd.h>
-#include <chrono>
 #include <boost/filesystem.hpp>
+
 #include "ft_vox.hpp"
-#include "commonInclude.hpp"
+#include "TextureManager.hpp"
 #include "AChunk.hpp"
 #include "Chunk.hpp"
 #include "ChunkManager.hpp"
+#include "utils/Shader.hpp"
+#include "utils/Skybox.hpp"
 
 std::chrono::milliseconds getMs() {
-	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+	return std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::system_clock::now().time_since_epoch());
 }
 
 bool	createDir(std::string const &dirNames) {
@@ -46,18 +49,49 @@ bool	createMapFiles(std::string const &mapName) {
 	return true;
 }
 
-void	gameLoop(ChunkManager *chunkManager) {
+void	gameLoop(GLFWwindow *window, Camera const &cam, Shader &skyboxSh, Skybox &skybox, \
+AChunk &chunk) {
 	std::chrono::milliseconds time_start;
+	tWinUser	*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
 	bool firstLoop = true;
 
 	wordFVec3 pos(0, 0, 0);
 
-	while (true/*!glfwWindowShouldClose(window)*/) {
+	// projection matrix
+	glm::mat4	projection = glm::perspective(
+		glm::radians(cam.zoom), winU->width / winU->height, 0.1f, 100.0f);
+
+	skyboxSh.use();
+	skyboxSh.setMat4("projection", projection);
+
+	glClearColor(0.11373f, 0.17647f, 0.27059f, 1.0f);
+	checkError();
+	while (!glfwWindowShouldClose(window)) {
 		time_start = getMs();
 
-		chunkManager->update(pos);  // camera pos
+		processInput(window);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		break;
+		// view matrix
+		glm::mat4	view = cam.getViewMatrix();
+
+		glm::mat4	skyView = view;
+		skyView[3][0] = 0;  // remove translation for the skybox
+		skyView[3][1] = 0;
+		skyView[3][2] = 0;
+		skyboxSh.use();
+		skyboxSh.setMat4("view", skyView);
+
+		// draw here
+
+		chunk.update();
+		chunk.draw();
+
+		skybox.draw();  // draw shader
+
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+		checkError();
 
 		// fps
 		std::chrono::milliseconds time_loop = getMs() - time_start;
@@ -74,22 +108,83 @@ void	gameLoop(ChunkManager *chunkManager) {
 	}
 }
 
-int		main(int ac, char **av) {
-	if (ac != 2) {
-		std::cout << "Usage: ./ft_vox <map_name>" << std::endl;
-		return 0;
+bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
+	winU->cam = cam;
+	winU->dtTime = 0.0f;
+	winU->lastFrame = 0.0f;
+	winU->width = SCREEN_W;
+	winU->height = SCREEN_H;
+
+	if (!initWindow(window, name, winU))
+		return (false);
+	return (true);
+}
+
+int		main(int ac, char const **av) {
+	GLFWwindow	*window;
+	tWinUser	winU;
+	Camera		cam(glm::vec3(0.0f, 0.0f, 3.0f));
+	AChunk		*chunk;
+	TextureManager	*textureManager;
+
+	(void)ac;
+	(void)av;
+	// if (ac != 2) {
+	// 	std::cout << "Usage: ./ft_vox <map_name>" << std::endl;
+	// 	return 0;
+	// }
+	// std::string mapName = std::string(MAPS_PATH) + av[1];
+	// if (createMapFiles(mapName) == false) {
+	// 	return 1;
+	// }
+
+	// ChunkManager * chunkManager = new ChunkManager(mapName);
+
+	// chunkManager->init(wordFVec3(0, 0, 0));
+
+	if (!init(&window, "ft_vox", &winU, &cam))
+		return (1);
+
+	try {
+		textureManager = new TextureManager("./assets/textures.json");
+
+		Shader skyboxShader("./shaders/skybox_vs.glsl", "./shaders/skybox_fs.glsl");
+		Skybox skybox(skyboxShader);
+
+		chunk = new Chunk;
+		chunk->oldCreateChunk();
+		chunk->updateBlock(chunkVec3(0, 0, 0), 1);
+		chunk->updateBlock(chunkVec3(15, 0, 0), 1);
+		chunk->updateBlock(chunkVec3(15, 0, 15), 1);
+		chunk->updateBlock(chunkVec3(0, 0, 15), 1);
+		chunk->updateBlock(chunkVec3(0, 15, 0), 1);
+		chunk->updateBlock(chunkVec3(15, 15, 0), 1);
+		chunk->updateBlock(chunkVec3(15, 15, 15), 1);
+		chunk->updateBlock(chunkVec3(0, 15, 15), 1);
+
+		gameLoop(window, cam, skyboxShader, skybox, *chunk);
+
+		delete chunk;
 	}
-	std::string mapName = std::string(MAPS_PATH) + av[1];
-	if (createMapFiles(mapName) == false) {
+	catch(const TextureManager::TextureManagerError& e) {
+		std::cerr << e.what() << std::endl;
+
+		// delete chunkManager;
+		glfwDestroyWindow(window);
+		glfwPollEvents();
+		glfwTerminate();
 		return 1;
 	}
+	catch(const Shader::ShaderError& e) {
+		std::cout << "ShaderError !" << std::endl;
+		std::cerr << e.what() << std::endl;
+	}
 
-	ChunkManager * chunkManager = new ChunkManager(mapName);
+	delete textureManager;
+	// delete chunkManager;
+	glfwDestroyWindow(window);
+	glfwPollEvents();
+	glfwTerminate();
 
-	chunkManager->init(wordFVec3(0, 0, 0));
-
-	gameLoop(chunkManager);
-
-	delete chunkManager;
 	return 0;
 }

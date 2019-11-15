@@ -4,8 +4,8 @@
 #include <stdexcept>
 #include "commonInclude.hpp"
 
-u_int32_t	textureFromFile(const std::string path, const std::string &directory, \
-bool inSpaceSRGB);
+u_int32_t	textureFromFile(const std::string path, bool inSpaceSRGB);
+
 
 class TextureFailToLoad : public std::exception {
 	public:
