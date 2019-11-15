@@ -12,6 +12,7 @@ SRC =	main.cpp \
 		TextureManager.cpp \
 \
 		chunk/AChunk.cpp \
+		chunk/ChunkManager.cpp \
 		chunk/Chunk.cpp \
 \
 		utils/Texture.cpp \
@@ -25,6 +26,7 @@ HEAD =	commonInclude.hpp \
 		TextureManager.hpp \
 \
 		chunk/AChunk.hpp \
+		chunk/ChunkManager.hpp \
 		chunk/Chunk.hpp \
 \
 		utils/Texture.hpp \
@@ -41,10 +43,9 @@ LINTER_RULES = --filter=-whitespace/tab,-legal/copyright,-build/c++11,-whitespac
 
 CC = g++
 DEBUG_FLAGS = -g3 -fsanitize=address
-LIBS_FLAGS	= -L ~/.brew/lib -framework OpenGL -lglfw
+LIBS_FLAGS	= -L ~/.brew/lib -framework OpenGL -lglfw -lboost_filesystem
 LIBS_INC	= ~/.brew/include $(INC_DIR)/lib/stb_image.h $(INC_DIR)/lib/json.hpp
-
-CFLAGS		= -Ofast -std=c++11 -Wall -Wextra -Werror -Wno-deprecated
+CFLAGS		= -Ofast -std=c++11 -Wall -Wextra -Wno-deprecated
 
 ifneq ($(DEBUG),)
 	CFLAGS := $(CFLAGS) $(DEBUG_FLAGS)

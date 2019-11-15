@@ -20,7 +20,7 @@ TextureManager::TextureManager(std::string const &texturesSettings) {
 			nlohmann::json	data;
 			data << fileStream;
 			loadBlocksTextures(data);
-			drawBlocks();
+			// drawBlocks();
 		}
 		else {
 			std::cout << "throw FailedToOpenException" << std::endl;

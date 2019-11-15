@@ -1,0 +1,17 @@
+name: linter
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: macOS-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: zsh
+      run: brew install zsh
+    - name: linter_install
+      run: ./install_linter.sh ; source ~/.zshrc
+    - name: lint
+      run: make lint

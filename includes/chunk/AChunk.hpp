@@ -4,7 +4,6 @@
 #include "commonInclude.hpp"
 #include "ft_vox.hpp"
 
-
 class AChunk {
 	public:
 		struct ChunkData {
@@ -20,14 +19,24 @@ class AChunk {
 
 		AChunk &operator=(AChunk const &rhs);
 
-		virtual void	createChunk() = 0;
 		virtual void	draw() = 0;
+		virtual void	update() = 0;
+		virtual void	oldCreateChunk() = 0;  // TODO(zer0nim): remove
+		void			createChunk(std::string const &mapName, wordIVec3 const &chunkPos);
+		void			createChunk(std::string const &mapName, std::string const &chunkPos);
+		void			updateBlock(chunkVec3 pos, uint8_t value);
+		void			save();
 
-		void		updateBlock(chunkVec3 pos, uint8_t value);
 		AChunk::ChunkData const	&getData() const;
+
 	protected:
-		ChunkData	_data;
-	private:
+		bool			_createChunkFromFile();
+		virtual void	_createChunk() = 0;
+		ChunkData		_data;
+		std::string		_filename;
+		bool			_isModifiedFromBegining;  // true if the chunk was modified
 };
+
+AChunk * instanciateNewChunk();
 
 #endif  // ACHUNK_HPP_

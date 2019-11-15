@@ -1,9 +1,11 @@
 #!/bin/zsh
 
+git stash -q --keep-index
+
 make check -j8
 
-if [[ $? -ne 0 ]]; then
-	exit 1
-fi
+RESULT=$?
 
-exit 0
+git stash pop -q
+
+exit $RESULT
