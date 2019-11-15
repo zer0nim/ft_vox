@@ -2,9 +2,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "lib/stb_image.h"
 
-u_int32_t	textureFromFile(const std::string path, const std::string &directory, \
-bool inSpaceSRGB) {
-	std::string	filename;
+u_int32_t	textureFromFile(const std::string path, bool inSpaceSRGB) {
 	u_int32_t	textureID;
     int			nrComponents;
     int			width;
@@ -14,8 +12,7 @@ bool inSpaceSRGB) {
 	GLenum		format;
 
 
-	filename = directory + '/' + std::string(path);
-	data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+	data = stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
 
 	if (data) {
 		glGenTextures(1, &textureID);

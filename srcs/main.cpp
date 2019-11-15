@@ -1,6 +1,7 @@
 #include <unistd.h>
 
 #include "ft_vox.hpp"
+#include "TextureManager.hpp"
 #include "AChunk.hpp"
 #include "Chunk.hpp"
 #include "utils/Shader.hpp"
@@ -82,11 +83,14 @@ int		main() {
 	tWinUser	winU;
 	Camera		cam(glm::vec3(0.0f, 0.0f, 3.0f));
 	AChunk		*chunk;
+	TextureManager	*textureManager;
 
 	if (!init(&window, "ft_vox", &winU, &cam))
 		return (1);
 
 	try {
+		textureManager = new TextureManager("./assets/textures.json");
+
 		Shader skyboxShader("./shaders/skybox_vs.glsl", "./shaders/skybox_fs.glsl");
 		Skybox skybox(skyboxShader);
 
@@ -105,9 +109,20 @@ int		main() {
 
 		delete chunk;
 	}
-	catch(Shader::ShaderError & e) {
-		std::cerr << e.what() << '\n';
+	catch(const TextureManager::TextureManagerError& e) {
+		std::cerr << e.what() << std::endl;
+
+		glfwDestroyWindow(window);
+		glfwPollEvents();
+		glfwTerminate();
+		return 1;
 	}
+	catch(const Shader::ShaderError& e) {
+		std::cout << "ShaderError !" << std::endl;
+		std::cerr << e.what() << std::endl;
+	}
+
+	delete textureManager;
 
 	glfwDestroyWindow(window);
 	glfwPollEvents();

@@ -9,6 +9,7 @@ INC_DIR		= includes
 
 SRC =	main.cpp \
 		windowEvents.cpp \
+		TextureManager.cpp \
 \
 		chunk/AChunk.cpp \
 		chunk/Chunk.cpp \
@@ -21,6 +22,7 @@ SRC =	main.cpp \
 
 HEAD =	commonInclude.hpp \
 		ft_vox.hpp \
+		TextureManager.hpp \
 \
 		chunk/AChunk.hpp \
 		chunk/Chunk.hpp \
@@ -40,7 +42,8 @@ LINTER_RULES = --filter=-whitespace/tab,-legal/copyright,-build/c++11,-whitespac
 CC = g++
 DEBUG_FLAGS = -g3 -fsanitize=address
 LIBS_FLAGS	= -L ~/.brew/lib -framework OpenGL -lglfw
-LIBS_INC	= ~/.brew/include
+LIBS_INC	= ~/.brew/include $(INC_DIR)/lib/stb_image.h $(INC_DIR)/lib/json.hpp
+
 CFLAGS		= -Ofast -std=c++11 -Wall -Wextra -Werror -Wno-deprecated
 
 ifneq ($(DEBUG),)
