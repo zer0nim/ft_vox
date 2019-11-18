@@ -33,6 +33,8 @@ typedef struct	sWinUser {
 	float		lastFrame;
 	float		width;
 	float		height;
+
+	bool		showInfo;
 }				tWinUser;
 
 bool	initWindow(GLFWwindow **window, const char *name, tWinUser *winU);

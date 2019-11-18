@@ -3,7 +3,7 @@
 
 #include "commonInclude.hpp"
 
-#define MOVEMENT_SPEED 2.5f
+#define MOVEMENT_SPEED 10.0f
 #define MOUSE_SENSITIVITY 0.1f
 
 enum class CamMovement {

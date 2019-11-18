@@ -4,30 +4,6 @@
 #include "ft_vox.hpp"
 #include "AChunk.hpp"
 
-/*
-stocker les chunks dans une map:
-map < <int int int> <AChunk*> >
-
-les int correspondent aux coordonee reel (0, 16, 32, ...) et pas 0, 1, 2
-
-avantage:
-- acces rapide
-- destruction rapide
-- acces aux voisins rapide
-
-defaut:
-- chiant de savoir si les truc a delete sont encore la (peut etre une fonction OnChunkChange ?)
-
-
-TODO:
-stocker le chunk actuel
-appel de fonction si le chunk actuel change
-fonction de creation de chunk
-fonction de destruction de chunk
-
-? load chunk from file (in AChunk) ?
-*/
-
 std::string	vecToString(const wordIVec3 &vec);  // vec to string -> "x_y_z"
 wordIVec3	stringToVec(const std::string &s);  // string "x_y_z" to vec
 
@@ -42,9 +18,10 @@ class ChunkManager {
 		void	init(wordFVec3 camPos);  // load the firsts chunks
 		void	update(wordFVec3 camPos);  // global update (call each frame)
 
-		std::string const &getMapName() const;
+		std::string const						&getMapName() const;
 		std::map<std::string, AChunk*>			&getChunkMap();
 		std::map<std::string, AChunk*> const	&getChunkMap() const;
+		wordIVec3 const							&getChunkActPos() const;
 
 	private:
 		ChunkManager();

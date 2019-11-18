@@ -7,6 +7,9 @@
 #define FPS 120  // [Hz] type: int -> fps of the main loop
 #define LOOP_TIME (1000 / FPS)  // [s] type: float -> duration in s for a loop
 
+#define TEXT_SIZE_TITLE 40
+#define TEXT_SIZE_NORMAL 20
+
 // glfw
 #define GLFW_INCLUDE_GLCOREARB
 #include <GLFW/glfw3.h>

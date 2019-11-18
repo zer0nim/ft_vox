@@ -130,3 +130,4 @@ bool	ChunkManager::_isChunkExist(wordIVec3 const &chunkPos) const {
 std::string const &ChunkManager::getMapName() const { return _mapName; }
 std::map<std::string, AChunk*>			&ChunkManager::getChunkMap() { return _chunkMap; }
 std::map<std::string, AChunk*> const	&ChunkManager::getChunkMap() const { return _chunkMap; }
+wordIVec3 const							&ChunkManager::getChunkActPos() const { return _chunkActPos; }

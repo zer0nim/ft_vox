@@ -70,6 +70,11 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 	if (key == GLFW_KEY_R && action == GLFW_PRESS) {
 		winU->cam->resetPosition();
 	}
+
+	// F3 key
+	if (key == GLFW_KEY_F3 && action == GLFW_PRESS) {
+		winU->showInfo = !winU->showInfo;
+	}
 }
 
 void	mouseCb(GLFWwindow *window, double xPos, double yPos) {

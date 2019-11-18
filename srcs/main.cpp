@@ -52,9 +52,11 @@ bool	createMapFiles(std::string const &mapName) {
 
 int counter = 0;
 int savedFps = 0;
-void	drawText(GLFWwindow *window, TextRender &textRender, int actFps) {
+void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManager &chunkManager) {
 	tWinUser	*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
-	(void)winU;
+
+	if (winU->showInfo == false)
+		return;
 
 	if (counter % 10 == 0) {
 		savedFps = actFps;
@@ -62,12 +64,39 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps) {
 	}
 	counter++;
 
+	GLfloat lineSz = TEXT_SIZE_NORMAL * 1.2;
+	GLfloat textX = 10;
+	GLfloat textY = winU->height - lineSz;
+
+	// fps
 	std::string sFps = std::to_string(savedFps) + " fps";
-	textRender.write("normal", sFps);
+	textRender.write("normal", sFps, textX, textY);
+
+	// position
+	textY -= lineSz;
+	std::string sPos = std::string("XYZ: ");
+	std::stringstream pos;
+	pos << std::fixed << std::setprecision(3) << winU->cam->pos.x << " / ";
+	pos << std::fixed << std::setprecision(3) << winU->cam->pos.y << " / ";
+	pos << std::fixed << std::setprecision(3) << winU->cam->pos.z;
+	sPos += pos.str();
+	textRender.write("normal", sPos, textX, textY);
+
+	// block position
+	textY -= lineSz;
+	std::string sPosBlock = std::string("Block: ") + std::to_string(static_cast<int>(winU->cam->pos.x)) + " " +
+		std::to_string(static_cast<int>(winU->cam->pos.y)) + " " +std::to_string(static_cast<int>(winU->cam->pos.z));
+	textRender.write("normal", sPosBlock, textX, textY);
+
+	// actual chunk
+	textY -= lineSz;
+	std::string sPosChunk = std::string("Chunk: ") + std::to_string(chunkManager.getChunkActPos().x) + " " +
+		std::to_string(chunkManager.getChunkActPos().y) + " " +std::to_string(chunkManager.getChunkActPos().z);
+	textRender.write("normal", sPosChunk, textX, textY);
 }
 
 void	gameLoop(GLFWwindow *window, Camera const &cam, Skybox &skybox, \
-TextRender &textRender, AChunk &chunk) {
+TextRender &textRender, ChunkManager &chunkManager) {
 	std::chrono::milliseconds	time_start;
 	int							lastFps;
 	tWinUser	*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
@@ -101,14 +130,13 @@ TextRender &textRender, AChunk &chunk) {
 		skybox.getShader().setMat4("view", skyView);
 
 		// draw here
-		chunk.update();
-		chunk.draw();
+		chunkManager.update(winU->cam->pos);
 
 		// draw skybox
 		skybox.draw();
 
 		// draw text
-		drawText(window, textRender, lastFps);
+		drawText(window, textRender, lastFps, chunkManager);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -137,6 +165,7 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
 	winU->lastFrame = 0.0f;
 	winU->width = SCREEN_W;
 	winU->height = SCREEN_H;
+	winU->showInfo = true;
 
 	if (!initWindow(window, name, winU))
 		return (false);
@@ -144,60 +173,52 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
 }
 
 int		main(int ac, char const **av) {
-	GLFWwindow	*window;
-	tWinUser	winU;
-	Camera		cam(glm::vec3(0.0f, 0.0f, 3.0f));
-	AChunk		*chunk;
-	TextureManager	*textureManager;
+	GLFWwindow		*window;
+	tWinUser		winU;
+	Camera			cam(glm::vec3(0.0f, 0.0f, 3.0f));
+	TextureManager	*textureManager = nullptr;
 
 	(void)ac;
 	(void)av;
-	// if (ac != 2) {
-	// 	std::cout << "Usage: ./ft_vox <map_name>" << std::endl;
-	// 	return 0;
-	// }
-	// std::string mapName = std::string(MAPS_PATH) + av[1];
-	// if (createMapFiles(mapName) == false) {
-	// 	return 1;
-	// }
+	if (ac != 2) {
+		std::cout << "Usage: ./ft_vox <map_name>" << std::endl;
+		return 0;
+	}
+	std::string mapName = std::string(MAPS_PATH) + av[1];
+	if (createMapFiles(mapName) == false) {
+		return 1;
+	}
 
-	// ChunkManager * chunkManager = new ChunkManager(mapName);
-
-	// chunkManager->init(wordFVec3(0, 0, 0));
 
 	if (!init(&window, "ft_vox", &winU, &cam))
 		return (1);
 
 	try {
+		// load textures
 		textureManager = new TextureManager("./assets/textures.json");
 
+		// load all shaders
 		Shader textShader("./shaders/text_vs.glsl", "./shaders/text_fs.glsl");
 		Shader skyboxShader("./shaders/skybox_vs.glsl", "./shaders/skybox_fs.glsl");
+
+		// load all fonts
+		TextRender textRender(textShader);
+		textRender.loadFont("title", "fonts/minecraft_title.ttf", TEXT_SIZE_TITLE);
+		textRender.loadFont("normal", "fonts/minecraft_normal.ttf", TEXT_SIZE_NORMAL);
+
+		// load skybox
 		Skybox skybox(skyboxShader);
 
-		TextRender textRender(textShader);
-		textRender.loadFont("title", "fonts/minecraft_title.ttf", 25);
-		textRender.loadFont("normal", "fonts/minecraft_normal.ttf", 30);
+		// create chunkManager
+		ChunkManager chunkManager(mapName);
+		chunkManager.init(wordFVec3(0, 0, 0));
 
-		chunk = new Chunk;
-		chunk->oldCreateChunk();
-		chunk->updateBlock(chunkVec3(0, 0, 0), 1);
-		chunk->updateBlock(chunkVec3(15, 0, 0), 1);
-		chunk->updateBlock(chunkVec3(15, 0, 15), 1);
-		chunk->updateBlock(chunkVec3(0, 0, 15), 1);
-		chunk->updateBlock(chunkVec3(0, 15, 0), 1);
-		chunk->updateBlock(chunkVec3(15, 15, 0), 1);
-		chunk->updateBlock(chunkVec3(15, 15, 15), 1);
-		chunk->updateBlock(chunkVec3(0, 15, 15), 1);
-
-		gameLoop(window, cam, skybox, textRender, *chunk);
-
-		delete chunk;
+		// run the game
+		gameLoop(window, cam, skybox, textRender, chunkManager);
 	}
 	catch(const TextureManager::TextureManagerError& e) {
 		std::cerr << e.what() << std::endl;
 
-		// delete chunkManager;
 		glfwDestroyWindow(window);
 		glfwPollEvents();
 		glfwTerminate();
@@ -209,7 +230,6 @@ int		main(int ac, char const **av) {
 	}
 
 	delete textureManager;
-	// delete chunkManager;
 	glfwDestroyWindow(window);
 	glfwPollEvents();
 	glfwTerminate();
