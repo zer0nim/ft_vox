@@ -8,6 +8,7 @@
 #include "ChunkManager.hpp"
 #include "utils/Shader.hpp"
 #include "utils/Skybox.hpp"
+#include "utils/TextRender.hpp"
 
 std::chrono::milliseconds getMs() {
 	return std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -50,7 +51,7 @@ bool	createMapFiles(std::string const &mapName) {
 }
 
 void	gameLoop(GLFWwindow *window, Camera const &cam, Skybox &skybox, \
-AChunk &chunk) {
+TextRender &textRender, AChunk &chunk) {
 	std::chrono::milliseconds time_start;
 	tWinUser	*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
 	bool firstLoop = true;
@@ -83,11 +84,12 @@ AChunk &chunk) {
 		skybox.getShader().setMat4("view", skyView);
 
 		// draw here
+		// chunk.update();
+		// chunk.draw();
+		textRender.write("This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(1, 1, 1));
+		textRender.write("(C) LearnOpenGL.com", 540.0f, 570.0f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
 
-		chunk.update();
-		chunk.draw();
-
-		skybox.draw();  // draw skybox
+		// skybox.draw();  // draw skybox
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -148,8 +150,11 @@ int		main(int ac, char const **av) {
 	try {
 		textureManager = new TextureManager("./assets/textures.json");
 
+		Shader textShader("./shaders/text_vs.glsl", "./shaders/text_fs.glsl");
 		Shader skyboxShader("./shaders/skybox_vs.glsl", "./shaders/skybox_fs.glsl");
 		Skybox skybox(skyboxShader);
+
+		TextRender textRender(textShader);
 
 		chunk = new Chunk;
 		chunk->oldCreateChunk();
@@ -162,7 +167,7 @@ int		main(int ac, char const **av) {
 		chunk->updateBlock(chunkVec3(15, 15, 15), 1);
 		chunk->updateBlock(chunkVec3(0, 15, 15), 1);
 
-		gameLoop(window, cam, skybox, *chunk);
+		gameLoop(window, cam, skybox, textRender, *chunk);
 
 		delete chunk;
 	}

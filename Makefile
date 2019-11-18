@@ -20,6 +20,7 @@ SRC =	main.cpp \
 		utils/Skybox.cpp \
 		utils/Camera.cpp \
 		utils/debug.cpp \
+		utils/TextRender.cpp \
 
 HEAD =	commonInclude.hpp \
 		ft_vox.hpp \
@@ -34,6 +35,7 @@ HEAD =	commonInclude.hpp \
 		utils/Skybox.hpp \
 		utils/Camera.hpp \
 		utils/debug.hpp \
+		utils/TextRender.hpp \
 
 # download the cpp linter (https://github.com/isocpp/CppCoreGuidelines)
 # set command to launch linter on LINTER
@@ -43,8 +45,12 @@ LINTER_RULES = --filter=-whitespace/tab,-legal/copyright,-build/c++11,-whitespac
 
 CC = g++
 DEBUG_FLAGS = -g3 -fsanitize=address
-LIBS_FLAGS	= -L ~/.brew/lib -framework OpenGL -lglfw -lboost_filesystem
-LIBS_INC	= ~/.brew/include $(INC_DIR)/lib/stb_image.h $(INC_DIR)/lib/json.hpp
+LIBS_FLAGS	= -L ~/.brew/lib -framework OpenGL -lglfw -lboost_filesystem -lfreetype
+LIBS_INC	=	~/.brew/include \
+				$(INC_DIR)/lib/stb_image.h \
+				$(INC_DIR)/lib/json.hpp \
+				/usr/local/opt/freetype/include/freetype2 \
+
 CFLAGS		= -Ofast -std=c++11 -Wall -Wextra -Wno-deprecated
 
 ifneq ($(DEBUG),)

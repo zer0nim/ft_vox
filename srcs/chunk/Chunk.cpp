@@ -37,7 +37,7 @@ void	Chunk::update() {
 		return;  // chunk not modified -> don't update it
 	_data.isModified = false;
 
-	std::cout << "update: " << this << std::endl << std::endl;
+	// std::cout << "update: " << this << std::endl << std::endl;
 
 	// for (uint8_t x = 0; x < CHUNK_SZ_X; ++x) {
 	// 	for (uint8_t y = 0; y < CHUNK_SZ_Y; ++y) {
