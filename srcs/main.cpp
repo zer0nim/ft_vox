@@ -49,7 +49,7 @@ bool	createMapFiles(std::string const &mapName) {
 	return true;
 }
 
-void	gameLoop(GLFWwindow *window, Camera const &cam, Shader &skyboxSh, Skybox &skybox, \
+void	gameLoop(GLFWwindow *window, Camera const &cam, Skybox &skybox, \
 AChunk &chunk) {
 	std::chrono::milliseconds time_start;
 	tWinUser	*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
@@ -61,8 +61,8 @@ AChunk &chunk) {
 	glm::mat4	projection = glm::perspective(
 		glm::radians(cam.zoom), winU->width / winU->height, 0.1f, 100.0f);
 
-	skyboxSh.use();
-	skyboxSh.setMat4("projection", projection);
+	skybox.getShader().use();
+	skybox.getShader().setMat4("projection", projection);
 
 	glClearColor(0.11373f, 0.17647f, 0.27059f, 1.0f);
 	checkError();
@@ -79,15 +79,15 @@ AChunk &chunk) {
 		skyView[3][0] = 0;  // remove translation for the skybox
 		skyView[3][1] = 0;
 		skyView[3][2] = 0;
-		skyboxSh.use();
-		skyboxSh.setMat4("view", skyView);
+		skybox.getShader().use();
+		skybox.getShader().setMat4("view", skyView);
 
 		// draw here
 
 		chunk.update();
 		chunk.draw();
 
-		skybox.draw();  // draw shader
+		skybox.draw();  // draw skybox
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -162,7 +162,7 @@ int		main(int ac, char const **av) {
 		chunk->updateBlock(chunkVec3(15, 15, 15), 1);
 		chunk->updateBlock(chunkVec3(0, 15, 15), 1);
 
-		gameLoop(window, cam, skyboxShader, skybox, *chunk);
+		gameLoop(window, cam, skybox, *chunk);
 
 		delete chunk;
 	}
