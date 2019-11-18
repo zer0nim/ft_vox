@@ -3,7 +3,6 @@
 
 #include <array>
 #include <vector>
-#include <map>
 
 #include "lib/json.hpp"
 #include "commonInclude.hpp"
@@ -65,6 +64,18 @@ class TextureManager {
 				std::string const _msg;
 				char	cstr[512];
 		};
+		class missingBlockException : public TextureManagerError {
+			public:
+				virtual const char* what() const throw() {
+					return ("Missing some blocks textures Infos");
+				}
+		};
+		class failed2LoadTextureException : public TextureManagerError {
+			public:
+				virtual const char* what() const throw() {
+					return ("Failed to load texture");
+				}
+		};
 
 	private:
 		Texture	*loadTextures(std::string const &path);
@@ -73,7 +84,7 @@ class TextureManager {
 
 		std::vector<Texture *>						_texturesLoaded;
 		std::array<BlockTexture *, 4>				_blocks;
-		static const std::map<std::string, int8_t>	_blocksId;
+		static const std::array<std::string, 4>		_blocksNames;
 };
 
 std::ostream & operator << (std::ostream &out, const TextureManager::Texture &m);

@@ -4,11 +4,11 @@
 
 #include "utils/Texture.hpp"
 
-const std::map<std::string, int8_t>	TextureManager::_blocksId = {
-	{"dirt", 0},
-	{"stone", 1},
-	{"grass", 2},
-	{"sand", 3}
+const std::array<std::string, 4>	TextureManager::_blocksNames = {
+	"dirt",
+	"stone",
+	"grass",
+	"sand"
 };
 
 TextureManager::TextureManager(std::string const &texturesSettings) {
@@ -20,7 +20,7 @@ TextureManager::TextureManager(std::string const &texturesSettings) {
 			nlohmann::json	data;
 			data << fileStream;
 			loadBlocksTextures(data);
-			// drawBlocks();
+			drawBlocks();
 		}
 		else {
 			std::cout << "throw FailedToOpenException" << std::endl;
@@ -120,7 +120,13 @@ TextureManager::Texture	*TextureManager::loadTextures(std::string const &path) {
 		TextureManager::Texture	*texture = new TextureManager::Texture();
 		bool inSpaceSRGB = true;
 
-		texture->id = textureFromFile(path, inSpaceSRGB);
+		try {
+			texture->id = textureFromFile(path, inSpaceSRGB);
+		}
+		catch(TextureFailToLoad const & e) {
+			throw TextureManager::failed2LoadTextureException();
+		}
+
 		texture->path = path;
 		// save to _texturesLoaded array to skip duplicate textures loading later
 		_texturesLoaded.push_back(texture);
@@ -131,11 +137,13 @@ TextureManager::Texture	*TextureManager::loadTextures(std::string const &path) {
 }
 
 void	TextureManager::loadBlocksTextures(nlohmann::json const &data) {
+	// read json data to fill blocks textures infos
 	if (data.find("blocks") != data.end()) {
 		for (auto &block : data["blocks"].items()) {
 			// valid material name
-			if (_blocksId.find(block.key()) != _blocksId.end()) {
-				int8_t id = _blocksId.at(block.key());
+			auto it = std::find(_blocksNames.begin(), _blocksNames.end(), block.key());
+			if (it != _blocksNames.end()) {
+				int8_t id = it - _blocksNames.begin();
 
 				// texture has not already been defined
 				if (_blocks[id] == nullptr) {
@@ -153,12 +161,34 @@ void	TextureManager::loadBlocksTextures(nlohmann::json const &data) {
 						else if (key == "bottom") {
 							blockTexture->bottom = loadTextures(blockText.value());
 						}
+						else {
+							std::cout << "WARNING ! block \"" << _blocksNames[id] << \
+							"\", unrecognized texture key \"" <<  key  << '"' << std::endl;
+						}
+					}
+
+					if (blockTexture->side == nullptr) {
+						std::cerr << "missing default texture for block \"" << \
+						_blocksNames[id] << '"' << std::endl;
+						throw TextureManager::missingBlockException();
 					}
 
 					_blocks[id] = blockTexture;
 				}
 			}
 		}
+	}
+
+	// check for missing block textures info
+	bool missingBlock = false;
+	for (size_t i = 0; i < _blocks.size(); ++i) {
+		if (_blocks[i] == nullptr) {
+			missingBlock = true;
+			std::cerr << "missing block: " << _blocksNames[i] << std::endl;
+		}
+	}
+	if (missingBlock) {
+		throw TextureManager::missingBlockException();
 	}
 }
 
