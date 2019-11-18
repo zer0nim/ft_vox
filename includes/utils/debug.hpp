@@ -6,4 +6,7 @@
 GLenum  checkError_(const char *file, int line);
 void    checkErrorExit_(const char *file, int line);
 
+#define checkError() checkError_(__FILE__, __LINE__)
+#define checkErrorExit() checkErrorExit_(__FILE__, __LINE__)
+
 #endif  // DEBUG_HPP_

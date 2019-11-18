@@ -1,20 +1,40 @@
 #include "TextRender.hpp"
+#include "debug.hpp"
 
 TextRender::TextRender(Shader &sh) :
 _shader(sh),
-_projection(glm::ortho(0, SCREEN_W, 0, SCREEN_H)) {
+_projection(glm::ortho(0.0f, static_cast<GLfloat>(SCREEN_W), 0.0f, static_cast<GLfloat>(SCREEN_H))) {
+	// create VAO & VBO
+	glGenVertexArrays(1, &_vao);
+	glGenBuffers(1, &_vbo);
+	glBindVertexArray(_vao);
+	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+
+	_shader.use();
+	_shader.setMat4("projection", _projection);
+}
+
+void TextRender::loadFont(std::string name, std::string const &filename, uint32_t size) {
 	FT_Library ft;
 	if (FT_Init_FreeType(&ft)) {
 		std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
 		throw TextRender::LoadTextRenderException();
 	}
 	FT_Face face;
-	if (FT_New_Face(ft, "fonts/minecraft_normal.ttf", 0, &face)) {
+	if (FT_New_Face(ft, filename.c_str(), 0, &face)) {
 		std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
 		FT_Done_FreeType(ft);
 		throw TextRender::LoadTextRenderException();
 	}
-	FT_Set_Pixel_Sizes(face, 0, 48);  // size
+	FT_Set_Pixel_Sizes(face, 0, size);  // set size
+
+	_font.insert(std::pair<std::string, std::map<GLchar, Character> >(name, std::map<GLchar, Character>()));
+
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	for (GLubyte c = 0; c < 128; c++) {
@@ -41,28 +61,15 @@ _projection(glm::ortho(0, SCREEN_W, 0, SCREEN_H)) {
 			glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
 			face->glyph->advance.x
 		};
-		_characters.insert(std::pair<GLchar, Character>(c, character));
+		_font[name].insert(std::pair<GLchar, Character>(c, character));
 	}
     glBindTexture(GL_TEXTURE_2D, 0);
 
 	// delete freetype objects
 	FT_Done_Face(face);
 	FT_Done_FreeType(ft);
-
-	// create VAO & VBO
-	glGenVertexArrays(1, &_vao);
-	glGenBuffers(1, &_vbo);
-	glBindVertexArray(_vao);
-	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
-	_shader.use();
-	_shader.setMat4("projection", _projection);
 }
+
 
 TextRender::TextRender(TextRender const &src) :
 _shader(src.getShader()) {
@@ -81,14 +88,14 @@ TextRender &TextRender::operator=(TextRender const &rhs) {
 	return *this;
 }
 
-void TextRender::write(std::string text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color) {
+void TextRender::write(std::string const &fontName, std::string text, GLfloat x, GLfloat y,
+GLfloat scale, glm::vec3 color) {
     _shader.use();
     _shader.setVec3("textColor", color);
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(_vao);
-	std::string::const_iterator c;
-	for (c = text.begin(); c != text.end(); c++) {  // foreach chars
-        Character ch = _characters[*c];
+	for (auto c = text.begin(); c != text.end(); c++) {  // foreach chars
+        Character ch = _font[fontName][*c];
         GLfloat xpos = x + ch.bearing.x * scale;
         GLfloat ypos = y - (ch.size.y - ch.bearing.y) * scale;
         GLfloat w = ch.size.x * scale;

@@ -50,9 +50,26 @@ bool	createMapFiles(std::string const &mapName) {
 	return true;
 }
 
+int counter = 0;
+int savedFps = 0;
+void	drawText(GLFWwindow *window, TextRender &textRender, int actFps) {
+	tWinUser	*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
+	(void)winU;
+
+	if (counter % 10 == 0) {
+		savedFps = actFps;
+		counter = 0;
+	}
+	counter++;
+
+	std::string sFps = std::to_string(savedFps) + " fps";
+	textRender.write("normal", sFps);
+}
+
 void	gameLoop(GLFWwindow *window, Camera const &cam, Skybox &skybox, \
 TextRender &textRender, AChunk &chunk) {
-	std::chrono::milliseconds time_start;
+	std::chrono::milliseconds	time_start;
+	int							lastFps;
 	tWinUser	*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
 	bool firstLoop = true;
 
@@ -84,12 +101,14 @@ TextRender &textRender, AChunk &chunk) {
 		skybox.getShader().setMat4("view", skyView);
 
 		// draw here
-		// chunk.update();
-		// chunk.draw();
-		textRender.write("This is sample text", 25.0f, 25.0f, 1.0f, glm::vec3(1, 1, 1));
-		textRender.write("(C) LearnOpenGL.com", 540.0f, 570.0f, 0.5f, glm::vec3(0.3, 0.7f, 0.9f));
+		chunk.update();
+		chunk.draw();
 
-		// skybox.draw();  // draw skybox
+		// draw skybox
+		skybox.draw();
+
+		// draw text
+		drawText(window, textRender, lastFps);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -98,12 +117,14 @@ TextRender &textRender, AChunk &chunk) {
 		// fps
 		std::chrono::milliseconds time_loop = getMs() - time_start;
 		if (time_loop.count() > LOOP_TIME) {
+			lastFps = static_cast<int>(1000.0f / time_loop.count());
 			#if DEBUG == true
 				if (!firstLoop)
 					std::cerr << "loop slow -> " << time_loop.count() << "ms / " << LOOP_TIME << "ms (" << FPS << "fps)\n";
 			#endif
 		}
 		else {
+			lastFps = FPS;
 			usleep((LOOP_TIME - time_loop.count()) * 1000);
 		}
 		firstLoop = false;
@@ -155,6 +176,8 @@ int		main(int ac, char const **av) {
 		Skybox skybox(skyboxShader);
 
 		TextRender textRender(textShader);
+		textRender.loadFont("title", "fonts/minecraft_title.ttf", 25);
+		textRender.loadFont("normal", "fonts/minecraft_normal.ttf", 30);
 
 		chunk = new Chunk;
 		chunk->oldCreateChunk();

@@ -14,7 +14,9 @@ class TextRender {
 		virtual ~TextRender();
 
 		TextRender &operator=(TextRender const &rhs);
-		void write(std::string text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color);
+		void loadFont(std::string name, std::string const &filename, uint32_t size);
+		void write(std::string const &fontName, std::string text, GLfloat x = 0, GLfloat y = 0, GLfloat scale = 1,
+			glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f));
 
 
 		Shader		&getShader();
@@ -41,7 +43,7 @@ class TextRender {
 			glm::ivec2	bearing;
 			int64_t		advance;
 		};
-		std::map<GLchar, Character> _characters;
+		std::map<std::string, std::map<GLchar, Character> > _font;
 
 		Shader		&_shader;
 		glm::mat4	_projection;
