@@ -20,6 +20,7 @@ SRC =	main.cpp \
 		utils/Skybox.cpp \
 		utils/Camera.cpp \
 		utils/debug.cpp \
+		utils/Material.cpp \
 
 HEAD =	commonInclude.hpp \
 		ft_vox.hpp \
@@ -34,6 +35,7 @@ HEAD =	commonInclude.hpp \
 		utils/Skybox.hpp \
 		utils/Camera.hpp \
 		utils/debug.hpp \
+		utils/Material.hpp \
 
 # download the cpp linter (https://github.com/isocpp/CppCoreGuidelines)
 # set command to launch linter on LINTER

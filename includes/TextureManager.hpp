@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "lib/json.hpp"
+#include "utils/Shader.hpp"
 #include "commonInclude.hpp"
 
 class TextureManager {
@@ -24,19 +25,19 @@ class TextureManager {
 		};
 		struct BlockTexture {
 			BlockTexture() {
-				side = nullptr;
-				top = nullptr;
-				bottom = nullptr;
+				side = -1;
+				top = -1;
+				bottom = -1;
 			};
 
-			Texture	*side;
-			Texture	*top;
-			Texture	*bottom;
+			int8_t	side;
+			int8_t	top;
+			int8_t	bottom;
 		};
 
+		void	setUniform(Shader &sh) const;
 		std::vector<Texture *> const &			getTexturesLoaded() const;
 		std::array<BlockTexture *, 4> const &	getBlocks() const;
-		void									drawBlocks() const;
 
 		// Exceptions _______________________________
 		class TextureManagerError : public std::exception {
@@ -78,8 +79,9 @@ class TextureManager {
 		};
 
 	private:
-		Texture	*loadTextures(std::string const &path);
+		int8_t	loadTextures(std::string const &path);
 		void	loadBlocksTextures(nlohmann::json const &data);
+		void	drawBlocks() const;
 
 
 		std::vector<Texture *>						_texturesLoaded;
@@ -88,6 +90,6 @@ class TextureManager {
 };
 
 std::ostream & operator << (std::ostream &out, const TextureManager::Texture &m);
-std::ostream & operator << (std::ostream &out, const TextureManager::BlockTexture &m);
+std::ostream & operator << (std::ostream &out, const TextureManager &tm);
 
 #endif  // TEXTUREMANAGER_HPP_

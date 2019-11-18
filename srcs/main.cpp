@@ -63,6 +63,7 @@ AChunk &chunk) {
 
 	skyboxSh.use();
 	skyboxSh.setMat4("projection", projection);
+	chunk.setProjection(projection);
 
 	glClearColor(0.11373f, 0.17647f, 0.27059f, 1.0f);
 	checkError();
@@ -85,7 +86,7 @@ AChunk &chunk) {
 		// draw here
 
 		chunk.update();
-		chunk.draw();
+		chunk.draw(view);
 
 		skybox.draw();  // draw shader
 
@@ -127,40 +128,41 @@ int		main(int ac, char const **av) {
 	AChunk		*chunk;
 	TextureManager	*textureManager;
 
-	(void)ac;
-	(void)av;
-	// if (ac != 2) {
-	// 	std::cout << "Usage: ./ft_vox <map_name>" << std::endl;
-	// 	return 0;
-	// }
-	// std::string mapName = std::string(MAPS_PATH) + av[1];
-	// if (createMapFiles(mapName) == false) {
-	// 	return 1;
-	// }
-
-	// ChunkManager * chunkManager = new ChunkManager(mapName);
-
-	// chunkManager->init(wordFVec3(0, 0, 0));
-
 	if (!init(&window, "ft_vox", &winU, &cam))
 		return (1);
 
 	try {
 		textureManager = new TextureManager("./assets/textures.json");
 
+		(void)ac;
+		(void)av;
+		// if (ac != 2) {
+		// 	std::cout << "Usage: ./ft_vox <map_name>" << std::endl;
+		// 	return 0;
+		// }
+		// std::string mapName = std::string(MAPS_PATH) + av[1];
+		// if (createMapFiles(mapName) == false) {
+		// 	return 1;
+		// }
+
+		// ChunkManager * chunkManager = new ChunkManager(textureManager, mapName);
+
+		// chunkManager->init(wordFVec3(0, 0, 0));
+
+
 		Shader skyboxShader("./shaders/skybox_vs.glsl", "./shaders/skybox_fs.glsl");
 		Skybox skybox(skyboxShader);
 
-		chunk = new Chunk;
+		chunk = new Chunk(*textureManager);
 		chunk->oldCreateChunk();
-		chunk->updateBlock(chunkVec3(0, 0, 0), 1);
-		chunk->updateBlock(chunkVec3(15, 0, 0), 1);
-		chunk->updateBlock(chunkVec3(15, 0, 15), 1);
-		chunk->updateBlock(chunkVec3(0, 0, 15), 1);
-		chunk->updateBlock(chunkVec3(0, 15, 0), 1);
-		chunk->updateBlock(chunkVec3(15, 15, 0), 1);
-		chunk->updateBlock(chunkVec3(15, 15, 15), 1);
-		chunk->updateBlock(chunkVec3(0, 15, 15), 1);
+		chunk->updateBlock(chunkVec3(0, 0, 0), 3);
+		chunk->updateBlock(chunkVec3(15, 0, 0), 3);
+		chunk->updateBlock(chunkVec3(15, 0, 15), 3);
+		chunk->updateBlock(chunkVec3(0, 0, 15), 3);
+		chunk->updateBlock(chunkVec3(0, 15, 0), 3);
+		chunk->updateBlock(chunkVec3(15, 15, 0), 3);
+		chunk->updateBlock(chunkVec3(15, 15, 15), 3);
+		chunk->updateBlock(chunkVec3(0, 15, 15), 3);
 
 		gameLoop(window, cam, skyboxShader, skybox, *chunk);
 

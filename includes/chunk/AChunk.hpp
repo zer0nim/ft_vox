@@ -3,6 +3,7 @@
 
 #include "commonInclude.hpp"
 #include "ft_vox.hpp"
+#include "TextureManager.hpp"
 
 class AChunk {
 	public:
@@ -13,21 +14,23 @@ class AChunk {
 			ChunkData() : isModified(true) {}
 		};
 
-		AChunk();
+		explicit AChunk(TextureManager const &textureManager);
 		AChunk(AChunk const &src);
 		virtual ~AChunk();
 
 		AChunk &operator=(AChunk const &rhs);
 
-		virtual void	draw() = 0;
+		virtual void	draw(glm::mat4 &view) = 0;
 		virtual void	update() = 0;
 		virtual void	oldCreateChunk() = 0;  // TODO(zer0nim): remove
+		virtual void	setProjection(glm::mat4 &projection) = 0;
 		void			createChunk(std::string const &mapName, wordIVec3 const &chunkPos);
 		void			createChunk(std::string const &mapName, std::string const &chunkPos);
 		void			updateBlock(chunkVec3 pos, uint8_t value);
 		void			save();
 
 		AChunk::ChunkData const	&getData() const;
+		TextureManager const &getTextureManager() const;
 
 	protected:
 		bool			_createChunkFromFile();
@@ -35,8 +38,9 @@ class AChunk {
 		ChunkData		_data;
 		std::string		_filename;
 		bool			_isModifiedFromBegining;  // true if the chunk was modified
+		TextureManager const &_textureManager;
 };
 
-AChunk * instanciateNewChunk();
+AChunk * instanciateNewChunk(TextureManager const &textureManager);
 
 #endif  // ACHUNK_HPP_

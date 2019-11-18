@@ -139,7 +139,7 @@ bool	initWindow(GLFWwindow **window, const char *name, tWinUser *winU) {
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);  // anti aliasing
-	glEnable(GL_CULL_FACE);  // face culling
+	// glEnable(GL_CULL_FACE);  // face culling
 
 	glfwSetWindowUserPointer(*window, winU);
 	return (true);

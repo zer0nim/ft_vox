@@ -23,13 +23,15 @@ wordIVec3 stringToVec(const std::string &s) {
     return vec;
 }
 
-ChunkManager::ChunkManager(std::string const &mapName) :
+ChunkManager::ChunkManager(TextureManager const &textureManager, std::string const &mapName) :
 _mapName(mapName),
 _chunkMap(),
-_chunkActPos(-1, -1, -1) {}
+_chunkActPos(-1, -1, -1),
+_textureManager(textureManager) {}
 
 ChunkManager::ChunkManager(ChunkManager const &src) :
-_mapName(src.getMapName()) {
+_mapName(src.getMapName()),
+_textureManager(src.getTextureManager()) {
 	*this = src;
 }
 
@@ -73,7 +75,7 @@ void ChunkManager::update(wordFVec3 camPos) {
 				for (int32_t y = 0; y < CHUNK_SZ_Y * MAX_Y_CHUNK; y += CHUNK_SZ_Y) {
 					wordIVec3 chunkPos(x, y, z);  // this is the position of the chunk
 					if (_isChunkExist(chunkPos) == false) {  // if the chunk doesnt exist (for now)
-						newChunk = instanciateNewChunk();  // create a chunk with the rihgt type
+						newChunk = instanciateNewChunk(_textureManager);  // create a chunk with the rihgt type
 						newChunk->createChunk(_mapName, chunkPos);  // init the chunk with the right values
 						_insertChunk(chunkPos, newChunk);
 					}
@@ -130,3 +132,4 @@ bool	ChunkManager::_isChunkExist(wordIVec3 const &chunkPos) const {
 std::string const &ChunkManager::getMapName() const { return _mapName; }
 std::map<std::string, AChunk*>			&ChunkManager::getChunkMap() { return _chunkMap; }
 std::map<std::string, AChunk*> const	&ChunkManager::getChunkMap() const { return _chunkMap; }
+TextureManager const	&ChunkManager::getTextureManager() const { return _textureManager; };

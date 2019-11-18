@@ -33,7 +33,7 @@ wordIVec3	stringToVec(const std::string &s);  // string "x_y_z" to vec
 
 class ChunkManager {
 	public:
-		explicit ChunkManager(std::string const &mapName);
+		explicit ChunkManager(TextureManager const &textureManager, std::string const &mapName);
 		explicit ChunkManager(ChunkManager const &src);
 		virtual ~ChunkManager();
 
@@ -45,6 +45,7 @@ class ChunkManager {
 		std::string const &getMapName() const;
 		std::map<std::string, AChunk*>			&getChunkMap();
 		std::map<std::string, AChunk*> const	&getChunkMap() const;
+		TextureManager const	&getTextureManager() const;
 
 	private:
 		ChunkManager();
@@ -62,4 +63,5 @@ class ChunkManager {
 		*/
 		std::map<std::string, AChunk*>	_chunkMap;  // map with all chunks
 		wordIVec3						_chunkActPos;  // actual chunk position
+		TextureManager const			&_textureManager;
 };
