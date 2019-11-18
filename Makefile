@@ -6,6 +6,7 @@ ARGS = map_test
 SRCS_DIR	= srcs
 OBJS_DIR	= objs
 INC_DIR		= includes
+DEP_DIR		= .dep
 
 SRC =	main.cpp \
 		windowEvents.cpp \
@@ -41,7 +42,8 @@ HEAD =	commonInclude.hpp \
 # set command to launch linter on LINTER
 # add rules for linter in LINTER_RULES
 LINTER = $(CPPLINT)
-LINTER_RULES = --filter=-whitespace/tab,-legal/copyright,-build/c++11,-whitespace/newline,-readability/braces,-whitespace/indent,-build/include_what_you_use,-build/header_guard,-runtime/references --linelength=120 --quiet
+LINTER_RULES =	--filter=-whitespace/tab,-legal/copyright,-build/c++11,-whitespace/newline,-readability/braces,-whitespace/indent,-build/include_what_you_use,-build/header_guard,-runtime/references \
+				--linelength=120 --quiet
 
 CC = g++
 DEBUG_FLAGS = -g3 -fsanitize=address
@@ -52,15 +54,17 @@ LIBS_INC	=	~/.brew/include \
 				/usr/local/opt/freetype/include/freetype2 \
 				~/.brew/opt/freetype/include/freetype2
 
+DEPFLAGS	= -MT $@ -MD -MP -MF $(DEP_DIR)/$*.Td
 CFLAGS		= -Ofast -std=c++11 -Wall -Wextra -Wno-deprecated
 
 ifneq ($(DEBUG),)
 	CFLAGS := $(CFLAGS) $(DEBUG_FLAGS)
 endif
 
-HEADS	= $(addprefix $(INC_DIR)/, $(HEAD))
-OBJS	= $(addprefix $(OBJS_DIR)/, $(SRC:.cpp=.o))
-INC		= -I $(INC_DIR) $(addprefix -I , $(addprefix $(INC_DIR)/, $(dir $(HEAD)))) $(addprefix -I , $(LIBS_INC))
+HEADS		= $(addprefix $(INC_DIR)/, $(HEAD))
+OBJS		= $(addprefix $(OBJS_DIR)/, $(SRC:.cpp=.o))
+DEPFILES	= $(addprefix $(DEP_DIR)/, $(SRC:.cpp=.d))
+INC			= -I $(INC_DIR) $(addprefix -I , $(addprefix $(INC_DIR)/, $(dir $(HEAD)))) $(addprefix -I , $(LIBS_INC))
 
 NORMAL = "\x1B[0m"
 RED = "\x1B[31m"
@@ -93,18 +97,27 @@ $(NAME): $(OBJS_DIR) $(OBJS)
 	@printf $(CYAN)"-> create program : $(NAME)\n"$(NORMAL)
 	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LIBS_FLAGS)
 
-$(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp $(HEADS)
+$(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp
+$(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp $(DEP_DIR)/%.d
 	@printf $(YELLOW)"-> $<\n"$(NORMAL)
-	@$(CC) $(CFLAGS) -c $< -o $@ $(INC)
-
+	@$(CC) $(DEPFLAGS) $(CFLAGS) -c $< -o $@ $(INC)
+	@mv -f $(DEP_DIR)/$*.Td $(DEP_DIR)/$*.d
 
 $(OBJS_DIR):
 	@mkdir -p $(dir $(OBJS))
+
+$(DEP_DIR):
+	@mkdir -p $(dir $(DEPFILES))
+
+$(DEP_DIR)/%.d: $(DEP_DIR) ;
+
+-include $(DEPFILES)
 
 clean:
 	$(START)
 	@printf $(RED)"-x remove .o files\n"$(NORMAL)
 	@rm -rf $(OBJS_DIR)
+	@rm -rf $(DEP_DIR)
 	$(END)
 
 fclean: clean
