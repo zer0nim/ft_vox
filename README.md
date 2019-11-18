@@ -10,13 +10,9 @@ and `glm` to manage matrix/vector/quaternion.
 
 ## Installation
 
-- Install `glfw` with brew
+- Install depencies (osx)
 
-	```brew install glfw3```
-
-- Install `glm` with brew
-
-	```brew install glm```
+	```./configure```
 
 - Add precommit rules
 
@@ -27,7 +23,7 @@ and `glm` to manage matrix/vector/quaternion.
 	```make -j8```
 - Run the project
 
-	```./ft_vox```
+	```./ft_vox <map_name>```
 
 
 ---
