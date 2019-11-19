@@ -63,7 +63,7 @@ void ChunkManager::init(wordFVec3 camPos, glm::mat4 &projection) {
 	update(camPos);  // call update once to create the chunks
 }
 
-void ChunkManager::update(wordFVec3 camPos) {
+void ChunkManager::update(wordFVec3 &camPos) {
 	std::vector<std::string> toDelete;
 	wordIVec3 lastChunkPos = _chunkActPos;
 

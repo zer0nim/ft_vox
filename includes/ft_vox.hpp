@@ -41,6 +41,18 @@ typedef struct	sWinUser {
 	bool		showInfo;
 }				tWinUser;
 
+
+class ChunkManager;
+struct ThreadupdateArgs {
+	GLFWwindow		*window;
+	ChunkManager	&chunkManager;
+	wordFVec3		&camPos;
+	bool			quit;
+
+	ThreadupdateArgs(GLFWwindow *window_, ChunkManager &chunkManager_, wordFVec3 &camPos_) :
+	window(window_), chunkManager(chunkManager_), camPos(camPos_), quit(false) {}
+};
+
 bool	initWindow(GLFWwindow **window, const char *name, tWinUser *winU);
 void	processInput(GLFWwindow *window);
 

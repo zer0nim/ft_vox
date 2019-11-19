@@ -1,7 +1,8 @@
 #ifndef COMMONINCLUDE_HPP_
 #define COMMONINCLUDE_HPP_
 
-#define DEBUG false  // type: bool -> enable / disable the debug mode
+#define DEBUG true  // type: bool -> enable / disable the debug mode
+#define DEBUG_FPS_LOW DEBUG & false
 #define SCREEN_W 800  // [px] type: int ->width of the screen in pixels
 #define SCREEN_H 600  // [px] type: int -> height of the screen in pixels
 #define FPS 120  // [Hz] type: int -> fps of the main loop

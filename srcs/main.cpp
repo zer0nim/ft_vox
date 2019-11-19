@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <pthread.h>
 #include <iomanip>
 
 #include "ft_vox.hpp"
@@ -13,6 +14,37 @@
 std::chrono::milliseconds getMs() {
 	return std::chrono::duration_cast<std::chrono::milliseconds>(
 		std::chrono::system_clock::now().time_since_epoch());
+}
+
+void	*threadUpdateFunction(void *args_) {
+	ThreadupdateArgs			*args = reinterpret_cast<ThreadupdateArgs*>(args_);
+	std::chrono::milliseconds	time_start;
+	tWinUser					*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(args->window));
+	bool						firstLoop = true;
+
+	(void)winU;
+	while (!glfwWindowShouldClose(args->window)) {
+		time_start = getMs();
+
+		// update
+		// args->chunkManager.update(args->camPos);
+
+		// fps
+		std::chrono::milliseconds time_loop = getMs() - time_start;
+		if (time_loop.count() > LOOP_TIME) {
+			#if DEBUG_FPS_LOW == true
+				if (!firstLoop)
+					std::cerr << "update loop slow -> " << time_loop.count() << "ms / " << LOOP_TIME << "ms (" << FPS << "fps)\n";
+			#endif
+		}
+		else {
+			usleep((LOOP_TIME - time_loop.count()) * 1000);
+		}
+		firstLoop = false;
+	}
+	args->quit = true;
+	pthread_exit(NULL);
+	return nullptr;
 }
 
 int counter = 0;
@@ -64,8 +96,9 @@ void	gameLoop(GLFWwindow *window, Camera const &cam, Skybox &skybox, \
 TextRender &textRender, ChunkManager &chunkManager) {
 	std::chrono::milliseconds	time_start;
 	int							lastFps;
-	tWinUser	*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
-	bool firstLoop = true;
+	tWinUser					*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
+	bool						firstLoop = true;
+	ThreadupdateArgs			*threadUpdateArgs = new ThreadupdateArgs(window, chunkManager, winU->cam->pos);
 
 	wordFVec3 pos(0, 0, 0);
 
@@ -78,11 +111,16 @@ TextRender &textRender, ChunkManager &chunkManager) {
 	skybox.getShader().use();
 	skybox.getShader().setMat4("projection", projection);
 
-	std::cout << "init done" << std::endl;
+	pthread_t threadUpdate;
+	int rc = pthread_create(&threadUpdate, NULL, threadUpdateFunction, reinterpret_cast<void*>(threadUpdateArgs));
+	if (rc) {
+         std::cout << "Error: unable to create thread," << rc << std::endl;
+         return;
+	}
 
 	glClearColor(0.11373f, 0.17647f, 0.27059f, 1.0f);
 	checkError();
-	while (!glfwWindowShouldClose(window)) {
+	while (!threadUpdateArgs->quit) {
 		time_start = getMs();
 
 		processInput(window);
@@ -116,7 +154,7 @@ TextRender &textRender, ChunkManager &chunkManager) {
 		std::chrono::milliseconds time_loop = getMs() - time_start;
 		if (time_loop.count() > LOOP_TIME) {
 			lastFps = static_cast<int>(1000.0f / time_loop.count());
-			#if DEBUG == true
+			#if DEBUG_FPS_LOW == true
 				if (!firstLoop)
 					std::cerr << "loop slow -> " << time_loop.count() << "ms / " << LOOP_TIME << "ms (" << FPS << "fps)\n";
 			#endif
