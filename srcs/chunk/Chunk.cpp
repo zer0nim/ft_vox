@@ -57,9 +57,13 @@ const float	Chunk::_cubeData[] = {
 	-0.5f, -0.5f, -0.5f,	0.0f, -1.0f, 0.0f,		0.0f, 1.0f,		5.0f  // 5r
 };
 
+std::unique_ptr<Chunk::ShaderData>	Chunk::_shaderData = std::unique_ptr<Chunk::ShaderData>();
+
 Chunk::Chunk(TextureManager const &textureManager) : AChunk(textureManager) {
-	_naiveShader = new Shader("shaders/naive_vs.glsl", "shaders/naive_fs.glsl");
-	sendCubeData();
+	if (!_shaderData) {
+		_shaderData = std::unique_ptr<ShaderData>(new ShaderData());
+		sendCubeData();
+	}
 }
 
 Chunk::Chunk(Chunk const &src) : AChunk(src) {
@@ -67,7 +71,6 @@ Chunk::Chunk(Chunk const &src) : AChunk(src) {
 }
 
 Chunk::~Chunk() {
-	delete _naiveShader;
 }
 
 Chunk &Chunk::operator=(Chunk const &rhs) {
@@ -85,9 +88,9 @@ void	Chunk::update() {
 void	Chunk::draw(glm::mat4 &view, wordIVec3 &startPos) {
 	_textureManager.activateTextures();
 
-	_naiveShader->use();
-	_naiveShader->setMat4("view", view);
-	glBindVertexArray(_cubeVao);
+	_shaderData->naiveShader->use();
+	_shaderData->naiveShader->setMat4("view", view);
+	glBindVertexArray(_shaderData->cubeVao);
 
 	// loop throught chunk cubes and draw them
 	glm::mat4 baseModel = glm::translate(glm::mat4(1.0), glm::vec3(startPos));
@@ -95,10 +98,10 @@ void	Chunk::draw(glm::mat4 &view, wordIVec3 &startPos) {
 		for (uint8_t y = 0; y < CHUNK_SZ_Y; ++y) {
 			for (uint8_t z = 0; z < CHUNK_SZ_Z; ++z) {
 				if (_data.data[x][y][z] != 0) {
-					_naiveShader->setInt("cubeId", _data.data[x][y][z] - 1);
+					_shaderData->naiveShader->setInt("cubeId", _data.data[x][y][z] - 1);
 
 					glm::mat4 model = glm::translate(baseModel, glm::vec3(x, y, z));
-					_naiveShader->setMat4("model", model);
+					_shaderData->naiveShader->setMat4("model", model);
 
 					glDrawArrays(GL_TRIANGLES, 0, 36);
 				}
@@ -108,13 +111,13 @@ void	Chunk::draw(glm::mat4 &view, wordIVec3 &startPos) {
 }
 
 void	Chunk::sendCubeData() {
-    glGenVertexArrays(1, &_cubeVao);
-    glGenBuffers(1, &_cubeVbo);
+    glGenVertexArrays(1, &_shaderData->cubeVao);
+    glGenBuffers(1, &(_shaderData->cubeVbo));
 
-    glBindBuffer(GL_ARRAY_BUFFER, _cubeVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, _shaderData->cubeVbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Chunk::_cubeData), Chunk::_cubeData, GL_STATIC_DRAW);
 
-    glBindVertexArray(_cubeVao);
+    glBindVertexArray(_shaderData->cubeVao);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
@@ -124,24 +127,24 @@ void	Chunk::sendCubeData() {
     glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 9 * sizeof(float), reinterpret_cast<void*>(8 * sizeof(float)));
     glEnableVertexAttribArray(3);
 
-	_naiveShader->use();
+	_shaderData->naiveShader->use();
 	// set cube material
 	Material material;
-	_naiveShader->use();
-	_naiveShader->setBool("material.specular.isTexture", false);
-	_naiveShader->setVec3("material.specular.color", material.specular);
-	_naiveShader->setFloat("material.shininess", material.shininess);
+	_shaderData->naiveShader->use();
+	_shaderData->naiveShader->setBool("material.specular.isTexture", false);
+	_shaderData->naiveShader->setVec3("material.specular.color", material.specular);
+	_shaderData->naiveShader->setFloat("material.shininess", material.shininess);
 
 	// set direction light
-	_naiveShader->setVec3("dirLight.direction", -0.2f, -0.8f, -0.6f);
-	_naiveShader->setVec3("dirLight.ambient", 0.4f, 0.4f, 0.4f);
-	_naiveShader->setVec3("dirLight.diffuse", 1.5f, 1.5f, 1.5f);
-	_naiveShader->setVec3("dirLight.specular", 1, 1, 1);
+	_shaderData->naiveShader->setVec3("dirLight.direction", -0.2f, -0.8f, -0.6f);
+	_shaderData->naiveShader->setVec3("dirLight.ambient", 0.4f, 0.4f, 0.4f);
+	_shaderData->naiveShader->setVec3("dirLight.diffuse", 1.5f, 1.5f, 1.5f);
+	_shaderData->naiveShader->setVec3("dirLight.specular", 1, 1, 1);
 
-	_textureManager.setUniform(*_naiveShader);
+	_textureManager.setUniform(*_shaderData->naiveShader);
 }
 
 void	Chunk::setProjection(glm::mat4 &projection) {
-	_naiveShader->use();
-	_naiveShader->setMat4("projection", projection);
+	_shaderData->naiveShader->use();
+	_shaderData->naiveShader->setMat4("projection", projection);
 }
