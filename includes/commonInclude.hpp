@@ -21,4 +21,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+bool	createDir(std::string const &dirNames);
+bool	createDir(char const *dirNames);
+bool	createMapFiles(std::string const &mapName);
+
 #endif  // COMMONINCLUDE_HPP_
