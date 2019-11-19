@@ -79,9 +79,8 @@ void ChunkManager::update(wordFVec3 &camPos) {
 				for (int32_t y = 0; y < CHUNK_SZ_Y * MAX_Y_CHUNK; y += CHUNK_SZ_Y) {
 					wordIVec3 chunkPos(x, y, z);  // this is the position of the chunk
 					if (_isChunkExist(chunkPos) == false) {  // if the chunk doesnt exist (for now)
-						newChunk = instanciateNewChunk(_textureManager);  // create a chunk with the rihgt type
+						newChunk = instanciateNewChunk(_textureManager, _projection);  // create a chunk with the rihgt type
 						newChunk->createChunk(_mapName, chunkPos);  // init the chunk with the right values
-						newChunk->setProjection(_projection);
 						_insertChunk(chunkPos, newChunk);
 					}
 				}
@@ -112,7 +111,8 @@ void ChunkManager::draw(glm::mat4 view) {
 		z <= _chunkActPos.z + CHUNK_SZ_Z * RENDER_DISTANCE_CHUNK; z += CHUNK_SZ_Z) {
 			for (int32_t y = 0; y < CHUNK_SZ_Y * MAX_Y_CHUNK; y += CHUNK_SZ_Y) {
 				wordIVec3 chunkPos(x, y, z);  // this is the position of the chunk
-				_chunkMap[vecToString(chunkPos)]->draw(view, chunkPos);
+				if (_isChunkExist(chunkPos))
+					_chunkMap[vecToString(chunkPos)]->draw(view, chunkPos);
 			}
 		}
 	}

@@ -59,9 +59,11 @@ const float	Chunk::_cubeData[] = {
 
 std::unique_ptr<Chunk::ShaderData>	Chunk::_shaderData = std::unique_ptr<Chunk::ShaderData>();
 
-Chunk::Chunk(TextureManager const &textureManager) : AChunk(textureManager) {
+Chunk::Chunk(TextureManager const &textureManager, glm::mat4 &projection) : AChunk(textureManager, projection) {
 	if (!_shaderData) {
 		_shaderData = std::unique_ptr<ShaderData>(new ShaderData());
+		_shaderData->naiveShader->use();
+		_shaderData->naiveShader->setMat4("projection", projection);
 		sendCubeData();
 	}
 }
@@ -142,9 +144,4 @@ void	Chunk::sendCubeData() {
 	_shaderData->naiveShader->setVec3("dirLight.specular", 1, 1, 1);
 
 	_textureManager.setUniform(*_shaderData->naiveShader);
-}
-
-void	Chunk::setProjection(glm::mat4 &projection) {
-	_shaderData->naiveShader->use();
-	_shaderData->naiveShader->setMat4("projection", projection);
 }

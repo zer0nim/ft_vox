@@ -7,16 +7,17 @@
 #include "Chunk.hpp"
 #include "ChunkManager.hpp"
 
-AChunk * instanciateNewChunk(TextureManager const &textureManager) {
-	AChunk * newChunk = new Chunk(textureManager);
+AChunk * instanciateNewChunk(TextureManager const &textureManager, glm::mat4 &projection) {
+	AChunk * newChunk = new Chunk(textureManager, projection);
 	return newChunk;
 }
 
-AChunk::AChunk(TextureManager const &textureManager) :
+AChunk::AChunk(TextureManager const &textureManager, glm::mat4 &projection) :
 _data(),
 _filename(""),
 _isModifiedFromBegining(false),
 _textureManager(textureManager) {
+	(void)projection;
 }
 
 AChunk::AChunk(AChunk const &src)

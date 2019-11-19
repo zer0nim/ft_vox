@@ -14,7 +14,7 @@ class AChunk {
 			ChunkData() : isModified(true) {}
 		};
 
-		explicit AChunk(TextureManager const &textureManager);
+		explicit AChunk(TextureManager const &textureManager, glm::mat4 &projection);
 		AChunk(AChunk const &src);
 		virtual ~AChunk();
 
@@ -22,7 +22,6 @@ class AChunk {
 
 		virtual void	draw(glm::mat4 &view, wordIVec3 &startPos) const = 0;
 		virtual void	update() = 0;
-		virtual void	setProjection(glm::mat4 &projection) = 0;
 		void			createChunk(std::string const &mapName, wordIVec3 const &chunkPos);
 		void			createChunk(std::string const &mapName, std::string const &chunkPos);
 		void			updateBlock(chunkVec3 pos, uint8_t value);
@@ -41,6 +40,6 @@ class AChunk {
 		TextureManager const &_textureManager;
 };
 
-AChunk * instanciateNewChunk(TextureManager const &textureManager);
+AChunk * instanciateNewChunk(TextureManager const &textureManager, glm::mat4 &projection);
 
 #endif  // ACHUNK_HPP_

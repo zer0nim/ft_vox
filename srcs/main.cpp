@@ -22,7 +22,7 @@ void	*threadUpdateFunction(void *args_) {
 		time_start = getMs();
 
 		// update
-		// args->chunkManager.update(args->camPos);
+		args->chunkManager.update(args->camPos);
 
 		// fps
 		std::chrono::milliseconds time_loop = getMs() - time_start;
@@ -87,7 +87,7 @@ TextRender &textRender, ChunkManager &chunkManager) {
 		skybox.getShader().setMat4("view", skyView);
 
 		// draw here
-		chunkManager.update(winU->cam->pos);
+		// chunkManager.update(winU->cam->pos);
 		chunkManager.draw(view);
 
 		// draw skybox
