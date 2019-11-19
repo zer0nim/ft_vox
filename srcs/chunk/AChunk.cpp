@@ -118,11 +118,13 @@ void	AChunk::createChunk(std::string const &mapName, wordIVec3 const &chunkPos) 
 	bool normalLoad = true;
 
 	_chunkPos = chunkPos;
-	_filename = mapName + "/" + CHUNK_PATH + vecToString(chunkPos) + CHUNK_EXTENSION;
-	if (boost::filesystem::is_regular_file(_filename)) {
-		normalLoad = false;
-		if (_createChunkFromFile() == false) {
-			normalLoad = true;
+	if (mapName != "") {  // if there is a map
+		_filename = mapName + "/" + CHUNK_PATH + vecToString(chunkPos) + CHUNK_EXTENSION;
+		if (boost::filesystem::is_regular_file(_filename)) {
+			normalLoad = false;
+			if (_createChunkFromFile() == false) {
+				normalLoad = true;
+			}
 		}
 	}
 	if (normalLoad) {
@@ -141,7 +143,6 @@ void AChunk::updateBlock(chunkVec3 pos, uint8_t value) {
 
 void AChunk::save() {
 	if (_filename == "") {
-		std::cout << "unable to save: no filename specified" << std::endl;
 		return;
 	}
 	std::string fileData;

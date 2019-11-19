@@ -1,7 +1,7 @@
 NAME = ft_vox
 PROJECT_NAME = $(shell echo $(NAME) | tr a-z A-Z)  # name in MAJUSCULE
 
-ARGS = map_test
+ARGS =
 
 SRCS_DIR	= srcs
 OBJS_DIR	= objs

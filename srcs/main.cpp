@@ -136,14 +136,22 @@ int		main(int ac, char const **av) {
 	Camera			cam(glm::vec3(0.0f, 0.0f, 19.0f));
 	TextureManager	*textureManager = nullptr;
 
-	if (ac != 2) {
-		std::cout << "Usage: ./ft_vox <map_name>" << std::endl;
+	if (ac > 2) {
+		std::cout << "Usage: ./ft_vox [map_name]" << std::endl;
 		return 0;
 	}
-	std::string mapName = std::string(MAPS_PATH) + av[1];
-	if (createMapFiles(mapName) == false) {
-		return 1;
+
+	std::string mapName = "";
+	if (ac == 1) {  // load without mapName
+		std::cout << "[WARN]: no mapname -> you can't save the map" << std::endl;
 	}
+	else {
+		mapName = std::string(av[1]);
+		if (createMapFiles(mapName) == false) {
+			return 1;
+		}
+	}
+
 
 	if (!init(&window, "ft_vox", &winU, &cam))
 		return (1);

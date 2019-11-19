@@ -32,13 +32,18 @@ bool	createMapFiles(std::string const &mapName) {
 		return false;
 	}
 
-	// create map (is needed)
-	if (createDir(mapName) == false) {
+	std::string fullMapName = std::string(MAPS_PATH) + mapName;
+	if (boost::filesystem::is_directory(fullMapName) == false)
+		std::cout << "[INFO]: create " << mapName << std::endl;
+	else
+		std::cout << "[INFO]: load " << mapName << std::endl;
+	// create map (if needed)
+	if (createDir(fullMapName) == false) {
 		return false;
 	}
 
-	// create map (is needed)
-	if (createDir(mapName + "/" + CHUNK_PATH) == false) {
+	// create map (if needed)
+	if (createDir(fullMapName + "/" + CHUNK_PATH) == false) {
 		return false;
 	}
 	return true;
