@@ -34,7 +34,8 @@ class AChunk {
 	protected:
 		bool			_createChunkFromFile();
 		virtual void	_createChunk();
-		ChunkData		_data;
+		ChunkData		_data;  // all chunk data
+		wordIVec3		_chunkPos;  // position of the chunk
 		std::string		_filename;
 		bool			_isModifiedFromBegining;  // true if the chunk was modified
 		TextureManager const &_textureManager;

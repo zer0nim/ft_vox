@@ -2,6 +2,7 @@
 #include <sstream>
 #include <limits>
 #include <boost/filesystem.hpp>
+#include <glm/gtc/noise.hpp>
 #include "AChunk.hpp"
 #include "Chunk.hpp"
 #include "ChunkManager.hpp"
@@ -79,25 +80,45 @@ bool	AChunk::_createChunkFromFile() {
 }
 
 void	AChunk::_createChunk() {
-	srand(1);
+	float xFactor = 1.0 / (MAX_MAP_SIZE_X - 1);
+	float yFactor = 1.0 / (MAX_MAP_SIZE_Y - 1);
+	float zFactor = 1.0 / (MAX_MAP_SIZE_Z - 1);
 
-	for (uint8_t x = 0; x < CHUNK_SZ_X; x++) {
-		for (uint8_t y = 0; y < CHUNK_SZ_Y; y++) {
-			for (uint8_t z = 0; z < CHUNK_SZ_Z; z++) {
-				_data.data[x][y][z] = 0;
-				if (rand() % 300 == 0)
-					_data.data[x][y][z] = rand() % 4 + 1;
+	float x, y, z;
+	for (uint8_t ix = 0; ix < CHUNK_SZ_X; ix++) {
+		x = (_chunkPos.x + ix) * xFactor;
+		for (uint8_t iy = 0; iy < CHUNK_SZ_Y; iy++) {
+			y = (_chunkPos.y + iy) * yFactor;
+			for (uint8_t iz = 0; iz < CHUNK_SZ_Z; iz++) {
+				z = (_chunkPos.z + iz) * zFactor;
+
+				glm::vec3 v(x, y, z);
+				float val = glm::perlin(v);
+				if (val > 0.1) {
+					if (y < 0.25)
+						_data.data[ix][iy][iz] = 1;
+					else if (y < 0.5)
+						_data.data[ix][iy][iz] = 2;
+					else if (y < 0.75)
+						_data.data[ix][iy][iz] = 3;
+					else
+						_data.data[ix][iy][iz] = 4;
+				}
+				else
+					_data.data[ix][iy][iz] = 0;
 			}
 		}
 	}
 }
 
-void	AChunk::createChunk(std::string const &mapName, wordIVec3 const &chunkPos) {
-	createChunk(mapName, vecToString(chunkPos));
-}
 void	AChunk::createChunk(std::string const &mapName, std::string const &chunkPos) {
+	createChunk(mapName, stringToVec(chunkPos));
+}
+void	AChunk::createChunk(std::string const &mapName, wordIVec3 const &chunkPos) {
 	bool normalLoad = true;
-	_filename = mapName + "/" + CHUNK_PATH + chunkPos + CHUNK_EXTENSION;
+
+	_chunkPos = chunkPos;
+	_filename = mapName + "/" + CHUNK_PATH + vecToString(chunkPos) + CHUNK_EXTENSION;
 	if (boost::filesystem::is_regular_file(_filename)) {
 		normalLoad = false;
 		if (_createChunkFromFile() == false) {
