@@ -34,7 +34,7 @@ class AChunk {
 
 	protected:
 		bool			_createChunkFromFile();
-		virtual void	_createChunk() = 0;
+		virtual void	_createChunk();
 		ChunkData		_data;
 		std::string		_filename;
 		bool			_isModifiedFromBegining;  // true if the chunk was modified

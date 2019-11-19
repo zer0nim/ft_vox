@@ -42,10 +42,10 @@ glm::mat4 Camera::getViewMatrix() const {
 	return glm::lookAt(pos, pos + front, up);
 }
 
-void Camera::processKeyboard(CamMovement direction, float dtTime) {
+void Camera::processKeyboard(CamMovement direction, float dtTime, bool isRun) {
 	float	velocity;
 
-	velocity = movementSpeed * dtTime;
+	velocity = movementSpeed * dtTime * ((isRun) ? RUN_FACTOR : 1);
 	if (direction == CamMovement::Forward)
 		pos = pos + front * velocity;
 	if (direction == CamMovement::Backward)

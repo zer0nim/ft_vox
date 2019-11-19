@@ -71,20 +71,6 @@ Chunk &Chunk::operator=(Chunk const &rhs) {
 	return *this;
 }
 
-void	Chunk::_createChunk() {
-	srand(1);
-
-	for (uint8_t x = 0; x < CHUNK_SZ_X; x++) {
-		for (uint8_t y = 0; y < CHUNK_SZ_Y; y++) {
-			for (uint8_t z = 0; z < CHUNK_SZ_Z; z++) {
-				_data.data[x][y][z] = 0;
-				if (rand() % 300 == 0)
-					_data.data[x][y][z] = rand() % 3;
-			}
-		}
-	}
-}
-
 // TODO(zer0nim): remove
 void	Chunk::oldCreateChunk() {
 	_createChunk();

@@ -29,23 +29,27 @@ void	processInput(GLFWwindow *window) {
 	winU->dtTime = crntFrame - winU->lastFrame;
 	winU->lastFrame = crntFrame;
 
-	// wasd qe fps camera input
+	// wasd qe shift fps camera input
+	bool isRun = false;
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS ||
+	glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS)
+		isRun = true;
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ||
 	glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-        winU->cam->processKeyboard(CamMovement::Forward, winU->dtTime);
+        winU->cam->processKeyboard(CamMovement::Forward, winU->dtTime, isRun);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ||
 	glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-        winU->cam->processKeyboard(CamMovement::Backward, winU->dtTime);
+        winU->cam->processKeyboard(CamMovement::Backward, winU->dtTime, isRun);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS ||
 	glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-        winU->cam->processKeyboard(CamMovement::Left, winU->dtTime);
+        winU->cam->processKeyboard(CamMovement::Left, winU->dtTime, isRun);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ||
 	glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-        winU->cam->processKeyboard(CamMovement::Right, winU->dtTime);
+        winU->cam->processKeyboard(CamMovement::Right, winU->dtTime, isRun);
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-        winU->cam->processKeyboard(CamMovement::Up, winU->dtTime);
+        winU->cam->processKeyboard(CamMovement::Up, winU->dtTime, isRun);
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-        winU->cam->processKeyboard(CamMovement::Down, winU->dtTime);
+        winU->cam->processKeyboard(CamMovement::Down, winU->dtTime, isRun);
 }
 
 /*

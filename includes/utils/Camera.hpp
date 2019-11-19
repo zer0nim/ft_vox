@@ -3,8 +3,9 @@
 
 #include "commonInclude.hpp"
 
-#define MOVEMENT_SPEED 10.0f
-#define MOUSE_SENSITIVITY 0.1f
+#define MOVEMENT_SPEED		10.0f
+#define RUN_FACTOR			2.0f
+#define MOUSE_SENSITIVITY	0.1f
 
 enum class CamMovement {
 	Forward,
@@ -25,7 +26,7 @@ class Camera {
 		Camera &operator=(Camera const &rhs);
 
 		glm::mat4 getViewMatrix() const;
-		void processKeyboard(CamMovement direction, float dtTime);
+		void processKeyboard(CamMovement direction, float dtTime, bool isRun = false);
 		void processMouseMovement(float xOffset, float yOffset, bool \
 		constrainPitch = true);
 		void processMouseScroll(float yOffset);
