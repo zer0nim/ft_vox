@@ -22,6 +22,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+class TextRender;
+class ChunkManager;
+std::chrono::milliseconds getMs();
+void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManager &chunkManager);
 bool	createDir(std::string const &dirNames);
 bool	createDir(char const *dirNames);
 bool	createMapFiles(std::string const &mapName);
