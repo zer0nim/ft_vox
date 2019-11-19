@@ -46,18 +46,38 @@ void Camera::processKeyboard(CamMovement direction, float dtTime, bool isRun) {
 	float	velocity;
 
 	velocity = movementSpeed * dtTime * ((isRun) ? RUN_FACTOR : 1);
-	if (direction == CamMovement::Forward)
-		pos = pos + front * velocity;
-	if (direction == CamMovement::Backward)
-		pos = pos - front * velocity;
-	if (direction == CamMovement::Left)
+	if (direction == CamMovement::Forward) {
+		#if CONSTRAINT_Y == true
+			glm::vec3 tmpFront = front;
+			tmpFront.y = 0;
+			tmpFront = glm::normalize(tmpFront);
+			pos = pos + tmpFront * velocity;
+		#else
+			pos = pos + front * velocity;
+		#endif
+	}
+	if (direction == CamMovement::Backward) {
+		#if CONSTRAINT_Y == true
+			glm::vec3 tmpFront = front;
+			tmpFront.y = 0;
+			tmpFront = glm::normalize(tmpFront);
+			pos = pos - tmpFront * velocity;
+		#else
+			pos = pos - front * velocity;
+		#endif
+	}
+	if (direction == CamMovement::Left) {
 		pos = pos - right * velocity;
-	if (direction == CamMovement::Right)
+	}
+	if (direction == CamMovement::Right) {
 		pos = pos + right * velocity;
-	if (direction == CamMovement::Up)
+	}
+	if (direction == CamMovement::Up) {
 		pos = pos + glm::vec3(0, 1, 0) * velocity;
-	if (direction == CamMovement::Down)
+	}
+	if (direction == CamMovement::Down) {
 		pos = pos - glm::vec3(0, 1, 0) * velocity;
+	}
 }
 
 void Camera::processMouseMovement(float xOffset, float yOffset, bool constrainPitch) {

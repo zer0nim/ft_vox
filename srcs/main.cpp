@@ -50,8 +50,6 @@ TextRender &textRender, ChunkManager &chunkManager) {
 	bool						firstLoop = true;
 	ThreadupdateArgs			*threadUpdateArgs = new ThreadupdateArgs(window, chunkManager, winU->cam->pos);
 
-	wordFVec3 pos(0, 0, 0);
-
 	// projection matrix
 	glm::mat4	projection = glm::perspective(
 		glm::radians(cam.zoom), winU->width / winU->height, 0.1f, 100.0f);
@@ -133,7 +131,7 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
 int		main(int ac, char const **av) {
 	GLFWwindow		*window;
 	tWinUser		winU;
-	Camera			cam(glm::vec3(0.0f, 64.0f, 19.0f));
+	Camera			cam(glm::vec3(0.0f, 35.0f, 19.0f));
 	TextureManager	*textureManager = nullptr;
 
 	if (ac > 2) {
