@@ -124,7 +124,7 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
 int		main(int ac, char const **av) {
 	GLFWwindow	*window;
 	tWinUser	winU;
-	Camera		cam(glm::vec3(0.0f, 0.0f, 3.0f));
+	Camera		cam(glm::vec3(0.0f, 0.0f, 19.0f));
 	AChunk		*chunk;
 	TextureManager	*textureManager;
 
@@ -155,14 +155,14 @@ int		main(int ac, char const **av) {
 
 		chunk = new Chunk(*textureManager);
 		chunk->oldCreateChunk();
-		chunk->updateBlock(chunkVec3(0, 0, 0), 3);
-		chunk->updateBlock(chunkVec3(15, 0, 0), 3);
-		chunk->updateBlock(chunkVec3(15, 0, 15), 3);
-		chunk->updateBlock(chunkVec3(0, 0, 15), 3);
-		chunk->updateBlock(chunkVec3(0, 15, 0), 3);
-		chunk->updateBlock(chunkVec3(15, 15, 0), 3);
-		chunk->updateBlock(chunkVec3(15, 15, 15), 3);
+		chunk->updateBlock(chunkVec3(0, 0, 15), 1);
+		chunk->updateBlock(chunkVec3(15, 0, 15), 2);
 		chunk->updateBlock(chunkVec3(0, 15, 15), 3);
+		chunk->updateBlock(chunkVec3(15, 15, 15), 4);
+		chunk->updateBlock(chunkVec3(15, 0, 0), 3);
+		chunk->updateBlock(chunkVec3(0, 0, 0), 3);
+		chunk->updateBlock(chunkVec3(15, 15, 0), 3);
+		chunk->updateBlock(chunkVec3(0, 15, 0), 3);
 
 		gameLoop(window, cam, skyboxShader, skybox, *chunk);
 

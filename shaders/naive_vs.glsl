@@ -38,13 +38,13 @@ void main() {
 	vs_out.Normal = mat3(transpose(inverse(model))) * aNormal;
 
 	if (aFaceId == 4.0) {  // top
-		TextureId = blockTexturesInfo[0].textureTop;
+		TextureId = blockTexturesInfo[cubeId].textureTop;
 	}
 	else if  (aFaceId == 5.0) {  // bottom
-		TextureId = blockTexturesInfo[1].textureBottom;
+		TextureId = blockTexturesInfo[cubeId].textureBottom;
 	}
 	else {
-		TextureId = blockTexturesInfo[2].textureSide;
+		TextureId = blockTexturesInfo[cubeId].textureSide;
 	}
 
 	gl_Position = projection * view * model * pos;
