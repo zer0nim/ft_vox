@@ -174,7 +174,6 @@ void	TextureManager::setUniform(Shader &sh) const {
 		sh.setInt("blockTextures[" + std::to_string(i) + "]", i);
 		glBindTexture(GL_TEXTURE_2D, _texturesLoaded[i]->id);
 	}
-	glActiveTexture(GL_TEXTURE0);
 
 	// set uniforms textures
 	for (size_t i = 0; i < _blocks.size(); ++i) {

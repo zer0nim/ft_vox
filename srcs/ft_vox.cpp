@@ -1,5 +1,7 @@
 #include <iostream>
+#include <iomanip>
 #include <boost/filesystem.hpp>
+
 #include "ft_vox.hpp"
 #include "ChunkManager.hpp"
 #include "TextRender.hpp"
