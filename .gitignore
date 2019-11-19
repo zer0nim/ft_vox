@@ -35,4 +35,5 @@
 .DS_Store
 *.vim
 *.swp
+.dep
 ft_vox

@@ -171,7 +171,6 @@ void	TextureManager::setUniform(Shader &sh) const {
 	// activate textures
 	for (size_t i = 0; i < _texturesLoaded.size(); ++i) {
 		glActiveTexture(GL_TEXTURE0 + i);
-		// sh.setInt("blockTextures[" + std::to_string(i) + "]", _texturesLoaded[i]->id);
 		sh.setInt("blockTextures[" + std::to_string(i) + "]", i);
 		glBindTexture(GL_TEXTURE_2D, _texturesLoaded[i]->id);
 	}
@@ -198,6 +197,15 @@ void	TextureManager::setUniform(Shader &sh) const {
 		}
 	}
 }
+
+void	TextureManager::activateTextures() const {
+	// activate textures
+	for (size_t i = 0; i < _texturesLoaded.size(); ++i) {
+		glActiveTexture(GL_TEXTURE0 + i);
+		glBindTexture(GL_TEXTURE_2D, _texturesLoaded[i]->id);
+	}
+}
+
 
 std::vector<TextureManager::Texture *> const &	TextureManager::getTexturesLoaded() const {
 	return _texturesLoaded;

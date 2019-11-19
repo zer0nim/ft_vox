@@ -15,7 +15,6 @@ class Chunk : public AChunk {
 
 		virtual void	update();
 		virtual void	draw(glm::mat4 &view, wordIVec3 &startPos);
-		virtual void	oldCreateChunk();  // TODO(zer0nim): remove
 		virtual void	setProjection(glm::mat4 &projection);
 
 	private:

@@ -86,7 +86,7 @@ void	AChunk::_createChunk() {
 			for (uint8_t z = 0; z < CHUNK_SZ_Z; z++) {
 				_data.data[x][y][z] = 0;
 				if (rand() % 300 == 0)
-					_data.data[x][y][z] = rand() % 3;
+					_data.data[x][y][z] = rand() % 4 + 1;
 			}
 		}
 	}

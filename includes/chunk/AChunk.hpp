@@ -22,7 +22,6 @@ class AChunk {
 
 		virtual void	draw(glm::mat4 &view, wordIVec3 &startPos) = 0;
 		virtual void	update() = 0;
-		virtual void	oldCreateChunk() = 0;  // TODO(zer0nim): remove
 		virtual void	setProjection(glm::mat4 &projection) = 0;
 		void			createChunk(std::string const &mapName, wordIVec3 const &chunkPos);
 		void			createChunk(std::string const &mapName, std::string const &chunkPos);

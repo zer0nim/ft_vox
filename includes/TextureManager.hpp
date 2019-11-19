@@ -36,6 +36,7 @@ class TextureManager {
 		};
 
 		void	setUniform(Shader &sh) const;
+		void	activateTextures() const;
 		std::vector<Texture *> const &			getTexturesLoaded() const;
 		std::array<BlockTexture *, 4> const &	getBlocks() const;
 

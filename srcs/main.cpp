@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <iomanip>
 #include <boost/filesystem.hpp>
 
 #include "ft_vox.hpp"
@@ -180,7 +181,7 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
 int		main(int ac, char const **av) {
 	GLFWwindow		*window;
 	tWinUser		winU;
-	Camera			cam(glm::vec3(0.0f, 0.0f, 3.0f));
+	Camera			cam(glm::vec3(0.0f, 0.0f, 19.0f));
 	TextureManager	*textureManager = nullptr;
 
 	if (ac != 2) {
@@ -191,7 +192,6 @@ int		main(int ac, char const **av) {
 	if (createMapFiles(mapName) == false) {
 		return 1;
 	}
-
 
 	if (!init(&window, "ft_vox", &winU, &cam))
 		return (1);
@@ -230,6 +230,7 @@ int		main(int ac, char const **av) {
 		std::cout << "ShaderError !" << std::endl;
 		std::cerr << e.what() << std::endl;
 	}
+	// TODO(tnicolas42): add textRender errors catchings
 
 	delete textureManager;
 	glfwDestroyWindow(window);
