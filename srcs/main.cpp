@@ -148,6 +148,7 @@ int		main(int ac, char const **av) {
 		if (createMapFiles(mapName) == false) {
 			return 1;
 		}
+		mapName = std::string(MAPS_PATH) + mapName;
 	}
 
 
