@@ -9,19 +9,22 @@ wordIVec3	stringToVec(const std::string &s);  // string "x_y_z" to vec
 
 class ChunkManager {
 	public:
-		explicit ChunkManager(std::string const &mapName);
+		ChunkManager(std::string const &mapName, TextureManager const &textureManager);
 		explicit ChunkManager(ChunkManager const &src);
 		virtual ~ChunkManager();
 
 		ChunkManager &operator=(ChunkManager const &rhs);
 
-		void	init(wordFVec3 camPos);  // load the firsts chunks
+		void	init(wordFVec3 camPos, glm::mat4 &projection);  // load the firsts chunks
 		void	update(wordFVec3 camPos);  // global update (call each frame)
+		void	draw(glm::mat4 view);  // draw all chunks
 
 		std::string const						&getMapName() const;
 		std::map<std::string, AChunk*>			&getChunkMap();
 		std::map<std::string, AChunk*> const	&getChunkMap() const;
 		wordIVec3 const							&getChunkActPos() const;
+		TextureManager const					&getTextureManager() const;
+		glm::mat4 const							&getProjection() const;
 
 	private:
 		ChunkManager();
@@ -39,4 +42,6 @@ class ChunkManager {
 		*/
 		std::map<std::string, AChunk*>	_chunkMap;  // map with all chunks
 		wordIVec3						_chunkActPos;  // actual chunk position
+		TextureManager const			&_textureManager;
+		glm::mat4						_projection;
 };

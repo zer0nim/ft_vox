@@ -9,7 +9,7 @@
 #define checkErrorExit() checkErrorExit_(__FILE__, __LINE__)
 
 #define CHUNK_SZ_X 16  // [bloc] type: int
-#define CHUNK_SZ_Y 16  // [bloc] type: int
+#define CHUNK_SZ_Y 128  // [bloc] type: int
 #define CHUNK_SZ_Z 16  // [bloc] type: int
 
 #define RENDER_DISTANCE_CHUNK	2  // [chunk] type: int

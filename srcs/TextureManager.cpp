@@ -4,11 +4,11 @@
 
 #include "utils/Texture.hpp"
 
-const std::map<std::string, int8_t>	TextureManager::_blocksId = {
-	{"dirt", 0},
-	{"stone", 1},
-	{"grass", 2},
-	{"sand", 3}
+const std::array<std::string, 4>	TextureManager::_blocksNames = {
+	"dirt",
+	"stone",
+	"grass",
+	"sand"
 };
 
 TextureManager::TextureManager(std::string const &texturesSettings) {
@@ -20,7 +20,6 @@ TextureManager::TextureManager(std::string const &texturesSettings) {
 			nlohmann::json	data;
 			data << fileStream;
 			loadBlocksTextures(data);
-			// drawBlocks();
 		}
 		else {
 			std::cout << "throw FailedToOpenException" << std::endl;
@@ -72,44 +71,20 @@ TextureManager &TextureManager::operator=(TextureManager const &rhs) {
 		// clone _texturesLoaded
 		_texturesLoaded = std::vector<TextureManager::Texture *>(rhs.getTexturesLoaded());
 		for (auto it = _texturesLoaded.begin(); it != _texturesLoaded.end(); ++it) {
-			TextureManager::Texture	*tmp = *it;
 			*it = new Texture((*it)->id, (*it)->path);
-
-			for (size_t i = 0; i < rhsBlocks.size(); ++i) {
-				if (_blocks[i] != nullptr) {
-					if (_blocks[i]->side == tmp) {
-						_blocks[i]->side = *it;
-					}
-					if (_blocks[i]->top == tmp) {
-						_blocks[i]->top = *it;
-					}
-					if (_blocks[i]->bottom == tmp) {
-						_blocks[i]->bottom = *it;
-					}
-				}
-			}
 		}
 	}
 	return *this;
 }
 
-void	TextureManager::drawBlocks() const {
-	for (BlockTexture *block : _blocks) {
-		if (block != nullptr) {
-			std::cout << *block;
-		}
-	}
-}
-
-
-TextureManager::Texture	*TextureManager::loadTextures(std::string const &path) {
-	TextureManager::Texture	*res;
+int8_t	TextureManager::loadTextures(std::string const &path) {
+	int8_t	res;
 	bool skip = false;
 
 	// verify if the texture has been loaded already
 	for (u_int32_t i = 0; i < _texturesLoaded.size(); ++i) {
 		if (path == _texturesLoaded[i]->path) {
-			res = _texturesLoaded[i];
+			res = i;
 			skip = true;
 			break;
 		}
@@ -120,22 +95,30 @@ TextureManager::Texture	*TextureManager::loadTextures(std::string const &path) {
 		TextureManager::Texture	*texture = new TextureManager::Texture();
 		bool inSpaceSRGB = true;
 
-		texture->id = textureFromFile(path, inSpaceSRGB);
+		try {
+			texture->id = textureFromFile(path, inSpaceSRGB);
+		}
+		catch(TextureFailToLoad const & e) {
+			throw TextureManager::failed2LoadTextureException();
+		}
+
 		texture->path = path;
 		// save to _texturesLoaded array to skip duplicate textures loading later
 		_texturesLoaded.push_back(texture);
-		res = texture;
+		res = _texturesLoaded.size() - 1;
 	}
 
 	return res;
 }
 
 void	TextureManager::loadBlocksTextures(nlohmann::json const &data) {
+	// read json data to fill blocks textures infos
 	if (data.find("blocks") != data.end()) {
 		for (auto &block : data["blocks"].items()) {
 			// valid material name
-			if (_blocksId.find(block.key()) != _blocksId.end()) {
-				int8_t id = _blocksId.at(block.key());
+			auto it = std::find(_blocksNames.begin(), _blocksNames.end(), block.key());
+			if (it != _blocksNames.end()) {
+				int8_t id = it - _blocksNames.begin();
 
 				// texture has not already been defined
 				if (_blocks[id] == nullptr) {
@@ -153,11 +136,65 @@ void	TextureManager::loadBlocksTextures(nlohmann::json const &data) {
 						else if (key == "bottom") {
 							blockTexture->bottom = loadTextures(blockText.value());
 						}
+						else {
+							std::cout << "WARNING ! block \"" << _blocksNames[id] << \
+							"\", unrecognized texture key \"" <<  key  << '"' << std::endl;
+						}
+					}
+
+					if (blockTexture->side == -1) {
+						std::cerr << "missing default texture for block \"" << \
+						_blocksNames[id] << '"' << std::endl;
+						throw TextureManager::missingBlockException();
 					}
 
 					_blocks[id] = blockTexture;
 				}
 			}
+		}
+	}
+
+	// check for missing block textures info
+	bool missingBlock = false;
+	for (size_t i = 0; i < _blocks.size(); ++i) {
+		if (_blocks[i] == nullptr) {
+			missingBlock = true;
+			std::cerr << "missing block: " << _blocksNames[i] << std::endl;
+		}
+	}
+	if (missingBlock) {
+		throw TextureManager::missingBlockException();
+	}
+}
+
+void	TextureManager::setUniform(Shader &sh) const {
+	// activate textures
+	for (size_t i = 0; i < _texturesLoaded.size(); ++i) {
+		glActiveTexture(GL_TEXTURE0 + i);
+		// sh.setInt("blockTextures[" + std::to_string(i) + "]", _texturesLoaded[i]->id);
+		sh.setInt("blockTextures[" + std::to_string(i) + "]", i);
+		glBindTexture(GL_TEXTURE_2D, _texturesLoaded[i]->id);
+	}
+	glActiveTexture(GL_TEXTURE0);
+
+	// set uniforms textures
+	for (size_t i = 0; i < _blocks.size(); ++i) {
+		sh.setInt("blockTexturesInfo[" + std::to_string(i) + "].textureSide", _blocks[i]->side);
+
+		// top texture
+		if (_blocks[i]->top != -1) {
+			sh.setInt("blockTexturesInfo[" + std::to_string(i) + "].textureTop", _blocks[i]->top);
+		}
+		else {
+			sh.setInt("blockTexturesInfo[" + std::to_string(i) + "].textureTop", _blocks[i]->side);
+		}
+
+		// bottom texture
+		if (_blocks[i]->top != -1) {
+			sh.setInt("blockTexturesInfo[" + std::to_string(i) + "].textureBottom", _blocks[i]->bottom);
+		}
+		else {
+			sh.setInt("blockTexturesInfo[" + std::to_string(i) + "].textureBottom", _blocks[i]->side);
 		}
 	}
 }
@@ -174,17 +211,25 @@ std::ostream & operator << (std::ostream &out, const TextureManager::Texture &m)
 	return out;
 }
 
-std::ostream & operator << (std::ostream &out, const TextureManager::BlockTexture &m) {
-	out << "{ " << std::endl;
-	if (m.side != nullptr) {
-		out << " side: " << m.side << ": " << *(m.side) << std::endl;
+std::ostream & operator << (std::ostream &out, const TextureManager &tm) {
+	std::vector<TextureManager::Texture *> const &texturesLoaded = tm.getTexturesLoaded();
+	std::array<TextureManager::BlockTexture *, 4> const &blocks = tm.getBlocks();
+
+	for (TextureManager::BlockTexture *b : blocks) {
+		if (b != nullptr) {
+			out << "{ " << std::endl;
+			if (b->side != -1) {
+				out << " side: " << b->side << ": " << *(texturesLoaded[b->side]) << std::endl;
+			}
+			if (b->top != -1) {
+				out << " top: " << b->top << ": " << *(texturesLoaded[b->top]) << std::endl;
+			}
+			if (b->bottom != -1) {
+				out << " bottom: " << b->bottom << ": " << *(texturesLoaded[b->bottom]) << std::endl;
+			}
+			out << "}" << std::endl;
+		}
 	}
-	if (m.top != nullptr) {
-		out << " top: " << m.top << ": " << *(m.top) << std::endl;
-	}
-	if (m.bottom != nullptr) {
-		out << " bottom: " << m.bottom << ": " << *(m.bottom) << std::endl;
-	}
-	out << "}" << std::endl;
+
 	return out;
 }

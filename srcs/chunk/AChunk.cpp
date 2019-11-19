@@ -6,18 +6,20 @@
 #include "Chunk.hpp"
 #include "ChunkManager.hpp"
 
-AChunk * instanciateNewChunk() {
-	AChunk * newChunk = new Chunk;
+AChunk * instanciateNewChunk(TextureManager const &textureManager) {
+	AChunk * newChunk = new Chunk(textureManager);
 	return newChunk;
 }
 
-AChunk::AChunk() :
+AChunk::AChunk(TextureManager const &textureManager) :
 _data(),
 _filename(""),
-_isModifiedFromBegining(false) {
+_isModifiedFromBegining(false),
+_textureManager(textureManager) {
 }
 
-AChunk::AChunk(AChunk const &src) {
+AChunk::AChunk(AChunk const &src)
+: _textureManager(src.getTextureManager()) {
 	*this = src;
 }
 
@@ -130,3 +132,4 @@ void AChunk::save() {
 }
 
 AChunk::ChunkData const	&AChunk::getData() const { return _data; }
+TextureManager const &AChunk::getTextureManager() const { return _textureManager; }

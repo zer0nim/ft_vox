@@ -23,13 +23,16 @@ wordIVec3 stringToVec(const std::string &s) {
     return vec;
 }
 
-ChunkManager::ChunkManager(std::string const &mapName) :
+ChunkManager::ChunkManager(std::string const &mapName, TextureManager const &textureManager) :
 _mapName(mapName),
 _chunkMap(),
-_chunkActPos(-1, -1, -1) {}
+_chunkActPos(-1, -1, -1),
+_textureManager(textureManager),
+_projection() {}
 
 ChunkManager::ChunkManager(ChunkManager const &src) :
-_mapName(src.getMapName()) {
+_mapName(src.getMapName()),
+_textureManager(src.getTextureManager()) {
 	*this = src;
 }
 
@@ -48,12 +51,15 @@ ChunkManager::~ChunkManager() {
 }
 
 ChunkManager &ChunkManager::operator=(ChunkManager const &rhs) {
-	(void)rhs;
-	// if (this != &rhs) {}
+	if (this != &rhs) {
+		_chunkMap = rhs.getChunkMap();
+		_projection = rhs.getProjection();
+	}
 	return *this;
 }
 
-void ChunkManager::init(wordFVec3 camPos) {
+void ChunkManager::init(wordFVec3 camPos, glm::mat4 &projection) {
+	_projection = projection;
 	update(camPos);  // call update once to create the chunks
 }
 
@@ -73,8 +79,9 @@ void ChunkManager::update(wordFVec3 camPos) {
 				for (int32_t y = 0; y < CHUNK_SZ_Y * MAX_Y_CHUNK; y += CHUNK_SZ_Y) {
 					wordIVec3 chunkPos(x, y, z);  // this is the position of the chunk
 					if (_isChunkExist(chunkPos) == false) {  // if the chunk doesnt exist (for now)
-						newChunk = instanciateNewChunk();  // create a chunk with the rihgt type
+						newChunk = instanciateNewChunk(_textureManager);  // create a chunk with the rihgt type
 						newChunk->createChunk(_mapName, chunkPos);  // init the chunk with the right values
+						newChunk->setProjection(_projection);
 						_insertChunk(chunkPos, newChunk);
 					}
 				}
@@ -95,6 +102,19 @@ void ChunkManager::update(wordFVec3 camPos) {
 	for (auto it = toDelete.begin(); it != toDelete.end(); it++) {
 		delete _chunkMap[*it];
 		_chunkMap.erase(*it);
+	}
+}
+
+void ChunkManager::draw(glm::mat4 view) {
+	for (int32_t x = _chunkActPos.x - CHUNK_SZ_X * RENDER_DISTANCE_CHUNK;
+	x <= _chunkActPos.x + CHUNK_SZ_X * RENDER_DISTANCE_CHUNK; x += CHUNK_SZ_X) {
+		for (int32_t z = _chunkActPos.z - CHUNK_SZ_Z * RENDER_DISTANCE_CHUNK;
+		z <= _chunkActPos.z + CHUNK_SZ_Z * RENDER_DISTANCE_CHUNK; z += CHUNK_SZ_Z) {
+			for (int32_t y = 0; y < CHUNK_SZ_Y * MAX_Y_CHUNK; y += CHUNK_SZ_Y) {
+				wordIVec3 chunkPos(x, y, z);  // this is the position of the chunk
+				_chunkMap[vecToString(chunkPos)]->draw(view, chunkPos);
+			}
+		}
 	}
 }
 
@@ -131,3 +151,5 @@ std::string const &ChunkManager::getMapName() const { return _mapName; }
 std::map<std::string, AChunk*>			&ChunkManager::getChunkMap() { return _chunkMap; }
 std::map<std::string, AChunk*> const	&ChunkManager::getChunkMap() const { return _chunkMap; }
 wordIVec3 const							&ChunkManager::getChunkActPos() const { return _chunkActPos; }
+TextureManager const					&ChunkManager::getTextureManager() const { return _textureManager; };
+glm::mat4 const							&ChunkManager::getProjection() const { return _projection; };

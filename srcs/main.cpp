@@ -108,8 +108,12 @@ TextRender &textRender, ChunkManager &chunkManager) {
 	glm::mat4	projection = glm::perspective(
 		glm::radians(cam.zoom), winU->width / winU->height, 0.1f, 100.0f);
 
+	chunkManager.init(winU->cam->pos, projection);
+
 	skybox.getShader().use();
 	skybox.getShader().setMat4("projection", projection);
+
+	std::cout << "init done" << std::endl;
 
 	glClearColor(0.11373f, 0.17647f, 0.27059f, 1.0f);
 	checkError();
@@ -131,6 +135,7 @@ TextRender &textRender, ChunkManager &chunkManager) {
 
 		// draw here
 		chunkManager.update(winU->cam->pos);
+		chunkManager.draw(view);
 
 		// draw skybox
 		skybox.draw();
@@ -178,8 +183,6 @@ int		main(int ac, char const **av) {
 	Camera			cam(glm::vec3(0.0f, 0.0f, 3.0f));
 	TextureManager	*textureManager = nullptr;
 
-	(void)ac;
-	(void)av;
 	if (ac != 2) {
 		std::cout << "Usage: ./ft_vox <map_name>" << std::endl;
 		return 0;
@@ -210,8 +213,7 @@ int		main(int ac, char const **av) {
 		Skybox skybox(skyboxShader);
 
 		// create chunkManager
-		ChunkManager chunkManager(mapName);
-		chunkManager.init(wordFVec3(0, 0, 0));
+		ChunkManager chunkManager(mapName, *textureManager);
 
 		// run the game
 		gameLoop(window, cam, skybox, textRender, chunkManager);
