@@ -93,7 +93,7 @@ void ChunkManager::update(wordFVec3 &camPos) {
 		if (_isInChunkLoaded(stringToVec(it->first))) {
 			it->second->update();
 		}
-		else {  // we need to remove the chunk
+		else if (_isInChunkLoadedBorder(stringToVec(it->first)) == false) {  // we need to remove the chunk
 			toDelete.push_back(it->first);
 		}
 	}
@@ -122,9 +122,9 @@ void ChunkManager::_updateChunkPos(wordFVec3 const &pos) {
 	_updateChunkPos(wordIVec3(pos));
 }
 void ChunkManager::_updateChunkPos(wordIVec3 const &pos) {
-	_chunkActPos.x = pos.x - pos.x % 16 + ((pos.x < 0) ? -CHUNK_SZ_X : 0);
-	_chunkActPos.y = pos.y - pos.y % 16 + ((pos.y < 0) ? -CHUNK_SZ_Y : 0);
-	_chunkActPos.z = pos.z - pos.z % 16 + ((pos.z < 0) ? -CHUNK_SZ_Z : 0);
+	_chunkActPos.x = pos.x - pos.x % CHUNK_SZ_X + ((pos.x < 0) ? -CHUNK_SZ_X : 0);
+	_chunkActPos.y = pos.y - pos.y % CHUNK_SZ_Y + ((pos.y < 0) ? -CHUNK_SZ_Y : 0);
+	_chunkActPos.z = pos.z - pos.z % CHUNK_SZ_Z + ((pos.z < 0) ? -CHUNK_SZ_Z : 0);
 }
 
 void	ChunkManager::_insertChunk(wordIVec3 chunkPos, AChunk * newChunk) {
@@ -136,6 +136,18 @@ bool	ChunkManager::_isInChunkLoaded(wordIVec3 const &chunkPos) const {
 	|| chunkPos.x > _chunkActPos.x + RENDER_DISTANCE_CHUNK * CHUNK_SZ_X + CHUNK_SZ_X
 	|| chunkPos.z < _chunkActPos.z - RENDER_DISTANCE_CHUNK * CHUNK_SZ_Z
 	|| chunkPos.z > _chunkActPos.z + RENDER_DISTANCE_CHUNK * CHUNK_SZ_Z + CHUNK_SZ_Z)
+		return false;
+	return true;
+}
+
+bool	ChunkManager::_isInChunkLoadedBorder(wordIVec3 const &chunkPos) const {
+	/*
+	return true if the chunk is in loaded chunk or at a dist of 1 to loaded chunks
+	*/
+	if (chunkPos.x < _chunkActPos.x - (RENDER_DISTANCE_CHUNK + 1) * CHUNK_SZ_X
+	|| chunkPos.x > _chunkActPos.x + (RENDER_DISTANCE_CHUNK + 1) * CHUNK_SZ_X + CHUNK_SZ_X
+	|| chunkPos.z < _chunkActPos.z - (RENDER_DISTANCE_CHUNK + 1) * CHUNK_SZ_Z
+	|| chunkPos.z > _chunkActPos.z + (RENDER_DISTANCE_CHUNK + 1) * CHUNK_SZ_Z + CHUNK_SZ_Z)
 		return false;
 	return true;
 }
