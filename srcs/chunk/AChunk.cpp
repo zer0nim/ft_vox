@@ -80,6 +80,10 @@ bool	AChunk::_createChunkFromFile() {
 	return true;
 }
 
+#define MAP_FREQ 0.5  // frequency -> nb of mountain
+#define MAP_HEIGHT_EXP 1  // bigger nb == small mountains
+#define LOWER_HEIGHT 1  // under LOWER_HEIGHT -> block
+
 void	AChunk::_createChunk() {
 	float xFactor = 1.0 / (MAX_MAP_SIZE_X - 1);
 	float yFactor = 1.0 / (MAX_MAP_SIZE_Y - 1);
@@ -92,21 +96,18 @@ void	AChunk::_createChunk() {
 			y = (_chunkPos.y + iy) * yFactor;
 			for (uint8_t iz = 0; iz < CHUNK_SZ_Z; iz++) {
 				z = (_chunkPos.z + iz) * zFactor;
+				_data.data[ix][iy][iz] = 0;
 
-				glm::vec3 v(x, y, z);
-				float val = glm::perlin(v);
-				if (val > 0.1) {
-					if (y < 0.25)
-						_data.data[ix][iy][iz] = 1;
-					else if (y < 0.5)
-						_data.data[ix][iy][iz] = 2;
-					else if (y < 0.75)
-						_data.data[ix][iy][iz] = 3;
-					else
-						_data.data[ix][iy][iz] = 4;
+				float elevation = 1 * glm::perlin(glm::vec2(MAP_FREQ * x * 1, MAP_FREQ * z * 1))
+                	+  0.5 * glm::perlin(glm::vec2(MAP_FREQ * x * 2, MAP_FREQ * z * 2))
+                	+ 0.25 * glm::perlin(glm::vec2(MAP_FREQ * x * 4, MAP_FREQ * z * 4));
+				elevation = std::pow(elevation, MAP_HEIGHT_EXP);
+				if (y <= elevation) {
+					_data.data[ix][iy][iz] = 1;
 				}
-				else
-					_data.data[ix][iy][iz] = 0;
+				else if (_chunkPos.y + iy < LOWER_HEIGHT) {
+					_data.data[ix][iy][iz] = 2;
+				}
 			}
 		}
 	}
