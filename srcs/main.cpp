@@ -194,7 +194,9 @@ int		main(int ac, char const **av) {
 		std::cout << "ShaderError !" << std::endl;
 		std::cerr << e.what() << std::endl;
 	}
-	// TODO(tnicolas42): add textRender errors catchings
+	catch (const TextRender::TextRenderError & e) {
+		std::cerr << "TextRenderError: " << e.what() << std::endl;
+	}
 
 	delete textureManager;
 	glfwDestroyWindow(window);
