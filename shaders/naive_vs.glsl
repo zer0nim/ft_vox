@@ -11,9 +11,8 @@ out VS_OUT {
 	vec2 TexCoords;
 	vec3 FragPos;
 	vec3 Normal;
+	flat int TextureId;
 } vs_out;
-
-flat out int TextureId;
 
 struct	BlockTexture {
 	int	textureSide;
@@ -38,13 +37,13 @@ void main() {
 	vs_out.Normal = mat3(transpose(inverse(model))) * aNormal;
 
 	if (aFaceId == 4.0) {  // top
-		TextureId = blockTexturesInfo[cubeId].textureTop;
+		vs_out.TextureId = blockTexturesInfo[cubeId].textureTop;
 	}
 	else if  (aFaceId == 5.0) {  // bottom
-		TextureId = blockTexturesInfo[cubeId].textureBottom;
+		vs_out.TextureId = blockTexturesInfo[cubeId].textureBottom;
 	}
 	else {
-		TextureId = blockTexturesInfo[cubeId].textureSide;
+		vs_out.TextureId = blockTexturesInfo[cubeId].textureSide;
 	}
 
 	gl_Position = projection * view * model * pos;
