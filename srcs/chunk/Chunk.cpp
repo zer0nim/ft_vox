@@ -85,7 +85,7 @@ void	Chunk::update() {
 	_data.isModified = false;
 }
 
-void	Chunk::draw(glm::mat4 &view, wordIVec3 &startPos) const {
+void	Chunk::draw(glm::mat4 &view) const {
 	_textureManager.activateTextures();
 
 	_shaderData->naiveShader->use();
@@ -93,7 +93,7 @@ void	Chunk::draw(glm::mat4 &view, wordIVec3 &startPos) const {
 	glBindVertexArray(_shaderData->cubeVao);
 
 	// loop throught chunk cubes and draw them
-	glm::mat4 baseModel = glm::translate(glm::mat4(1.0), glm::vec3(startPos));
+	glm::mat4 baseModel = glm::translate(glm::mat4(1.0), glm::vec3(_chunkPos));
 	for (uint8_t x = 0; x < CHUNK_SZ_X; ++x) {
 		for (uint8_t y = 0; y < CHUNK_SZ_Y; ++y) {
 			for (uint8_t z = 0; z < CHUNK_SZ_Z; ++z) {

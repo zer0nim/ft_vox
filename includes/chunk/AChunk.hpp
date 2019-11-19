@@ -20,7 +20,7 @@ class AChunk {
 
 		AChunk &operator=(AChunk const &rhs);
 
-		virtual void	draw(glm::mat4 &view, wordIVec3 &startPos) const = 0;
+		virtual void	draw(glm::mat4 &view) const = 0;
 		virtual void	update() = 0;
 		virtual void	setProjection(glm::mat4 &projection) = 0;
 		void			createChunk(std::string const &mapName, wordIVec3 const &chunkPos);

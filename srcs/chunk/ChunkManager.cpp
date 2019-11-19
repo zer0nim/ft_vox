@@ -112,7 +112,7 @@ void ChunkManager::draw(glm::mat4 view) {
 		z <= _chunkActPos.z + CHUNK_SZ_Z * RENDER_DISTANCE_CHUNK; z += CHUNK_SZ_Z) {
 			for (int32_t y = 0; y < CHUNK_SZ_Y * MAX_Y_CHUNK; y += CHUNK_SZ_Y) {
 				wordIVec3 chunkPos(x, y, z);  // this is the position of the chunk
-				_chunkMap[vecToString(chunkPos)]->draw(view, chunkPos);
+				_chunkMap[vecToString(chunkPos)]->draw(view);
 			}
 		}
 	}
