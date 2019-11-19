@@ -1,6 +1,6 @@
 #include <unistd.h>
+#include <pthread.h>
 #include <iomanip>
-#include <boost/filesystem.hpp>
 
 #include "ft_vox.hpp"
 #include "TextureManager.hpp"
@@ -11,97 +11,44 @@
 #include "utils/Skybox.hpp"
 #include "utils/TextRender.hpp"
 
-std::chrono::milliseconds getMs() {
-	return std::chrono::duration_cast<std::chrono::milliseconds>(
-		std::chrono::system_clock::now().time_since_epoch());
-}
+void	*threadUpdateFunction(void *args_) {
+	ThreadupdateArgs			*args = reinterpret_cast<ThreadupdateArgs*>(args_);
+	std::chrono::milliseconds	time_start;
+	tWinUser					*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(args->window));
+	bool						firstLoop = true;
 
-bool	createDir(std::string const &dirNames) {
-	if (boost::filesystem::is_directory(dirNames) == false) {
-		try {
-			if (boost::filesystem::create_directories(dirNames) == false) {
-				std::cout << "failed to create " << dirNames << std::endl;
-				return false;
-			}
+	(void)winU;
+	while (!glfwWindowShouldClose(args->window)) {
+		time_start = getMs();
+
+		// update
+		// args->chunkManager.update(args->camPos);
+
+		// fps
+		std::chrono::milliseconds time_loop = getMs() - time_start;
+		if (time_loop.count() > LOOP_TIME) {
+			#if DEBUG_FPS_LOW == true
+				if (!firstLoop)
+					std::cerr << "update loop slow -> " << time_loop.count() << "ms / " << LOOP_TIME << "ms (" << FPS << "fps)\n";
+			#endif
 		}
-		catch (boost::filesystem::filesystem_error &e) {
-			std::cout << "failed to create " << dirNames << " -> " << e.what() << std::endl;
-			return false;
+		else {
+			usleep((LOOP_TIME - time_loop.count()) * 1000);
 		}
+		firstLoop = false;
 	}
-	return true;
-}
-bool	createDir(char const *dirNames) { return createDir(std::string(dirNames)); }
-
-bool	createMapFiles(std::string const &mapName) {
-	// create the maps directory
-	if (createDir(MAPS_PATH) == false) {
-		return false;
-	}
-
-	// create map (is needed)
-	if (createDir(mapName) == false) {
-		return false;
-	}
-
-	// create map (is needed)
-	if (createDir(mapName + "/" + CHUNK_PATH) == false) {
-		return false;
-	}
-	return true;
-}
-
-int counter = 0;
-int savedFps = 0;
-void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManager &chunkManager) {
-	tWinUser	*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
-
-	if (winU->showInfo == false)
-		return;
-
-	if (counter % 10 == 0) {
-		savedFps = actFps;
-		counter = 0;
-	}
-	counter++;
-
-	GLfloat lineSz = TEXT_SIZE_NORMAL * 1.2;
-	GLfloat textX = 10;
-	GLfloat textY = winU->height - lineSz;
-
-	// fps
-	std::string sFps = std::to_string(savedFps) + " fps";
-	textRender.write("normal", sFps, textX, textY);
-
-	// position
-	textY -= lineSz;
-	std::string sPos = std::string("XYZ: ");
-	std::stringstream pos;
-	pos << std::fixed << std::setprecision(3) << winU->cam->pos.x << " / ";
-	pos << std::fixed << std::setprecision(3) << winU->cam->pos.y << " / ";
-	pos << std::fixed << std::setprecision(3) << winU->cam->pos.z;
-	sPos += pos.str();
-	textRender.write("normal", sPos, textX, textY);
-
-	// block position
-	textY -= lineSz;
-	std::string sPosBlock = std::string("Block: ") + std::to_string(static_cast<int>(winU->cam->pos.x)) + " " +
-		std::to_string(static_cast<int>(winU->cam->pos.y)) + " " +std::to_string(static_cast<int>(winU->cam->pos.z));
-	textRender.write("normal", sPosBlock, textX, textY);
-
-	// actual chunk
-	textY -= lineSz;
-	std::string sPosChunk = std::string("Chunk: ") + std::to_string(chunkManager.getChunkActPos().x) + " " +
-		std::to_string(chunkManager.getChunkActPos().y) + " " +std::to_string(chunkManager.getChunkActPos().z);
-	textRender.write("normal", sPosChunk, textX, textY);
+	args->quit = true;
+	pthread_exit(NULL);
+	return nullptr;
 }
 
 void	gameLoop(GLFWwindow *window, Camera const &cam, Skybox &skybox, \
 TextRender &textRender, ChunkManager &chunkManager) {
 	std::chrono::milliseconds	time_start;
 	int							lastFps;
-	tWinUser	*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
-	bool firstLoop = true;
+	tWinUser					*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
+	bool						firstLoop = true;
+	ThreadupdateArgs			*threadUpdateArgs = new ThreadupdateArgs(window, chunkManager, winU->cam->pos);
 
 	wordFVec3 pos(0, 0, 0);
 
@@ -114,11 +61,16 @@ TextRender &textRender, ChunkManager &chunkManager) {
 	skybox.getShader().use();
 	skybox.getShader().setMat4("projection", projection);
 
-	std::cout << "init done" << std::endl;
+	pthread_t threadUpdate;
+	int rc = pthread_create(&threadUpdate, NULL, threadUpdateFunction, reinterpret_cast<void*>(threadUpdateArgs));
+	if (rc) {
+         std::cout << "Error: unable to create thread," << rc << std::endl;
+         return;
+	}
 
 	glClearColor(0.11373f, 0.17647f, 0.27059f, 1.0f);
 	checkError();
-	while (!glfwWindowShouldClose(window)) {
+	while (!threadUpdateArgs->quit) {
 		time_start = getMs();
 
 		processInput(window);
@@ -152,7 +104,7 @@ TextRender &textRender, ChunkManager &chunkManager) {
 		std::chrono::milliseconds time_loop = getMs() - time_start;
 		if (time_loop.count() > LOOP_TIME) {
 			lastFps = static_cast<int>(1000.0f / time_loop.count());
-			#if DEBUG == true
+			#if DEBUG_FPS_LOW == true
 				if (!firstLoop)
 					std::cerr << "loop slow -> " << time_loop.count() << "ms / " << LOOP_TIME << "ms (" << FPS << "fps)\n";
 			#endif
@@ -230,7 +182,9 @@ int		main(int ac, char const **av) {
 		std::cout << "ShaderError !" << std::endl;
 		std::cerr << e.what() << std::endl;
 	}
-	// TODO(tnicolas42): add textRender errors catchings
+	catch (const TextRender::TextRenderError & e) {
+		std::cerr << "TextRenderError: " << e.what() << std::endl;
+	}
 
 	delete textureManager;
 	glfwDestroyWindow(window);

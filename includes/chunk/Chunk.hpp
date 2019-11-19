@@ -16,7 +16,7 @@ class Chunk : public AChunk {
 		Chunk &operator=(Chunk const &rhs);
 
 		virtual void	update();
-		virtual void	draw(glm::mat4 &view, wordIVec3 &startPos);
+		virtual void	draw(glm::mat4 &view, wordIVec3 &startPos) const;
 		virtual void	setProjection(glm::mat4 &projection);
 
 	private:

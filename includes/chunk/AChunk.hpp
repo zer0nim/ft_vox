@@ -20,7 +20,7 @@ class AChunk {
 
 		AChunk &operator=(AChunk const &rhs);
 
-		virtual void	draw(glm::mat4 &view, wordIVec3 &startPos) = 0;
+		virtual void	draw(glm::mat4 &view, wordIVec3 &startPos) const = 0;
 		virtual void	update() = 0;
 		virtual void	setProjection(glm::mat4 &projection) = 0;
 		void			createChunk(std::string const &mapName, wordIVec3 const &chunkPos);
@@ -34,7 +34,8 @@ class AChunk {
 	protected:
 		bool			_createChunkFromFile();
 		virtual void	_createChunk();
-		ChunkData		_data;
+		ChunkData		_data;  // all chunk data
+		wordIVec3		_chunkPos;  // position of the chunk
 		std::string		_filename;
 		bool			_isModifiedFromBegining;  // true if the chunk was modified
 		TextureManager const &_textureManager;

@@ -85,7 +85,7 @@ void	Chunk::update() {
 	_data.isModified = false;
 }
 
-void	Chunk::draw(glm::mat4 &view, wordIVec3 &startPos) {
+void	Chunk::draw(glm::mat4 &view, wordIVec3 &startPos) const {
 	_textureManager.activateTextures();
 
 	_shaderData->naiveShader->use();

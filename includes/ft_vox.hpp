@@ -8,12 +8,16 @@
 #define checkError() checkError_(__FILE__, __LINE__)
 #define checkErrorExit() checkErrorExit_(__FILE__, __LINE__)
 
-#define CHUNK_SZ_X 16  // [bloc] type: int
-#define CHUNK_SZ_Y 128  // [bloc] type: int
-#define CHUNK_SZ_Z 16  // [bloc] type: int
+#define CHUNK_SZ_X 8  // [bloc] type: int
+#define CHUNK_SZ_Y 16  // [bloc] type: int
+#define CHUNK_SZ_Z 8  // [bloc] type: int
+
+#define MAX_MAP_SIZE_X 2^16  // [bloc] type: int
+#define MAX_MAP_SIZE_Y 32  // [bloc] type: int
+#define MAX_MAP_SIZE_Z MAX_MAP_SIZE_X  // [bloc] type: int
 
 #define RENDER_DISTANCE_CHUNK	2  // [chunk] type: int
-#define MAX_Y_CHUNK				256 / CHUNK_SZ_Y  // [chunk] type: int
+#define MAX_Y_CHUNK				MAX_MAP_SIZE_Y / CHUNK_SZ_Y  // [chunk] type: int
 
 /*
 filesystem
@@ -36,6 +40,18 @@ typedef struct	sWinUser {
 
 	bool		showInfo;
 }				tWinUser;
+
+
+class ChunkManager;
+struct ThreadupdateArgs {
+	GLFWwindow		*window;
+	ChunkManager	&chunkManager;
+	wordFVec3		&camPos;
+	bool			quit;
+
+	ThreadupdateArgs(GLFWwindow *window_, ChunkManager &chunkManager_, wordFVec3 &camPos_) :
+	window(window_), chunkManager(chunkManager_), camPos(camPos_), quit(false) {}
+};
 
 bool	initWindow(GLFWwindow **window, const char *name, tWinUser *winU);
 void	processInput(GLFWwindow *window);

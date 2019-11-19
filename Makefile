@@ -11,6 +11,7 @@ DEP_DIR		= .dep
 SRC =	main.cpp \
 		windowEvents.cpp \
 		TextureManager.cpp \
+		ft_vox.cpp \
 \
 		chunk/AChunk.cpp \
 		chunk/ChunkManager.cpp \
