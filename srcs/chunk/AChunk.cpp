@@ -2,10 +2,10 @@
 #include <sstream>
 #include <limits>
 #include <boost/filesystem.hpp>
-#include <glm/gtc/noise.hpp>
 #include "AChunk.hpp"
 #include "Chunk.hpp"
 #include "ChunkManager.hpp"
+#include "MapGenerator.hpp"
 
 AChunk * instanciateNewChunk(TextureManager const &textureManager, glm::mat4 &projection) {
 	AChunk * newChunk = new Chunk(textureManager, projection);
@@ -80,34 +80,11 @@ bool	AChunk::_createChunkFromFile() {
 	return true;
 }
 
-#define MAP_FREQ 0.5  // frequency -> nb of mountain
-#define MAP_HEIGHT_EXP 1  // bigger nb == small mountains
-#define LOWER_HEIGHT 1  // under LOWER_HEIGHT -> block
-
 void	AChunk::_createChunk() {
-	float xFactor = 1.0 / (MAX_MAP_SIZE_X - 1);
-	float yFactor = 1.0 / (MAX_MAP_SIZE_Y - 1);
-	float zFactor = 1.0 / (MAX_MAP_SIZE_Z - 1);
-
-	float x, y, z;
 	for (uint8_t ix = 0; ix < CHUNK_SZ_X; ix++) {
-		x = (_chunkPos.x + ix) * xFactor;
 		for (uint8_t iy = 0; iy < CHUNK_SZ_Y; iy++) {
-			y = (_chunkPos.y + iy) * yFactor;
 			for (uint8_t iz = 0; iz < CHUNK_SZ_Z; iz++) {
-				z = (_chunkPos.z + iz) * zFactor;
-				_data.data[ix][iy][iz] = 0;
-
-				float elevation = 1 * glm::perlin(glm::vec2(MAP_FREQ * x * 1, MAP_FREQ * z * 1))
-                	+  0.5 * glm::perlin(glm::vec2(MAP_FREQ * x * 2, MAP_FREQ * z * 2))
-                	+ 0.25 * glm::perlin(glm::vec2(MAP_FREQ * x * 4, MAP_FREQ * z * 4));
-				elevation = std::pow(elevation, MAP_HEIGHT_EXP);
-				if (y <= elevation) {
-					_data.data[ix][iy][iz] = 1;
-				}
-				else if (_chunkPos.y + iy < LOWER_HEIGHT) {
-					_data.data[ix][iy][iz] = 2;
-				}
+				_data.data[ix][iy][iz] = getBlock(_chunkPos, ix, iy, iz);
 			}
 		}
 	}
@@ -158,12 +135,12 @@ void AChunk::save() {
 	fileData.pop_back();  // remove the last |
 	std::ofstream chunkFile(_filename);
 	if (chunkFile.fail()) {
-		std::cout << "unable to save chunk: " << _filename << strerror(errno) << std::endl;
+		std::cout << "unable to save chunk: " << _filename << " " << strerror(errno) << std::endl;
 		return;
 	}
 	chunkFile << fileData << std::endl;
 	if (chunkFile.fail()) {
-		std::cout << "unable to save chunk: " << _filename << strerror(errno) << std::endl;
+		std::cout << "unable to save chunk: " << _filename << " " << strerror(errno) << std::endl;
 		return;
 	}
 	chunkFile.close();
