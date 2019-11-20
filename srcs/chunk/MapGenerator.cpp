@@ -30,17 +30,23 @@ uint8_t		getBlock(wordIVec3 &chunkPos, uint8_t ix, uint8_t iy, uint8_t iz) {
 	}
 
 	// create cavern
-	if (y <= MAP_CAVERN_MAX_HEIGHT) {
-		float	cavern;
-		cavern = PERLIN(x * MAP_CAVERN_FREQ, y * MAP_CAVERN_FREQ, z * MAP_CAVERN_FREQ);
-		if (cavern > 0.2) {
+	float	cavern;
+	cavern = 1 * PERLIN(MAP_CAVERN_FREQ * x * 1, MAP_CAVERN_FREQ * z * 1)
+	+  0.5 * PERLIN(MAP_CAVERN_FREQ * x * 2, MAP_CAVERN_FREQ * z * 2)
+	+ 0.25 * PERLIN(MAP_CAVERN_FREQ * x * 4, MAP_CAVERN_FREQ * z * 4);
+	cavern = std::pow(cavern, MAP_HEIGHT_EXP);
+	if ((cavern > MAP_CAVERN_START && cavern < MAP_CAVERN_END)) {
+		// there is cavern
+		float cavernY1 = (PERLIN(x, y, z) + MAP_CAVERN_BASE_Y) * 0.5 + MAP_CAVERN_BASE_Y;
+		float cavernY2 = cavernY1 + (MAP_CAVERN_HEIGHT * 0.5 + (cavern - MAP_CAVERN_START) * 0.5);
+		if (y > cavernY1 && y < cavernY2) {
 			result = 0;
 		}
 	}
 
 	// always a block at the first layer
 	if (chunkPos.y + iy == 0) {
-		result = TextureManager::blocksNames["stone"];
+		result = TextureManager::blocksNames["sand"];  // replace by bedrock
 	}
 	return result;
 }
