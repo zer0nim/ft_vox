@@ -131,14 +131,11 @@ void	GreedyChunk::searchQuadMesh(chunkVec3 const &startI) {
 
 			++z;
 		}
-		if (z < startI.z + l) {
+		if (z == startI.z + l) {
 			validHeight = true;
 			++h;
 		}
 	}
-
-	// std::cout << "start: x: " << (int)(startI.x) << ", y: " << (int)(startI.y) << ", z: " << (int)(startI.z);
-	// std::cout << "  =>\tw: " << (int)w << ", l: " << (int)l << ", h: " << (int)h << std::endl;
 
 	// update _processedVox
 	for (uint8_t x = startI.x; x < startI.x + w; ++x) {
@@ -148,6 +145,9 @@ void	GreedyChunk::searchQuadMesh(chunkVec3 const &startI) {
 			}
 		}
 	}
+
+	// save mesh data
+	_meshDatas.push_back({startI, w, l, h});
 }
 
 void	GreedyChunk::update() {
@@ -184,6 +184,14 @@ void	GreedyChunk::draw(glm::mat4 &view) const {
 	_shaderData->naiveShader->use();
 	_shaderData->naiveShader->setMat4("view", view);
 	glBindVertexArray(_shaderData->cubeVao);
+
+	// std::cout << "nb meshes: " << _meshDatas.size() << std::endl;
+	// for (MeshData &md : _meshDatas) {
+	// 	std::cout << "start: x: " << (int)(md.pos.x) << ", y: " << (int)(md.pos.y) \
+	// 	<< ", z: " << (int)(md.pos.z);
+	// 	std::cout << "  =>\tw: " << (int)(md.width) << ", l: " << (int)(md.length) \
+	// 	<< ", h: " << (int)(md.height) << std::endl;
+	// }
 
 	// loop throught GreedyChunk cubes and draw them
 	glm::mat4 baseModel = glm::translate(glm::mat4(1.0), glm::vec3(_chunkPos));

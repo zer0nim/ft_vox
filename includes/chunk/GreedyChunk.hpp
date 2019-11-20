@@ -42,12 +42,14 @@ class GreedyChunk : public AChunk {
 
 		struct MeshData {
 			chunkVec3	pos;
-			chunkVec3	size;
+			uint8_t		width;
+			uint8_t		length;
+			uint8_t		height;
 		};
 
 		void	searchQuadMesh(chunkVec3 const &startI);
 
-		std::vector<MeshData>	_meshData;
+		std::vector<MeshData>	_meshDatas;
 
 		static const float	_cubeData[];
 		static std::unique_ptr<ShaderData>	_shaderData;
