@@ -8,15 +8,15 @@
 #define checkError() checkError_(__FILE__, __LINE__)
 #define checkErrorExit() checkErrorExit_(__FILE__, __LINE__)
 
-#define CHUNK_SZ_X 8  // [bloc] type: int
-#define CHUNK_SZ_Y 16  // [bloc] type: int
-#define CHUNK_SZ_Z 8  // [bloc] type: int
-
 #define MAX_MAP_SIZE_X 2^16  // [bloc] type: int
 #define MAX_MAP_SIZE_Y 64  // [bloc] type: int
 #define MAX_MAP_SIZE_Z MAX_MAP_SIZE_X  // [bloc] type: int
 
-#define RENDER_DISTANCE_CHUNK	2  // [chunk] type: int
+#define CHUNK_SZ_X 8  // [bloc] type: int
+#define CHUNK_SZ_Y 32  // [bloc] type: int
+#define CHUNK_SZ_Z 8  // [bloc] type: int
+
+#define RENDER_DISTANCE_CHUNK	3  // [chunk] type: int
 #define MAX_Y_CHUNK				MAX_MAP_SIZE_Y / CHUNK_SZ_Y  // [chunk] type: int
 
 /*

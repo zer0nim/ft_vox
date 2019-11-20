@@ -46,7 +46,7 @@ void	*threadUpdateFunction(void *args_) {
 void	gameLoop(GLFWwindow *window, Camera const &cam, Skybox &skybox, \
 TextRender &textRender, ChunkManager &chunkManager) {
 	std::chrono::milliseconds	time_start;
-	int							lastFps;
+	int							lastFps = 0;
 	tWinUser					*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
 	bool						firstLoop = true;
 	ThreadupdateArgs			*threadUpdateArgs = new ThreadupdateArgs(window, chunkManager, winU->cam->pos);

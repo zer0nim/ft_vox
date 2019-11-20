@@ -73,9 +73,9 @@ void ChunkManager::update(wordFVec3 &camPos) {
 	if (lastChunkPos != _chunkActPos) {  // if we change the actual chunk
 		AChunk * newChunk;
 		for (int32_t x = _chunkActPos.x - CHUNK_SZ_X * RENDER_DISTANCE_CHUNK;
-		x <= _chunkActPos.x + CHUNK_SZ_X * RENDER_DISTANCE_CHUNK; x += CHUNK_SZ_X) {
+		x < _chunkActPos.x + CHUNK_SZ_X * RENDER_DISTANCE_CHUNK; x += CHUNK_SZ_X) {
 			for (int32_t z = _chunkActPos.z - CHUNK_SZ_Z * RENDER_DISTANCE_CHUNK;
-			z <= _chunkActPos.z + CHUNK_SZ_Z * RENDER_DISTANCE_CHUNK; z += CHUNK_SZ_Z) {
+			z < _chunkActPos.z + CHUNK_SZ_Z * RENDER_DISTANCE_CHUNK; z += CHUNK_SZ_Z) {
 				for (int32_t y = 0; y < CHUNK_SZ_Y * MAX_Y_CHUNK; y += CHUNK_SZ_Y) {
 					wordIVec3 chunkPos(x, y, z);  // this is the position of the chunk
 					if (_isChunkExist(chunkPos) == false) {  // if the chunk doesnt exist (for now)
@@ -106,9 +106,9 @@ void ChunkManager::update(wordFVec3 &camPos) {
 
 void ChunkManager::draw(glm::mat4 view) {
 	for (int32_t x = _chunkActPos.x - CHUNK_SZ_X * RENDER_DISTANCE_CHUNK;
-	x <= _chunkActPos.x + CHUNK_SZ_X * RENDER_DISTANCE_CHUNK; x += CHUNK_SZ_X) {
+	x < _chunkActPos.x + CHUNK_SZ_X * RENDER_DISTANCE_CHUNK; x += CHUNK_SZ_X) {
 		for (int32_t z = _chunkActPos.z - CHUNK_SZ_Z * RENDER_DISTANCE_CHUNK;
-		z <= _chunkActPos.z + CHUNK_SZ_Z * RENDER_DISTANCE_CHUNK; z += CHUNK_SZ_Z) {
+		z < _chunkActPos.z + CHUNK_SZ_Z * RENDER_DISTANCE_CHUNK; z += CHUNK_SZ_Z) {
 			for (int32_t y = 0; y < CHUNK_SZ_Y * MAX_Y_CHUNK; y += CHUNK_SZ_Y) {
 				wordIVec3 chunkPos(x, y, z);  // this is the position of the chunk
 				if (_isChunkExist(chunkPos))
