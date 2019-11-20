@@ -5,9 +5,9 @@ static MapInfo mapInfo = MapInfo();
 
 uint8_t		getBlock(wordIVec3 &chunkPos, uint8_t ix, uint8_t iy, uint8_t iz) {
 	float elevation;
-	float x = (chunkPos.x + ix) * mapInfo.xFactor;
+	float x = (chunkPos.x + ix) * mapInfo.xFactor + 0.5;
 	float y = (chunkPos.y + iy) * mapInfo.yFactor;
-	float z = (chunkPos.z + iz) * mapInfo.zFactor;
+	float z = (chunkPos.z + iz) * mapInfo.zFactor + 0.5;
 
 	#if MAP_METHOD == 0
 		elevation = 1 * glm::perlin(glm::vec2(MAP_FREQ_MONTAIN * x * 1, MAP_FREQ_MONTAIN * z * 1))
