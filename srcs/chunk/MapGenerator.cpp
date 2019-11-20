@@ -45,8 +45,12 @@ uint8_t		getBlock(wordIVec3 &chunkPos, uint8_t ix, uint8_t iy, uint8_t iz) {
 	}
 
 	// always a block at the first layer
-	if (chunkPos.y + iy == 0) {
-		result = TextureManager::blocksNames["sand"];  // replace by bedrock
+	if (chunkPos.y + iy < MAP_MAX_BEDROCK_HEIGHT) {
+		float	elevation = PERLIN(10 * x, 10 * z);
+		elevation = std::pow(elevation, 0.4);
+		elevation *= MAP_MAX_BEDROCK_HEIGHT;
+		if (chunkPos.y + iy == 0 || chunkPos.y + iy <= static_cast<uint8_t>(elevation))
+			result = TextureManager::blocksNames["bedrock"];  // replace by bedrock
 	}
 	return result;
 }

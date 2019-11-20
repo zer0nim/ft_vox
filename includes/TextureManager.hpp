@@ -8,6 +8,8 @@
 #include "utils/Shader.hpp"
 #include "commonInclude.hpp"
 
+#define NB_TYPE_BLOCKS 5  // number of blocks types
+
 class TextureManager {
 	public:
 		explicit TextureManager(std::string const &texturesSettings);
@@ -40,7 +42,7 @@ class TextureManager {
 		void									setUniform(Shader &sh) const;
 		void									activateTextures() const;
 		std::vector<Texture *> const &			getTexturesLoaded() const;
-		std::array<BlockTexture *, 4> const &	getBlocks() const;
+		std::array<BlockTexture *, NB_TYPE_BLOCKS> const &	getBlocks() const;
 
 		// Exceptions _______________________________
 		class TextureManagerError : public std::exception {
@@ -88,7 +90,7 @@ class TextureManager {
 
 
 		std::vector<Texture *>					_texturesLoaded;
-		std::array<BlockTexture *, 4>			_blocks;
+		std::array<BlockTexture *, NB_TYPE_BLOCKS>			_blocks;
 };
 
 std::ostream & operator << (std::ostream &out, const TextureManager::Texture &m);

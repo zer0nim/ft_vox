@@ -8,7 +8,8 @@ std::map<std::string, uint8_t>	TextureManager::blocksNames = {
 	{"dirt",	1},
 	{"stone",	2},
 	{"grass",	3},
-	{"sand",	4}
+	{"sand",	4},
+	{"bedrock",	5}
 };
 
 TextureManager::TextureManager(std::string const &texturesSettings) {
@@ -57,7 +58,7 @@ TextureManager::~TextureManager() {
 TextureManager &TextureManager::operator=(TextureManager const &rhs) {
 	if (this != &rhs) {
 		// clone _blocks array
-		std::array<TextureManager::BlockTexture *, 4> const &rhsBlocks = rhs.getBlocks();
+		std::array<TextureManager::BlockTexture *, NB_TYPE_BLOCKS> const &rhsBlocks = rhs.getBlocks();
 		for (size_t i = 0; i < rhsBlocks.size(); ++i) {
 			_blocks[i] = nullptr;
 			if (rhsBlocks[i] != nullptr) {
@@ -209,7 +210,7 @@ void	TextureManager::activateTextures() const {
 std::vector<TextureManager::Texture *> const &	TextureManager::getTexturesLoaded() const {
 	return _texturesLoaded;
 }
-std::array<TextureManager::BlockTexture *, 4> const &	TextureManager::getBlocks() const {
+std::array<TextureManager::BlockTexture *, NB_TYPE_BLOCKS> const &	TextureManager::getBlocks() const {
 	return _blocks;
 }
 
@@ -220,7 +221,7 @@ std::ostream & operator << (std::ostream &out, const TextureManager::Texture &m)
 
 std::ostream & operator << (std::ostream &out, const TextureManager &tm) {
 	std::vector<TextureManager::Texture *> const &texturesLoaded = tm.getTexturesLoaded();
-	std::array<TextureManager::BlockTexture *, 4> const &blocks = tm.getBlocks();
+	std::array<TextureManager::BlockTexture *, NB_TYPE_BLOCKS> const &blocks = tm.getBlocks();
 
 	for (TextureManager::BlockTexture *b : blocks) {
 		if (b != nullptr) {

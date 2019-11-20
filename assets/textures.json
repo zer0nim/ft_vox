@@ -1,5 +1,8 @@
 {
 	"blocks": {
+		"bedrock": {
+			"default": "./assets/textures/block/bedrock.png"
+		},
 		"dirt": {
 			"default": "./assets/textures/block/dirt.png"
 		},
