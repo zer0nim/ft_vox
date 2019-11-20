@@ -1,11 +1,11 @@
 #!/bin/zsh
 
-git stash -q --include-untracked
+git stash --all --quiet --include-untracked --no-keep-index
 
 make check -j8
 
 RESULT=$?
 
-git stash pop -q
+git stash pop --quiet
 
 exit $RESULT
