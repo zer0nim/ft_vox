@@ -189,7 +189,7 @@ void	TextureManager::setUniform(Shader &sh) const {
 		}
 
 		// bottom texture
-		if (_blocks[i]->top != -1) {
+		if (_blocks[i]->bottom != -1) {
 			sh.setInt("blockTexturesInfo[" + std::to_string(i) + "].textureBottom", _blocks[i]->bottom);
 		}
 		else {
