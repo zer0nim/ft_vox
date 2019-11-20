@@ -146,5 +146,9 @@ void AChunk::save() {
 	chunkFile.close();
 }
 
+void	AChunk::draw(glm::mat4 &view) const {
+	_draw(view);
+}
+
 AChunk::ChunkData const	&AChunk::getData() const { return _data; }
 TextureManager const &AChunk::getTextureManager() const { return _textureManager; }

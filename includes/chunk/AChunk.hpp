@@ -20,7 +20,7 @@ class AChunk {
 
 		AChunk &operator=(AChunk const &rhs);
 
-		virtual void	draw(glm::mat4 &view) const = 0;
+		void			draw(glm::mat4 &view) const;
 		virtual void	update() = 0;
 		void			createChunk(std::string const &mapName, wordIVec3 const &chunkPos);
 		void			createChunk(std::string const &mapName, std::string const &chunkPos);
@@ -33,6 +33,7 @@ class AChunk {
 	protected:
 		bool			_createChunkFromFile();
 		virtual void	_createChunk();
+		virtual void	_draw(glm::mat4 &view) const = 0;
 		ChunkData		_data;  // all chunk data
 		wordIVec3		_chunkPos;  // position of the chunk
 		std::string		_filename;

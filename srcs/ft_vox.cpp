@@ -1,5 +1,7 @@
 #include <iostream>
 #include <iomanip>
+#include <fstream>
+#include <sstream>
 #include <boost/filesystem.hpp>
 
 #include "ft_vox.hpp"
@@ -65,7 +67,7 @@ bool	createDir(std::string const &dirNames) {
 }
 bool	createDir(char const *dirNames) { return createDir(std::string(dirNames)); }
 
-bool	createMapFiles(std::string const &mapName) {
+bool	createMapFiles(std::string const &mapName, uint32_t *seed) {
 	// create the maps directory
 	if (createDir(MAPS_PATH) == false) {
 		return false;
@@ -84,6 +86,35 @@ bool	createMapFiles(std::string const &mapName) {
 	// create map (if needed)
 	if (createDir(fullMapName + "/" + CHUNK_PATH) == false) {
 		return false;
+	}
+
+	// check if the seed file exist
+	std::string seedFilename = fullMapName + "/" + SEED_FILE;
+	if (boost::filesystem::is_regular_file(seedFilename) == false) {
+		// create the seed file
+		std::ofstream seedFile(seedFilename);
+		if (seedFile.fail()) {
+			std::cout << "unable to save seed: " << seedFilename << " " << strerror(errno) << std::endl;
+			return false;
+		}
+		seedFile << *seed << std::endl;
+		if (seedFile.fail()) {
+			std::cout << "unable to save seed: " << seedFilename << " " << strerror(errno) << std::endl;
+			return false;
+		}
+		seedFile.close();
+	}
+	else {
+		// load the seed
+		std::ifstream seedFile(seedFilename);
+		if (seedFile.fail()) {
+			std::cout << "Error: " << strerror(errno) << std::endl;
+			return false;
+		}
+		std::string line;
+		std::getline(seedFile, line);
+		*seed = static_cast<uint32_t>(std::atoi(line.c_str()));
+		seedFile.close();
 	}
 	return true;
 }

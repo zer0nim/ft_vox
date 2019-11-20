@@ -151,7 +151,7 @@ int		main(int ac, char const **av) {
 		std::cout << "[WARN]: no mapname -> you can't save the map" << std::endl;
 	}
 	else {
-		if (createMapFiles(mapName) == false) {
+		if (createMapFiles(mapName, &seed) == false) {
 			return 1;
 		}
 		std::cout << "[INFO]: map " << mapName << std::endl;
@@ -184,7 +184,7 @@ int		main(int ac, char const **av) {
 		Skybox skybox(skyboxShader);
 
 		// create chunkManager
-		ChunkManager chunkManager(mapName, *textureManager);
+		ChunkManager chunkManager(mapName, *textureManager, &winU);
 
 		// run the game
 		gameLoop(window, cam, skybox, textRender, chunkManager);

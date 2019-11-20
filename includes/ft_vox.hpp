@@ -26,6 +26,7 @@ filesystem
 #define MAPS_PATH "/tmp/ft_vox/maps/"
 #define CHUNK_PATH "chunks/"
 #define CHUNK_EXTENSION ".chunk"
+#define SEED_FILE "seed"
 
 typedef glm::tvec3<int8_t>	chunkVec3;   // used for chunk coordinate
 typedef glm::tvec3<int32_t>	wordIVec3;  // used for word coordinate in int (bloc)

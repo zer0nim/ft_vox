@@ -23,8 +23,9 @@ wordIVec3 stringToVec(const std::string &s) {
     return vec;
 }
 
-ChunkManager::ChunkManager(std::string const &mapName, TextureManager const &textureManager) :
+ChunkManager::ChunkManager(std::string const &mapName, TextureManager const &textureManager, tWinUser *winU) :
 _mapName(mapName),
+_winU(winU),
 _chunkMap(),
 _chunkActPos(-1, -1, -1),
 _textureManager(textureManager),
@@ -52,6 +53,7 @@ ChunkManager::~ChunkManager() {
 
 ChunkManager &ChunkManager::operator=(ChunkManager const &rhs) {
 	if (this != &rhs) {
+		_winU = rhs.getWinU();
 		_chunkMap = rhs.getChunkMap();
 		_projection = rhs.getProjection();
 	}
@@ -159,7 +161,9 @@ bool	ChunkManager::_isChunkExist(wordIVec3 const &chunkPos) const {
 	return _isChunkExist(vecToString(chunkPos));
 }
 
-std::string const &ChunkManager::getMapName() const { return _mapName; }
+std::string const 						&ChunkManager::getMapName() const { return _mapName; }
+tWinUser								*ChunkManager::getWinU() { return _winU; }
+tWinUser								*ChunkManager::getWinU() const { return _winU; }
 std::map<std::string, AChunk*>			&ChunkManager::getChunkMap() { return _chunkMap; }
 std::map<std::string, AChunk*> const	&ChunkManager::getChunkMap() const { return _chunkMap; }
 wordIVec3 const							&ChunkManager::getChunkActPos() const { return _chunkActPos; }
