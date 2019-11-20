@@ -55,6 +55,7 @@ void	processInput(GLFWwindow *window) {
 /*
 	called on key input
 */
+bool launchF3Cmd = false;
 void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 	(void)scancode;
 	(void)mods;
@@ -75,9 +76,29 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 		winU->cam->resetPosition();
 	}
 
-	// F3 key
-	if (key == GLFW_KEY_F3 && action == GLFW_PRESS) {
-		winU->showInfo = !winU->showInfo;
+	// F3 key -> debug mode
+	if (key == GLFW_KEY_F3 && action == GLFW_RELEASE) {
+		if (launchF3Cmd == false)
+			winU->showInfo = !winU->showInfo;
+		launchF3Cmd = false;
+	}
+
+	// F3 + F -> freeze chunk update
+	if (key == GLFW_KEY_F && action == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
+		winU->freezeChunkUpdate = !winU->freezeChunkUpdate;
+		launchF3Cmd = true;
+	}
+
+	// F3 + H -> freeze chunk update
+	if (key == GLFW_KEY_H && action == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
+		if (winU->showInfo == false) {
+			winU->showHelp = true;
+			winU->showInfo = true;
+		}
+		else {
+			winU->showHelp = !winU->showHelp;
+		}
+		launchF3Cmd = true;
 	}
 }
 

@@ -131,4 +131,24 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 	std::string sPosChunk = std::string("Chunk: ") + std::to_string(chunkManager.getChunkActPos().x) + " " +
 		std::to_string(chunkManager.getChunkActPos().y) + " " +std::to_string(chunkManager.getChunkActPos().z);
 	textRender.write("normal", sPosChunk, textX, textY);
+
+	if (winU->freezeChunkUpdate) {
+		// freeze chunk update
+		textY -= lineSz;
+		std::string sFreeze = "Chunk update: freeze (unfreeze with F3 + F)";
+		textRender.write("normal", sFreeze, textX, textY, 1, glm::vec4(1, 0, 0, 1));
+	}
+
+	if (winU->showHelp) {
+		// show help
+		textY -= lineSz;
+		std::string sHelp = "Help:";
+		textRender.write("normal", sHelp, textX, textY);
+		textY -= lineSz;
+		sHelp = "F3 + F: freeze chunk update";
+		textRender.write("normal", sHelp, textX + 20, textY);
+		textY -= lineSz;
+		sHelp = "F3 + H: toggle help menu";
+		textRender.write("normal", sHelp, textX + 20, textY);
+	}
 }

@@ -18,12 +18,13 @@ void	*threadUpdateFunction(void *args_) {
 	tWinUser					*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(args->window));
 	bool						firstLoop = true;
 
-	(void)winU;
 	while (!glfwWindowShouldClose(args->window)) {
 		time_start = getMs();
 
 		// update
-		args->chunkManager.update(args->camPos);
+		if (winU->freezeChunkUpdate == false) {
+			args->chunkManager.update(args->camPos);
+		}
 
 		// fps
 		std::chrono::milliseconds time_loop = getMs() - time_start;
@@ -123,6 +124,8 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
 	winU->width = SCREEN_W;
 	winU->height = SCREEN_H;
 	winU->showInfo = true;
+	winU->showHelp = true;
+	winU->freezeChunkUpdate = false;
 
 	if (!initWindow(window, name, winU))
 		return (false);

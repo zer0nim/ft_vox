@@ -38,7 +38,9 @@ typedef struct	sWinUser {
 	float		width;
 	float		height;
 
-	bool		showInfo;
+	bool		showInfo;  // show info module (F3)
+	bool		showHelp;  // show help module (F3 + H)
+	bool		freezeChunkUpdate;  // freeze chunk update (F3 + F)
 }				tWinUser;
 
 
