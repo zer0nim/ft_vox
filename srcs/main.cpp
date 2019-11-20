@@ -145,7 +145,6 @@ int		main(int ac, char const **av) {
 	if (argparse(ac - 1, av + 1, mapName, &seed) == false) {
 		return 0;
 	}
-	setSeed(seed);
 
 	if (mapName == "") {  // load without mapName
 		std::cout << "[WARN]: no mapname -> you can't save the map" << std::endl;
@@ -157,6 +156,7 @@ int		main(int ac, char const **av) {
 		std::cout << "[INFO]: map " << mapName << std::endl;
 		mapName = std::string(MAPS_PATH) + mapName;
 	}
+	setSeed(seed);
 
 	std::cout << "[INFO]: starting at " << startingPos.x << " " << startingPos.y << " " << startingPos.z << std::endl;
 	std::cout << "[INFO]: random seed " << seed << std::endl;
