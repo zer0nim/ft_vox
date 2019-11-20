@@ -4,11 +4,11 @@
 
 #include "utils/Texture.hpp"
 
-const std::array<std::string, 4>	TextureManager::_blocksNames = {
-	"dirt",
-	"stone",
-	"grass",
-	"sand"
+std::map<std::string, uint8_t>	TextureManager::blocksNames = {
+	{"dirt",	1},
+	{"stone",	2},
+	{"grass",	3},
+	{"sand",	4}
 };
 
 TextureManager::TextureManager(std::string const &texturesSettings) {
@@ -116,9 +116,9 @@ void	TextureManager::loadBlocksTextures(nlohmann::json const &data) {
 	if (data.find("blocks") != data.end()) {
 		for (auto &block : data["blocks"].items()) {
 			// valid material name
-			auto it = std::find(_blocksNames.begin(), _blocksNames.end(), block.key());
-			if (it != _blocksNames.end()) {
-				int8_t id = it - _blocksNames.begin();
+			auto it = blocksNames.find(block.key());
+			if (it != blocksNames.end()) {
+				uint8_t id = blocksNames[block.key()] - 1;
 
 				// texture has not already been defined
 				if (_blocks[id] == nullptr) {
@@ -137,14 +137,14 @@ void	TextureManager::loadBlocksTextures(nlohmann::json const &data) {
 							blockTexture->bottom = loadTextures(blockText.value());
 						}
 						else {
-							std::cout << "WARNING ! block \"" << _blocksNames[id] << \
+							std::cout << "WARNING ! block \"" << block.key() << \
 							"\", unrecognized texture key \"" <<  key  << '"' << std::endl;
 						}
 					}
 
 					if (blockTexture->side == -1) {
 						std::cerr << "missing default texture for block \"" << \
-						_blocksNames[id] << '"' << std::endl;
+						block.key() << '"' << std::endl;
 						throw TextureManager::missingBlockException();
 					}
 
@@ -159,7 +159,7 @@ void	TextureManager::loadBlocksTextures(nlohmann::json const &data) {
 	for (size_t i = 0; i < _blocks.size(); ++i) {
 		if (_blocks[i] == nullptr) {
 			missingBlock = true;
-			std::cerr << "missing block: " << _blocksNames[i] << std::endl;
+			std::cerr << "missing block: " << i << std::endl;
 		}
 	}
 	if (missingBlock) {

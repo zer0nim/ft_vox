@@ -120,7 +120,7 @@ $(DEP_DIR)/%.d: $(DEP_DIR) ;
 
 clean:
 	$(START)
-	@printf $(RED)"-x remove .o files\n"$(NORMAL)
+	@printf $(RED)"-x remove .o & .d files\n"$(NORMAL)
 	@rm -rf $(OBJS_DIR)
 	@rm -rf $(DEP_DIR)
 	$(END)

@@ -1,5 +1,6 @@
 #include <glm/gtc/noise.hpp>
 #include "MapGenerator.hpp"
+#include "TextureManager.hpp"
 
 static MapInfo mapInfo = MapInfo();
 
@@ -28,11 +29,11 @@ uint8_t		getBlock(wordIVec3 &chunkPos, uint8_t ix, uint8_t iy, uint8_t iz) {
 	elevation = elevation / MAP_HEIGHT_DIV + MAP_START_HEIGHT;
 	if (y <= elevation) {
 		if (y + mapInfo.yFactor * 1 >= elevation)
-			result = 4;
-		else if (y + mapInfo.yFactor * 3 >= elevation)
-			result = 1;
+			result = TextureManager::blocksNames["grass"];
+		else if (y + mapInfo.yFactor * 2 >= elevation)
+			result = TextureManager::blocksNames["dirt"];
 		else
-			result = 3;
+			result = TextureManager::blocksNames["stone"];
 	}
 
 	// create cavern
@@ -42,8 +43,9 @@ uint8_t		getBlock(wordIVec3 &chunkPos, uint8_t ix, uint8_t iy, uint8_t iz) {
 		// result = 0;
 	}
 
+	// always a block at the first layer
 	if (chunkPos.y + iy == 0) {
-		result = 2;  // always a block at the first layer
+		result = TextureManager::blocksNames["stone"];
 	}
 	return result;
 }
