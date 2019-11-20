@@ -54,7 +54,7 @@ const float	Chunk::_cubeData[] = {
 
 	0.5f, -0.5f, 0.5f,		0.0f, -1.0f, 0.0f,		1.0f, 0.0f,		5.0f,  // 5r
 	-0.5f, -0.5f, 0.5f,		0.0f, -1.0f, 0.0f,		0.0f, 0.0f,		5.0f,  // 5r
-	-0.5f, -0.5f, -0.5f,	0.0f, -1.0f, 0.0f,		0.0f, 1.0f,		5.0f  // 5r
+	-0.5f, -0.5f, -0.5f,	0.0f, -1.0f, 0.0f,		0.0f, 1.0f,		5.0f   // 5r
 };
 
 std::unique_ptr<Chunk::ShaderData>	Chunk::_shaderData = std::unique_ptr<Chunk::ShaderData>();
@@ -87,7 +87,7 @@ void	Chunk::update() {
 	_data.isModified = false;
 }
 
-void	Chunk::_draw(glm::mat4 &view) const {
+void	Chunk::draw(glm::mat4 &view) const {
 	_textureManager.activateTextures();
 
 	_shaderData->naiveShader->use();

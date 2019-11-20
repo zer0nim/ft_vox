@@ -9,7 +9,7 @@
 #include "MapGenerator.hpp"
 
 AChunk * instanciateNewChunk(TextureManager const &textureManager, glm::mat4 &projection) {
-	AChunk * newChunk = new GreedyChunk(textureManager, projection);
+	AChunk * newChunk = new CHUNK_OBJECT(textureManager, projection);
 	return newChunk;
 }
 
@@ -145,10 +145,6 @@ void AChunk::save() {
 		return;
 	}
 	chunkFile.close();
-}
-
-void	AChunk::draw(glm::mat4 &view) const {
-	_draw(view);
 }
 
 AChunk::ChunkData const	&AChunk::getData() const { return _data; }

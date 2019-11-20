@@ -16,9 +16,7 @@ class Chunk : public AChunk {
 		Chunk &operator=(Chunk const &rhs);
 
 		virtual void	update();
-
-	protected:
-		virtual void	_draw(glm::mat4 &view) const;
+		virtual void	draw(glm::mat4 &view) const;
 
 	private:
 		void	sendCubeData();

@@ -19,6 +19,10 @@
 #define RENDER_DISTANCE_CHUNK	3  // [chunk] type: int
 #define MAX_Y_CHUNK				MAX_MAP_SIZE_Y / CHUNK_SZ_Y  // [chunk] type: int
 
+class Chunk;
+class GreedyChunk;
+#define CHUNK_OBJECT			GreedyChunk  // the chunk object used
+
 /*
 filesystem
 */
