@@ -30,7 +30,7 @@ class GreedyChunk : public AChunk {
 			u_int32_t	cubeVao;
 
 			ShaderData() {
-				naiveShader = new Shader("shaders/naive_vs.glsl", "shaders/naive_fs.glsl");
+				naiveShader = new Shader("shaders/greedyChunk_vs.glsl", "shaders/naive_fs.glsl");
 				cubeVbo = 0;
 				cubeVao = 0;
 			}
@@ -42,9 +42,8 @@ class GreedyChunk : public AChunk {
 
 		struct MeshData {
 			chunkVec3	pos;
-			uint8_t		width;
-			uint8_t		length;
-			uint8_t		height;
+			chunkVec3	size;
+			uint8_t		blockId;
 		};
 
 		void	searchQuadMesh(chunkVec3 const &startI);

@@ -3,62 +3,61 @@
 
 const float	GreedyChunk::_cubeData[] = {
 	// positions			// normals				// texture coords
-	0.5f, 0.5f, 0.5f,		0.0f, 0.0f, 1.0f,		0.0f, 0.0f,		0.0f,  // 0l
-	-0.5f, 0.5f, 0.5f,		0.0f, 0.0f, 1.0f,		1.0f, 0.0f,		0.0f,  // 0l
-	-0.5f, -0.5f, 0.5f,		0.0f, 0.0f, 1.0f,		1.0f, 1.0f,		0.0f,  // 0l
+	1.0f, 1.0f, 1.0f,		0.0f, 0.0f, 1.0f,		0.0f, 0.0f,		0.0f,  // 0l
+	0.0f, 1.0f, 1.0f,		0.0f, 0.0f, 1.0f,		1.0f, 0.0f,		0.0f,  // 0l
+	0.0f, 0.0f, 1.0f,		0.0f, 0.0f, 1.0f,		1.0f, 1.0f,		0.0f,  // 0l
 
-	-0.5f, -0.5f, 0.5f,		0.0f, 0.0f, 1.0f,		1.0f, 1.0f,		0.0f,  // 0r
-	0.5f, -0.5f, 0.5f,		0.0f, 0.0f, 1.0f,		0.0f, 1.0f,		0.0f,  // 0r
-	0.5f, 0.5f, 0.5f,		0.0f, 0.0f, 1.0f,		0.0f, 0.0f,		0.0f,  // 0r
-
-
-	0.5f, -0.5f, -0.5f,		1.0f, 0.0f, 0.0f,		1.0f, 1.0f,		1.0f,  // 1l
-	0.5f, -0.5f, 0.5f,		1.0f, 0.0f, 0.0f,		0.0f, 1.0f,		1.0f,  // 1l
-	0.5f, 0.5f, 0.5f,		1.0f, 0.0f, 0.0f,		0.0f, 0.0f,		1.0f,  // 1l
-
-	0.5f, 0.5f, 0.5f,		1.0f, 0.0f, 0.0f,		0.0f, 0.0f,		1.0f,  // 1r
-	0.5f, 0.5f, -0.5f,		1.0f, 0.0f, 0.0f,		1.0f, 0.0f,		1.0f,  // 1r
-	0.5f, -0.5f, -0.5f,		1.0f, 0.0f, 0.0f,		1.0f, 1.0f,		1.0f,  // 1r
+	0.0f, 0.0f, 1.0f,		0.0f, 0.0f, 1.0f,		1.0f, 1.0f,		0.0f,  // 0r
+	1.0f, 0.0f, 1.0f,		0.0f, 0.0f, 1.0f,		0.0f, 1.0f,		0.0f,  // 0r
+	1.0f, 1.0f, 1.0f,		0.0f, 0.0f, 1.0f,		0.0f, 0.0f,		0.0f,  // 0r
 
 
-	-0.5f, -0.5f, -0.5f,	0.0f, 0.0f, -1.0f,		1.0f, 1.0f,		2.0f,  // 2l
-	0.5f, -0.5f, -0.5f,		0.0f, 0.0f, -1.0f,		0.0f, 1.0f,		2.0f,  // 2l
-	0.5f, 0.5f, -0.5f,		0.0f, 0.0f, -1.0f,		0.0f, 0.0f,		2.0f,  // 2l
+	1.0f, 0.0f, 0.0f,		1.0f, 0.0f, 0.0f,		1.0f, 1.0f,		1.0f,  // 1l
+	1.0f, 0.0f, 1.0f,		1.0f, 0.0f, 0.0f,		0.0f, 1.0f,		1.0f,  // 1l
+	1.0f, 1.0f, 1.0f,		1.0f, 0.0f, 0.0f,		0.0f, 0.0f,		1.0f,  // 1l
 
-	0.5f, 0.5f, -0.5f,		0.0f, 0.0f, -1.0f,		0.0f, 0.0f,		2.0f,  // 2r
-	-0.5f, 0.5f, -0.5f,		0.0f, 0.0f, -1.0f,		1.0f, 0.0f,		2.0f,  // 2r
-	-0.5f, -0.5f, -0.5f,	0.0f, 0.0f, -1.0f,		1.0f, 1.0f,		2.0f,  // 2r
-
-
-	-0.5f, 0.5f, 0.5f,		-1.0f, 0.0f, 0.0f,		1.0f, 0.0f,		3.0f,  // 3l
-	-0.5f, 0.5f, -0.5f,		-1.0f, 0.0f, 0.0f,		0.0f, 0.0f,		3.0f,  // 3l
-	-0.5f, -0.5f, -0.5f,	-1.0f, 0.0f, 0.0f,		0.0f, 1.0f,		3.0f,  // 3l
-
-	-0.5f, -0.5f, -0.5f,	-1.0f, 0.0f, 0.0f,		0.0f, 1.0f,		3.0f,  // 3r
-	-0.5f, -0.5f, 0.5f,		-1.0f, 0.0f, 0.0f,		1.0f, 1.0f,		3.0f,  // 3r
-	-0.5f, 0.5f, 0.5f,		-1.0f, 0.0f, 0.0f,		1.0f, 0.0f,		3.0f,  // 3r
+	1.0f, 1.0f, 1.0f,		1.0f, 0.0f, 0.0f,		0.0f, 0.0f,		1.0f,  // 1r
+	1.0f, 1.0f, 0.0f,		1.0f, 0.0f, 0.0f,		1.0f, 0.0f,		1.0f,  // 1r
+	1.0f, 0.0f, 0.0f,		1.0f, 0.0f, 0.0f,		1.0f, 1.0f,		1.0f,  // 1r
 
 
-	-0.5f, 0.5f, -0.5f,		0.0f, 1.0f, 0.0f,		1.0f, 0.0f,		4.0f,  // 4l
-	0.5f, 0.5f, -0.5f,		0.0f, 1.0f, 0.0f,		0.0f, 0.0f,		4.0f,  // 4l
-	0.5f, 0.5f, 0.5f,		0.0f, 1.0f, 0.0f,		0.0f, 1.0f,		4.0f,  // 4l
+	0.0f, 0.0f, 0.0f,	0.0f, 0.0f, -1.0f,		1.0f, 1.0f,		2.0f,  // 2l
+	1.0f, 0.0f, 0.0f,		0.0f, 0.0f, -1.0f,		0.0f, 1.0f,		2.0f,  // 2l
+	1.0f, 1.0f, 0.0f,		0.0f, 0.0f, -1.0f,		0.0f, 0.0f,		2.0f,  // 2l
 
-	0.5f, 0.5f, 0.5f,		0.0f, 1.0f, 0.0f,		0.0f, 1.0f,		4.0f,  // 4r
-	-0.5f, 0.5f, 0.5f,		0.0f, 1.0f, 0.0f,		1.0f, 1.0f,		4.0f,  // 4r
-	-0.5f, 0.5f, -0.5f,		0.0f, 1.0f, 0.0f,		1.0f, 0.0f,		4.0f,  // 4r
+	1.0f, 1.0f, 0.0f,		0.0f, 0.0f, -1.0f,		0.0f, 0.0f,		2.0f,  // 2r
+	0.0f, 1.0f, 0.0f,		0.0f, 0.0f, -1.0f,		1.0f, 0.0f,		2.0f,  // 2r
+	0.0f, 0.0f, 0.0f,	0.0f, 0.0f, -1.0f,		1.0f, 1.0f,		2.0f,  // 2r
 
 
-	-0.5f, -0.5f, -0.5f,	0.0f, -1.0f, 0.0f,		0.0f, 1.0f,		5.0f,  // 5l
-	0.5f, -0.5f, -0.5f,		0.0f, -1.0f, 0.0f,		1.0f, 1.0f,		5.0f,  // 5l
-	0.5f, -0.5f, 0.5f,		0.0f, -1.0f, 0.0f,		1.0f, 0.0f,		5.0f,  // 5l
+	0.0f, 1.0f, 1.0f,		-1.0f, 0.0f, 0.0f,		1.0f, 0.0f,		3.0f,  // 3l
+	0.0f, 1.0f, 0.0f,		-1.0f, 0.0f, 0.0f,		0.0f, 0.0f,		3.0f,  // 3l
+	0.0f, 0.0f, 0.0f,	-1.0f, 0.0f, 0.0f,		0.0f, 1.0f,		3.0f,  // 3l
 
-	0.5f, -0.5f, 0.5f,		0.0f, -1.0f, 0.0f,		1.0f, 0.0f,		5.0f,  // 5r
-	-0.5f, -0.5f, 0.5f,		0.0f, -1.0f, 0.0f,		0.0f, 0.0f,		5.0f,  // 5r
-	-0.5f, -0.5f, -0.5f,	0.0f, -1.0f, 0.0f,		0.0f, 1.0f,		5.0f  // 5r
+	0.0f, 0.0f, 0.0f,	-1.0f, 0.0f, 0.0f,		0.0f, 1.0f,		3.0f,  // 3r
+	0.0f, 0.0f, 1.0f,		-1.0f, 0.0f, 0.0f,		1.0f, 1.0f,		3.0f,  // 3r
+	0.0f, 1.0f, 1.0f,		-1.0f, 0.0f, 0.0f,		1.0f, 0.0f,		3.0f,  // 3r
+
+
+	0.0f, 1.0f, 0.0f,		0.0f, 1.0f, 0.0f,		1.0f, 0.0f,		4.0f,  // 4l
+	1.0f, 1.0f, 0.0f,		0.0f, 1.0f, 0.0f,		0.0f, 0.0f,		4.0f,  // 4l
+	1.0f, 1.0f, 1.0f,		0.0f, 1.0f, 0.0f,		0.0f, 1.0f,		4.0f,  // 4l
+
+	1.0f, 1.0f, 1.0f,		0.0f, 1.0f, 0.0f,		0.0f, 1.0f,		4.0f,  // 4r
+	0.0f, 1.0f, 1.0f,		0.0f, 1.0f, 0.0f,		1.0f, 1.0f,		4.0f,  // 4r
+	0.0f, 1.0f, 0.0f,		0.0f, 1.0f, 0.0f,		1.0f, 0.0f,		4.0f,  // 4r
+
+
+	0.0f, 0.0f, 0.0f,	0.0f, -1.0f, 0.0f,		0.0f, 1.0f,		5.0f,  // 5l
+	1.0f, 0.0f, 0.0f,		0.0f, -1.0f, 0.0f,		1.0f, 1.0f,		5.0f,  // 5l
+	1.0f, 0.0f, 1.0f,		0.0f, -1.0f, 0.0f,		1.0f, 0.0f,		5.0f,  // 5l
+
+	1.0f, 0.0f, 1.0f,		0.0f, -1.0f, 0.0f,		1.0f, 0.0f,		5.0f,  // 5r
+	0.0f, 0.0f, 1.0f,		0.0f, -1.0f, 0.0f,		0.0f, 0.0f,		5.0f,  // 5r
+	0.0f, 0.0f, 0.0f,	0.0f, -1.0f, 0.0f,		0.0f, 1.0f,		5.0f  // 5r
 };
 
 std::unique_ptr<GreedyChunk::ShaderData>	GreedyChunk::_shaderData = std::unique_ptr<GreedyChunk::ShaderData>();
-// bool	GreedyChunk::_processedVox[CHUNK_SZ_X][CHUNK_SZ_Y][CHUNK_SZ_Z] = {{{0}}};
 std::array< std::array< std::array<bool, CHUNK_SZ_Z>, CHUNK_SZ_Y >, CHUNK_SZ_X >	\
 	GreedyChunk::_processedVox = {{{{{0}}}}};
 
@@ -121,6 +120,7 @@ void	GreedyChunk::searchQuadMesh(chunkVec3 const &startI) {
 		uint8_t z = startI.z;
 		while (z < startI.z + l && validLength) {
 			validLength = false;
+
 			uint8_t x = startI.x;
 			while (x < startI.x + w && _data.data[x][y][z] == blockId) {
 				++x;
@@ -131,7 +131,7 @@ void	GreedyChunk::searchQuadMesh(chunkVec3 const &startI) {
 
 			++z;
 		}
-		if (z == startI.z + l) {
+		if (validLength) {
 			validHeight = true;
 			++h;
 		}
@@ -147,7 +147,7 @@ void	GreedyChunk::searchQuadMesh(chunkVec3 const &startI) {
 	}
 
 	// save mesh data
-	_meshDatas.push_back({startI, w, l, h});
+	_meshDatas.push_back({startI, chunkVec3(w, h, l), blockId});
 }
 
 void	GreedyChunk::update() {
@@ -155,22 +155,17 @@ void	GreedyChunk::update() {
 		return;  // GreedyChunk not modified -> don't update it
 	_data.isModified = false;
 
-	std::cout << "------------------------: " << _chunkPos.x << ", " << _chunkPos.y << ", " << _chunkPos.z << std::endl;
-
 	// reset _processedVox
 	GreedyChunk::_processedVox = {{{{{0}}}}};
 
 	// loop through unprocessed index
-	for (uint8_t x = 0; x < CHUNK_SZ_X; ++x) {
+	for (uint8_t y = 0; y < CHUNK_SZ_Y; ++y) {
 		for (uint8_t z = 0; z < CHUNK_SZ_Z; ++z) {
-			for (uint8_t y = 0; y < CHUNK_SZ_Y; ++y) {
+			for (uint8_t x = 0; x < CHUNK_SZ_X; ++x) {
 				if (!_processedVox[x][y][z]) {
-					// empty block
-					if (_data.data[x][y][z] == 0) {
-						_processedVox[x][y][z] = true;
-					}
-					else {  // unprocessed index
-						searchQuadMesh(chunkVec3{x, y, z});
+					// unprocessed index
+					if (_data.data[x][y][z] != 0) {
+						searchQuadMesh(chunkVec3(x, y, z));
 					}
 				}
 			}
@@ -185,29 +180,16 @@ void	GreedyChunk::draw(glm::mat4 &view) const {
 	_shaderData->naiveShader->setMat4("view", view);
 	glBindVertexArray(_shaderData->cubeVao);
 
-	// std::cout << "nb meshes: " << _meshDatas.size() << std::endl;
-	// for (MeshData &md : _meshDatas) {
-	// 	std::cout << "start: x: " << (int)(md.pos.x) << ", y: " << (int)(md.pos.y) \
-	// 	<< ", z: " << (int)(md.pos.z);
-	// 	std::cout << "  =>\tw: " << (int)(md.width) << ", l: " << (int)(md.length) \
-	// 	<< ", h: " << (int)(md.height) << std::endl;
-	// }
-
-	// loop throught GreedyChunk cubes and draw them
 	glm::mat4 baseModel = glm::translate(glm::mat4(1.0), glm::vec3(_chunkPos));
-	for (uint8_t x = 0; x < CHUNK_SZ_X; ++x) {
-		for (uint8_t y = 0; y < CHUNK_SZ_Y; ++y) {
-			for (uint8_t z = 0; z < CHUNK_SZ_Z; ++z) {
-				if (_data.data[x][y][z] != 0) {
-					_shaderData->naiveShader->setInt("cubeId", _data.data[x][y][z] - 1);
+	for (MeshData const &md : _meshDatas) {
+		_shaderData->naiveShader->setInt("blockId", md.blockId - 1);
+		_shaderData->naiveShader->setVec3("size", glm::vec3(md.size));
 
-					glm::mat4 model = glm::translate(baseModel, glm::vec3(x, y, z));
-					_shaderData->naiveShader->setMat4("model", model);
+		glm::mat4 model = glm::translate(baseModel, glm::vec3(md.pos));
+		model = glm::scale(model, glm::vec3(md.size));
+		_shaderData->naiveShader->setMat4("model", model);
 
-					glDrawArrays(GL_TRIANGLES, 0, 36);
-				}
-			}
-		}
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
 }
 
