@@ -7,6 +7,7 @@
 #include "AChunk.hpp"
 #include "Chunk.hpp"
 #include "ChunkManager.hpp"
+#include "MapGenerator.hpp"
 #include "utils/Shader.hpp"
 #include "utils/Skybox.hpp"
 #include "utils/TextRender.hpp"
@@ -134,17 +135,18 @@ int		main(int ac, char const **av) {
 	Camera			cam(glm::vec3(0.0f, 64.0f, 19.0f));
 	TextureManager	*textureManager = nullptr;
 
-	if (ac > 2) {
-		std::cout << "Usage: ./ft_vox [map_name]" << std::endl;
+	uint32_t randSeed = time(nullptr);
+	std::string mapName = "";
+	uint32_t	seed = rand_r(&randSeed);
+	if (argparse(ac - 1, av + 1, mapName, &seed) == false) {
 		return 0;
 	}
+	setSeed(seed);
 
-	std::string mapName = "";
-	if (ac == 1) {  // load without mapName
+	if (mapName == "") {  // load without mapName
 		std::cout << "[WARN]: no mapname -> you can't save the map" << std::endl;
 	}
 	else {
-		mapName = std::string(av[1]);
 		if (createMapFiles(mapName) == false) {
 			return 1;
 		}

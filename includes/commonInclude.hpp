@@ -25,6 +25,8 @@
 class TextRender;
 class ChunkManager;
 std::chrono::milliseconds getMs();
+bool	usage();
+bool	argparse(int nbArgs, char const **args, std::string &mapName, uint32_t *seed);
 void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManager &chunkManager);
 bool	createDir(std::string const &dirNames);
 bool	createDir(char const *dirNames);

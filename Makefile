@@ -56,6 +56,7 @@ LIBS_FLAGS	= -L ~/.brew/lib -framework OpenGL -lglfw -lboost_filesystem -L ~/.br
 LIBS_INC	=	~/.brew/include \
 				$(INC_DIR)/lib/stb_image.h \
 				$(INC_DIR)/lib/json.hpp \
+				$(INC_DIR)/lib/PerlinNoise.hpp \
 				/usr/local/opt/freetype/include/freetype2 \
 				~/.brew/opt/freetype/include/freetype2
 
