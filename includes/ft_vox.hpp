@@ -13,7 +13,7 @@
 #define CHUNK_SZ_Z 8  // [bloc] type: int
 
 #define MAX_MAP_SIZE_X 2^16  // [bloc] type: int
-#define MAX_MAP_SIZE_Y 32  // [bloc] type: int
+#define MAX_MAP_SIZE_Y 64  // [bloc] type: int
 #define MAX_MAP_SIZE_Z MAX_MAP_SIZE_X  // [bloc] type: int
 
 #define RENDER_DISTANCE_CHUNK	2  // [chunk] type: int

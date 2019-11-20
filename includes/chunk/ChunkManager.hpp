@@ -32,6 +32,7 @@ class ChunkManager {
 		void	_updateChunkPos(wordIVec3 const &pos);  // update the chunk pos (call each frame)
 		void	_insertChunk(wordIVec3 chunkPos, AChunk * newChunk);
 		bool	_isInChunkLoaded(wordIVec3 const &chunkPos) const;  // return true if the chunk is loaded
+		bool	_isInChunkLoadedBorder(wordIVec3 const &chunkPos) const;  // return true if the chunk is loaded put not draw
 		bool	_isChunkExist(std::string const &chunkPos) const;  // return true if the chunk exist
 		bool	_isChunkExist(wordIVec3 const &chunkPos) const;
 

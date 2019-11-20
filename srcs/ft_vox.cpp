@@ -11,6 +11,43 @@ std::chrono::milliseconds getMs() {
 		std::chrono::system_clock::now().time_since_epoch());
 }
 
+bool	usage() {
+	std::cout << "Usage: ./ft_vox [--usage|-u] [--name|-n mapName] [--seed|-s seed]" << std::endl;
+	std::cout << "\t--usage|-u: display usage of the program" << std::endl;
+	std::cout << "\t--name|-n mapName: set map name" << std::endl;
+	std::cout << "\t--seed|-s seed: set seed (seed should be an int)" << std::endl;
+	return false;
+}
+
+bool	argparse(int nbArgs, char const **args, std::string &mapName, uint32_t *seed) {
+	int i = 0;
+	while (i < nbArgs) {
+		if (strcmp(args[i], "--usage") == 0 || strcmp(args[i], "-u") == 0) {
+			return usage();
+		}
+		else if (strcmp(args[i], "--name") == 0 || strcmp(args[i], "-n") == 0) {
+			i++;
+			if (i == nbArgs || args[i][0] == '-')
+				return usage();
+			mapName = args[i];
+		}
+		else if (strcmp(args[i], "--seed") == 0 || strcmp(args[i], "-s") == 0) {
+			i++;
+			if (i == nbArgs)
+				return usage();
+			*seed = static_cast<uint32_t>(atoi(args[i]));
+			if (*seed == 0)
+				return usage();
+		}
+		else {
+			return usage();
+		}
+
+		i++;
+	}
+	return true;
+}
+
 bool	createDir(std::string const &dirNames) {
 	if (boost::filesystem::is_directory(dirNames) == false) {
 		try {

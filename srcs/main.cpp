@@ -7,6 +7,7 @@
 #include "AChunk.hpp"
 #include "Chunk.hpp"
 #include "ChunkManager.hpp"
+#include "MapGenerator.hpp"
 #include "utils/Shader.hpp"
 #include "utils/Skybox.hpp"
 #include "utils/TextRender.hpp"
@@ -22,7 +23,7 @@ void	*threadUpdateFunction(void *args_) {
 		time_start = getMs();
 
 		// update
-		// args->chunkManager.update(args->camPos);
+		args->chunkManager.update(args->camPos);
 
 		// fps
 		std::chrono::milliseconds time_loop = getMs() - time_start;
@@ -49,8 +50,6 @@ TextRender &textRender, ChunkManager &chunkManager) {
 	tWinUser					*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
 	bool						firstLoop = true;
 	ThreadupdateArgs			*threadUpdateArgs = new ThreadupdateArgs(window, chunkManager, winU->cam->pos);
-
-	wordFVec3 pos(0, 0, 0);
 
 	// projection matrix
 	glm::mat4	projection = glm::perspective(
@@ -87,7 +86,7 @@ TextRender &textRender, ChunkManager &chunkManager) {
 		skybox.getShader().setMat4("view", skyView);
 
 		// draw here
-		chunkManager.update(winU->cam->pos);
+		// chunkManager.update(winU->cam->pos);
 		chunkManager.draw(view);
 
 		// draw skybox
@@ -133,24 +132,33 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
 int		main(int ac, char const **av) {
 	GLFWwindow		*window;
 	tWinUser		winU;
-	Camera			cam(glm::vec3(0.0f, 64.0f, 19.0f));
+	glm::vec3		startingPos(0.0f, 64.0f, 19.0f);
+	Camera			cam(startingPos);
 	TextureManager	*textureManager = nullptr;
 
-	if (ac > 2) {
-		std::cout << "Usage: ./ft_vox [map_name]" << std::endl;
+	uint32_t randSeed = time(nullptr);
+	std::string mapName = "";
+	uint32_t	seed = rand_r(&randSeed);
+	if (argparse(ac - 1, av + 1, mapName, &seed) == false) {
 		return 0;
 	}
+	setSeed(seed);
 
-	std::string mapName = "";
-	if (ac == 1) {  // load without mapName
+	if (mapName == "") {  // load without mapName
 		std::cout << "[WARN]: no mapname -> you can't save the map" << std::endl;
 	}
 	else {
-		mapName = std::string(av[1]);
 		if (createMapFiles(mapName) == false) {
 			return 1;
 		}
+		std::cout << "[INFO]: map " << mapName << std::endl;
+		mapName = std::string(MAPS_PATH) + mapName;
 	}
+
+	std::cout << "[INFO]: starting at " << startingPos.x << " " << startingPos.y << " " << startingPos.z << std::endl;
+	std::cout << "[INFO]: random seed " << seed << std::endl;
+	std::cout << "[INFO]: chunk size " << CHUNK_SZ_X << " " << CHUNK_SZ_Y << " " << CHUNK_SZ_Z << std::endl;
+	std::cout << "[INFO]: render distance " << RENDER_DISTANCE_CHUNK << " chunks" << std::endl;
 
 
 	if (!init(&window, "ft_vox", &winU, &cam))

@@ -1,7 +1,7 @@
 #ifndef TEXTUREMANAGER_HPP_
 #define TEXTUREMANAGER_HPP_
 
-#include <array>
+#include <map>
 #include <vector>
 
 #include "lib/json.hpp"
@@ -35,8 +35,10 @@ class TextureManager {
 			int8_t	bottom;
 		};
 
-		void	setUniform(Shader &sh) const;
-		void	activateTextures() const;
+		static std::map<std::string, uint8_t>	blocksNames;
+
+		void									setUniform(Shader &sh) const;
+		void									activateTextures() const;
 		std::vector<Texture *> const &			getTexturesLoaded() const;
 		std::array<BlockTexture *, 4> const &	getBlocks() const;
 
@@ -85,9 +87,8 @@ class TextureManager {
 		void	drawBlocks() const;
 
 
-		std::vector<Texture *>						_texturesLoaded;
-		std::array<BlockTexture *, 4>				_blocks;
-		static const std::array<std::string, 4>		_blocksNames;
+		std::vector<Texture *>					_texturesLoaded;
+		std::array<BlockTexture *, 4>			_blocks;
 };
 
 std::ostream & operator << (std::ostream &out, const TextureManager::Texture &m);

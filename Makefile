@@ -16,6 +16,7 @@ SRC =	main.cpp \
 		chunk/AChunk.cpp \
 		chunk/ChunkManager.cpp \
 		chunk/Chunk.cpp \
+		chunk/MapGenerator.cpp \
 \
 		utils/Texture.cpp \
 		utils/Shader.cpp \
@@ -32,6 +33,7 @@ HEAD =	commonInclude.hpp \
 		chunk/AChunk.hpp \
 		chunk/ChunkManager.hpp \
 		chunk/Chunk.hpp \
+		chunk/MapGenerator.hpp \
 \
 		utils/Texture.hpp \
 		utils/Shader.hpp \
@@ -54,6 +56,7 @@ LIBS_FLAGS	= -L ~/.brew/lib -framework OpenGL -lglfw -lboost_filesystem -L ~/.br
 LIBS_INC	=	~/.brew/include \
 				$(INC_DIR)/lib/stb_image.h \
 				$(INC_DIR)/lib/json.hpp \
+				$(INC_DIR)/lib/PerlinNoise.hpp \
 				/usr/local/opt/freetype/include/freetype2 \
 				~/.brew/opt/freetype/include/freetype2
 
@@ -92,8 +95,8 @@ all:
 
 init:
 	$(START)
-	@printf $(CYAN)"create pre-commit\n"$(NORMAL)
-	@cp .pre-commit .git/hooks/pre-commit
+	@printf $(CYAN)"create pre-push\n"$(NORMAL)
+	@cp .pre-push .git/hooks/pre-push
 	$(END)
 
 $(NAME): $(OBJS_DIR) $(OBJS)
@@ -118,7 +121,7 @@ $(DEP_DIR)/%.d: $(DEP_DIR) ;
 
 clean:
 	$(START)
-	@printf $(RED)"-x remove .o files\n"$(NORMAL)
+	@printf $(RED)"-x remove .o & .d files\n"$(NORMAL)
 	@rm -rf $(OBJS_DIR)
 	@rm -rf $(DEP_DIR)
 	$(END)

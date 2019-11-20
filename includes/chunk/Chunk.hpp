@@ -9,7 +9,7 @@
 
 class Chunk : public AChunk {
 	public:
-		explicit Chunk(TextureManager const &textureManager);
+		explicit Chunk(TextureManager const &textureManager, glm::mat4 &projection);
 		Chunk(Chunk const &src);
 		virtual ~Chunk();
 
@@ -17,7 +17,6 @@ class Chunk : public AChunk {
 
 		virtual void	update();
 		virtual void	draw(glm::mat4 &view) const;
-		virtual void	setProjection(glm::mat4 &projection);
 
 	private:
 		void	sendCubeData();
