@@ -6,6 +6,8 @@ make check -j8
 
 RESULT=$?
 
+make fclean > /dev/null
+
 git stash pop --quiet
 
 exit $RESULT
