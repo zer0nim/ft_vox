@@ -181,5 +181,8 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 		textY -= lineSz;
 		sHelp = "F3 + H: toggle help menu";
 		textRender.write("normal", sHelp, textX + 20, textY);
+		textY -= lineSz;
+		sHelp = "F3 + P: toggle polygon render mode";
+		textRender.write("normal", sHelp, textX + 20, textY);
 	}
 }

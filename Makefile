@@ -16,6 +16,7 @@ SRC =	main.cpp \
 		chunk/AChunk.cpp \
 		chunk/ChunkManager.cpp \
 		chunk/Chunk.cpp \
+		chunk/GreedyChunk.cpp \
 		chunk/MapGenerator.cpp \
 \
 		utils/Texture.cpp \
@@ -33,6 +34,7 @@ HEAD =	commonInclude.hpp \
 		chunk/AChunk.hpp \
 		chunk/ChunkManager.hpp \
 		chunk/Chunk.hpp \
+		chunk/GreedyChunk.hpp \
 		chunk/MapGenerator.hpp \
 \
 		utils/Texture.hpp \

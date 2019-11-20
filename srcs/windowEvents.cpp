@@ -100,6 +100,20 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 		}
 		launchF3Cmd = true;
 	}
+
+	// F3 + P -> toggle polygon render mode (F3 + P)
+	if (key == GLFW_KEY_P && action == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
+		winU->polygonRenderMode = (winU->polygonRenderMode + 1) % 3;
+		if (winU->polygonRenderMode == 0) {
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
+		else if (winU->polygonRenderMode == 1) {
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		}
+		else {
+			glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+		}
+	}
 }
 
 void	mouseCb(GLFWwindow *window, double xPos, double yPos) {

@@ -4,11 +4,12 @@
 #include <boost/filesystem.hpp>
 #include "AChunk.hpp"
 #include "Chunk.hpp"
+#include "GreedyChunk.hpp"
 #include "ChunkManager.hpp"
 #include "MapGenerator.hpp"
 
 AChunk * instanciateNewChunk(TextureManager const &textureManager, glm::mat4 &projection) {
-	AChunk * newChunk = new Chunk(textureManager, projection);
+	AChunk * newChunk = new GreedyChunk(textureManager, projection);
 	return newChunk;
 }
 
