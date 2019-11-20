@@ -132,7 +132,8 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
 int		main(int ac, char const **av) {
 	GLFWwindow		*window;
 	tWinUser		winU;
-	Camera			cam(glm::vec3(0.0f, 64.0f, 19.0f));
+	glm::vec3		startingPos(0.0f, 64.0f, 19.0f);
+	Camera			cam(startingPos);
 	TextureManager	*textureManager = nullptr;
 
 	uint32_t randSeed = time(nullptr);
@@ -150,8 +151,14 @@ int		main(int ac, char const **av) {
 		if (createMapFiles(mapName) == false) {
 			return 1;
 		}
+		std::cout << "[INFO]: map " << mapName << std::endl;
 		mapName = std::string(MAPS_PATH) + mapName;
 	}
+
+	std::cout << "[INFO]: starting at " << startingPos.x << " " << startingPos.y << " " << startingPos.z << std::endl;
+	std::cout << "[INFO]: random seed " << seed << std::endl;
+	std::cout << "[INFO]: chunk size " << CHUNK_SZ_X << " " << CHUNK_SZ_Y << " " << CHUNK_SZ_Z << std::endl;
+	std::cout << "[INFO]: render distance " << RENDER_DISTANCE_CHUNK << " chunks" << std::endl;
 
 
 	if (!init(&window, "ft_vox", &winU, &cam))
