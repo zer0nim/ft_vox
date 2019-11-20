@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-git stash -q --keep-index
+git stash -q --include-untracked
 
 make check -j8
 

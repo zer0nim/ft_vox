@@ -94,8 +94,8 @@ all:
 
 init:
 	$(START)
-	@printf $(CYAN)"create pre-commit\n"$(NORMAL)
-	@cp .pre-commit .git/hooks/pre-commit
+	@printf $(CYAN)"create pre-push\n"$(NORMAL)
+	@cp .pre-push .git/hooks/pre-push
 	$(END)
 
 $(NAME): $(OBJS_DIR) $(OBJS)
