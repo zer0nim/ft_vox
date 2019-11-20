@@ -7,6 +7,7 @@
 #define MAP_HEIGHT_EXP		1    // bigger nb == small mountains
 #define MAP_START_HEIGHT	0.5  // start at 05 (half of the height)
 #define MAP_HEIGHT_DIV		3    // height divisor (to avoid big montains)
+#define MAP_CAVERN_FREQ		0.3  // frequency of caverns
 
 struct MapInfo {
 	float	xFactor;

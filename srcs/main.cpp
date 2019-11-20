@@ -131,7 +131,7 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
 int		main(int ac, char const **av) {
 	GLFWwindow		*window;
 	tWinUser		winU;
-	Camera			cam(glm::vec3(0.0f, 35.0f, 19.0f));
+	Camera			cam(glm::vec3(0.0f, 64.0f, 19.0f));
 	TextureManager	*textureManager = nullptr;
 
 	if (ac > 2) {
