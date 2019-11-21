@@ -37,7 +37,7 @@ generation type
 */
 #define GENERATION_VOID		0
 #define GENERATION_NORMAL	1
-#define GENERATION_TYPE GENERATION_VOID  // choose the generation type
+#define GENERATION_TYPE GENERATION_NORMAL  // choose the generation type
 
 typedef glm::tvec3<int8_t>	chunkVec3;   // used for chunk coordinate
 typedef glm::tvec3<int32_t>	wordIVec3;  // used for word coordinate in int (bloc)
