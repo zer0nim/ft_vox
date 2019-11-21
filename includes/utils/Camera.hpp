@@ -4,8 +4,8 @@
 #include "commonInclude.hpp"
 
 #define CONSTRAINT_Y		true  // if true, move forward didn't affect Y position
-#define MOVEMENT_SPEED		10.0f
-#define RUN_FACTOR			2.0f
+#define MOVEMENT_SPEED		15.0f
+#define RUN_FACTOR			3.0f
 #define MOUSE_SENSITIVITY	0.1f
 
 enum class CamMovement {

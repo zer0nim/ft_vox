@@ -173,7 +173,7 @@ void	GreedyChunk::update() {
 	}
 }
 
-void	GreedyChunk::draw(glm::mat4 &view) const {
+void	GreedyChunk::_draw(glm::mat4 &view) const {
 	_textureManager.activateTextures();
 
 	_shaderData->naiveShader->use();

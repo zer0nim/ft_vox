@@ -20,7 +20,7 @@ class AChunk {
 
 		AChunk &operator=(AChunk const &rhs);
 
-		virtual void	draw(glm::mat4 &view) const = 0;
+		virtual void	draw(glm::mat4 &view) const;
 		virtual void	update() = 0;
 		void			createChunk(std::string const &mapName, wordIVec3 const &chunkPos);
 		void			createChunk(std::string const &mapName, std::string const &chunkPos);
@@ -30,9 +30,14 @@ class AChunk {
 		AChunk::ChunkData const	&getData() const;
 		TextureManager const &getTextureManager() const;
 
+		mutable bool	isDrawing;  // true if the chunk is actually in drawing process
+		mutable bool	isUpdating;  // true if the chunk is actually in updating process
+
 	protected:
+		virtual void	_draw(glm::mat4 &view) const = 0;
 		bool			_createChunkFromFile();
 		virtual void	_createChunk();
+
 		ChunkData		_data;  // all chunk data
 		wordIVec3		_chunkPos;  // position of the chunk
 		std::string		_filename;

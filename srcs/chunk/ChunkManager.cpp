@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <sstream>
 #include <vector>
 #include "ChunkManager.hpp"
@@ -66,7 +67,6 @@ void ChunkManager::init(wordFVec3 camPos, glm::mat4 &projection) {
 }
 
 void ChunkManager::update(wordFVec3 &camPos) {
-	std::vector<std::string> toDelete;
 	wordIVec3 lastChunkPos = _chunkActPos;
 
 	_updateChunkPos(camPos);
@@ -93,16 +93,16 @@ void ChunkManager::update(wordFVec3 &camPos) {
 	// update all chunks
 	for (auto it = _chunkMap.begin(); it != _chunkMap.end(); it++) {
 		if (_isInChunkLoaded(stringToVec(it->first))) {
+			while (it->second->isDrawing) {
+				usleep(10);
+			}
+			it->second->isUpdating = true;
 			it->second->update();
+			it->second->isUpdating = false;
 		}
-		else if (_isInChunkLoadedBorder(stringToVec(it->first)) == false) {  // we need to remove the chunk
+		else {  // we need to remove the chunk
 			toDelete.push_back(it->first);
 		}
-	}
-	// delete all old chunks
-	for (auto it = toDelete.begin(); it != toDelete.end(); it++) {
-		delete _chunkMap[*it];
-		_chunkMap.erase(*it);
 	}
 }
 
@@ -134,22 +134,10 @@ void	ChunkManager::_insertChunk(wordIVec3 chunkPos, AChunk * newChunk) {
 }
 
 bool	ChunkManager::_isInChunkLoaded(wordIVec3 const &chunkPos) const {
-	if (chunkPos.x < _chunkActPos.x - RENDER_DISTANCE_CHUNK * CHUNK_SZ_X
-	|| chunkPos.x > _chunkActPos.x + RENDER_DISTANCE_CHUNK * CHUNK_SZ_X + CHUNK_SZ_X
-	|| chunkPos.z < _chunkActPos.z - RENDER_DISTANCE_CHUNK * CHUNK_SZ_Z
-	|| chunkPos.z > _chunkActPos.z + RENDER_DISTANCE_CHUNK * CHUNK_SZ_Z + CHUNK_SZ_Z)
-		return false;
-	return true;
-}
-
-bool	ChunkManager::_isInChunkLoadedBorder(wordIVec3 const &chunkPos) const {
-	/*
-	return true if the chunk is in loaded chunk or at a dist of 1 to loaded chunks
-	*/
-	if (chunkPos.x < _chunkActPos.x - (RENDER_DISTANCE_CHUNK + 1) * CHUNK_SZ_X
-	|| chunkPos.x > _chunkActPos.x + (RENDER_DISTANCE_CHUNK + 1) * CHUNK_SZ_X + CHUNK_SZ_X
-	|| chunkPos.z < _chunkActPos.z - (RENDER_DISTANCE_CHUNK + 1) * CHUNK_SZ_Z
-	|| chunkPos.z > _chunkActPos.z + (RENDER_DISTANCE_CHUNK + 1) * CHUNK_SZ_Z + CHUNK_SZ_Z)
+	if (chunkPos.x <= _chunkActPos.x - RENDER_DISTANCE_CHUNK * CHUNK_SZ_X
+	|| chunkPos.x >= _chunkActPos.x + RENDER_DISTANCE_CHUNK * CHUNK_SZ_X
+	|| chunkPos.z <= _chunkActPos.z - RENDER_DISTANCE_CHUNK * CHUNK_SZ_Z
+	|| chunkPos.z >= _chunkActPos.z + RENDER_DISTANCE_CHUNK * CHUNK_SZ_Z)
 		return false;
 	return true;
 }

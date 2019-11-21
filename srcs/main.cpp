@@ -21,9 +21,17 @@ void	*threadUpdateFunction(void *args_) {
 	while (!glfwWindowShouldClose(args->window)) {
 		time_start = getMs();
 
-		// update
-		if (winU->freezeChunkUpdate == false) {
-			args->chunkManager.update(args->camPos);
+		args->deleteLocker.isLocked = args->deleteLocker.ask;
+
+		if (args->deleteLocker.isLocked == false) {  // thread is unlocked
+			// update
+			if (winU->freezeChunkUpdate == false) {
+				args->chunkManager.update(args->camPos);
+				if (args->chunkManager.toDelete.size() > 0) {  // auto lock
+					args->deleteLocker.ask = true;
+					continue;
+				}
+			}
 		}
 
 		// fps
@@ -87,7 +95,6 @@ TextRender &textRender, ChunkManager &chunkManager) {
 		skybox.getShader().setMat4("view", skyView);
 
 		// draw here
-		// chunkManager.update(winU->cam->pos);
 		chunkManager.draw(view);
 
 		// draw skybox
@@ -99,6 +106,20 @@ TextRender &textRender, ChunkManager &chunkManager) {
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 		checkError();
+
+		// delete chunks if needed
+		if (chunkManager.toDelete.size() > 0)
+			threadUpdateArgs->deleteLocker.ask = true;  // ask update thread to lock
+
+		if (threadUpdateArgs->deleteLocker.isLocked) {  // when the other thread is locked
+			// delete all old chunks
+			for (auto it = chunkManager.toDelete.begin(); it != chunkManager.toDelete.end(); it++) {
+				delete chunkManager.getChunkMap()[*it];
+				chunkManager.getChunkMap().erase(*it);
+			}
+			chunkManager.toDelete.clear();
+			threadUpdateArgs->deleteLocker.ask = false;
+		}
 
 		// fps
 		std::chrono::milliseconds time_loop = getMs() - time_start;

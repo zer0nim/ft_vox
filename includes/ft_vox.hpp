@@ -56,6 +56,26 @@ typedef struct	sWinUser {
 	int8_t		polygonRenderMode;  // toggle polygon render mode (F3 + P)
 }				tWinUser;
 
+struct Locker {
+	bool	ask;
+	bool	isLocked;
+
+	/*
+	thread locker:
+	main thread ask other thread to lock:
+		while loop:
+			locker.ask = true;
+			if (locker.isLocked):
+				-> do some stuff here: other thread is locked
+				locker.ask = false;
+	other thread
+		while loop:
+			locker.isLocked = locker.ask;
+			if (locker.isLocked == false)
+				-> do some stuff here: thread unlocked
+	*/
+	Locker() : ask(false), isLocked(false) {}
+};
 
 class ChunkManager;
 struct ThreadupdateArgs {
@@ -63,6 +83,7 @@ struct ThreadupdateArgs {
 	ChunkManager	&chunkManager;
 	wordFVec3		&camPos;
 	bool			quit;
+	Locker			deleteLocker;  // lock thread to delete chunks safely
 
 	ThreadupdateArgs(GLFWwindow *window_, ChunkManager &chunkManager_, wordFVec3 &camPos_) :
 	window(window_), chunkManager(chunkManager_), camPos(camPos_), quit(false) {}

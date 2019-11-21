@@ -14,6 +14,8 @@ AChunk * instanciateNewChunk(TextureManager const &textureManager, glm::mat4 &pr
 }
 
 AChunk::AChunk(TextureManager const &textureManager, glm::mat4 &projection) :
+isDrawing(false),
+isUpdating(false),
 _data(),
 _filename(""),
 _isModifiedFromBegining(false),
@@ -33,9 +35,20 @@ AChunk::~AChunk() {
 }
 
 AChunk &AChunk::operator=(AChunk const &rhs) {
-	(void)rhs;
-	// if (this != &rhs) {}
+	if (this != &rhs) {
+		isUpdating = false;
+		isDrawing = false;
+	}
 	return *this;
+}
+
+void	AChunk::draw(glm::mat4 &view) const {
+	while (isUpdating) {
+		usleep(10);
+	}
+	isDrawing = true;
+	_draw(view);
+	isDrawing = false;
 }
 
 bool	AChunk::_createChunkFromFile() {
