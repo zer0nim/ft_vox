@@ -55,7 +55,8 @@ vec3 calcDirLight(DirLight light, vec3 norm, vec3 viewDir) {
 	// use texture or color for the specular
 	vec3 specular = light.specular;
 	if (material.specular.isTexture) {
-		specular *= spec * vec3(texture(material.specular.texture, fs_in.TexCoords));
+		// specular *= spec * vec3(texture(material.specular.texture, fs_in.TexCoords));
+		specular *= spec * pow(material.specular.color, vec3(GAMMA));
 	}
 	else {
 		specular *= spec * pow(material.specular.color, vec3(GAMMA));
