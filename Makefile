@@ -69,6 +69,22 @@ ifneq ($(DEBUG),)
 	CFLAGS := $(CFLAGS) $(DEBUG_FLAGS)
 endif
 
+# pre-commit rules
+define PRE_COMMIT
+#!/bin/zsh
+
+git stash -q --keep-index
+
+make check -j8
+
+RESULT=$?
+
+git stash pop -q
+
+exit $RESULT
+endef
+export PRE_COMMIT
+
 HEADS		= $(addprefix $(INC_DIR)/, $(HEAD))
 OBJS		= $(addprefix $(OBJS_DIR)/, $(SRC:.cpp=.o))
 DEPFILES	= $(addprefix $(DEP_DIR)/, $(SRC:.cpp=.d))
@@ -97,8 +113,8 @@ all:
 
 init:
 	$(START)
-	@printf $(CYAN)"create pre-push\n"$(NORMAL)
-	@cp .pre-push .git/hooks/pre-push
+	@printf $(CYAN)"create pre-commit\n"$(NORMAL)
+	@echo "$$PRE_COMMIT" > .git/hooks/pre-commit
 	$(END)
 
 $(NAME): $(OBJS_DIR) $(OBJS)
