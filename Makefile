@@ -70,6 +70,7 @@ ifneq ($(DEBUG),)
 endif
 
 # pre-commit rules
+PRE_COMMIT_FILE = .git/hooks/pre-commit
 define PRE_COMMIT
 #!/bin/zsh
 
@@ -114,7 +115,8 @@ all:
 init:
 	$(START)
 	@printf $(CYAN)"create pre-commit\n"$(NORMAL)
-	@echo "$$PRE_COMMIT" > .git/hooks/pre-commit
+	@echo "$$PRE_COMMIT" > $(PRE_COMMIT_FILE)
+	@chmod 755 $(PRE_COMMIT_FILE)
 	$(END)
 
 $(NAME): $(OBJS_DIR) $(OBJS)
