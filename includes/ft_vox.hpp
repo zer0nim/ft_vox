@@ -32,6 +32,13 @@ filesystem
 #define CHUNK_EXTENSION ".chunk"
 #define SEED_FILE "seed"
 
+/*
+generation type
+*/
+#define GENERATION_VOID		0
+#define GENERATION_NORMAL	1
+#define GENERATION_TYPE GENERATION_VOID  // choose the generation type
+
 typedef glm::tvec3<int8_t>	chunkVec3;   // used for chunk coordinate
 typedef glm::tvec3<int32_t>	wordIVec3;  // used for word coordinate in int (bloc)
 typedef glm::tvec3<float>	wordFVec3;    // user for word coordinate in float (camera)

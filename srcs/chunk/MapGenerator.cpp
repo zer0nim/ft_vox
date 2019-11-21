@@ -8,7 +8,15 @@ void		setSeed(uint32_t seed) {
 	mapInfo.perlin.reseed(seed);
 }
 
-uint8_t		getBlock(wordIVec3 &chunkPos, uint8_t ix, uint8_t iy, uint8_t iz) {
+uint8_t		getBlockVoid(wordIVec3 &chunkPos, uint8_t ix, uint8_t iy, uint8_t iz) {
+	(void)chunkPos;
+	(void)ix;
+	(void)iy;
+	(void)iz;
+	return 0;
+}
+
+uint8_t		getBlockNormal(wordIVec3 &chunkPos, uint8_t ix, uint8_t iy, uint8_t iz) {
 	float	x = (chunkPos.x + ix) * mapInfo.xFactor + 0.5;
 	float	y = (chunkPos.y + iy) * mapInfo.yFactor;
 	float	z = (chunkPos.z + iz) * mapInfo.zFactor + 0.5;
@@ -53,4 +61,12 @@ uint8_t		getBlock(wordIVec3 &chunkPos, uint8_t ix, uint8_t iy, uint8_t iz) {
 			result = TextureManager::blocksNames["bedrock"];  // replace by bedrock
 	}
 	return result;
+}
+
+uint8_t		getBlock(wordIVec3 &chunkPos, uint8_t ix, uint8_t iy, uint8_t iz) {
+	#if GENERATION_TYPE == GENERATION_VOID
+		return getBlockVoid(chunkPos, ix, iy, iz);
+	#else
+		return getBlockNormal(chunkPos, ix, iy, iz);
+	#endif
 }

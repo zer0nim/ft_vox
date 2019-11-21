@@ -99,7 +99,7 @@ void	Chunk::draw(glm::mat4 &view) const {
 	for (uint8_t x = 0; x < CHUNK_SZ_X; ++x) {
 		for (uint8_t y = 0; y < CHUNK_SZ_Y; ++y) {
 			for (uint8_t z = 0; z < CHUNK_SZ_Z; ++z) {
-				if (_data.data[x][y][z] != 0) {
+				if (_data.data[x][y][z] > 0) {
 					_shaderData->naiveShader->setInt("cubeId", _data.data[x][y][z] - 1);
 
 					glm::mat4 model = glm::translate(baseModel, glm::vec3(x, y, z));
@@ -132,7 +132,6 @@ void	Chunk::sendCubeData() {
 	_shaderData->naiveShader->use();
 	// set cube material
 	Material material;
-	_shaderData->naiveShader->use();
 	_shaderData->naiveShader->setBool("material.specular.isTexture", false);
 	_shaderData->naiveShader->setVec3("material.specular.color", material.specular);
 	_shaderData->naiveShader->setFloat("material.shininess", material.shininess);

@@ -152,6 +152,10 @@ void	TextureManager::loadBlocksTextures(nlohmann::json const &data) {
 					_blocks[id] = blockTexture;
 				}
 			}
+			else {
+				std::cerr << "invalid block name in textures.json: " << block.key() << std::endl;
+				throw TextureManager::missingBlockException();
+			}
 		}
 	}
 

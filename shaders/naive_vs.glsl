@@ -21,7 +21,6 @@ struct	BlockTexture {
 	int	textureBottom;
 };
 uniform BlockTexture[NB_BLOCK_TYPES] blockTexturesInfo;
-uniform sampler2D[MAX_TEXTURES] blockTextures;
 
 uniform int cubeId;
 
