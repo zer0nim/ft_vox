@@ -132,8 +132,7 @@ void	Chunk::sendCubeData() {
 	_shaderData->naiveShader->use();
 	// set cube material
 	Material material;
-	_shaderData->naiveShader->setBool("material.specular.isTexture", false);
-	_shaderData->naiveShader->setVec3("material.specular.color", material.specular);
+	_shaderData->naiveShader->setVec3("material.specular", material.specular);
 	_shaderData->naiveShader->setFloat("material.shininess", material.shininess);
 
 	// set direction light

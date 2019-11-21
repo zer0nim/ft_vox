@@ -12,14 +12,8 @@ in VS_OUT {
 	flat int TextureId;
 } fs_in;
 
-struct	ColorData {
-	bool		isTexture;
-	vec3		color;
-	sampler2D	texture;
-};
-
 struct	Material {
-	ColorData	specular;
+	vec3		specular;
 	float		shininess;
 };
 
@@ -54,13 +48,7 @@ vec3 calcDirLight(DirLight light, vec3 norm, vec3 viewDir) {
 
 	// use texture or color for the specular
 	vec3 specular = light.specular;
-	if (material.specular.isTexture) {
-		// specular *= spec * vec3(texture(material.specular.texture, fs_in.TexCoords));
-		specular *= spec * pow(material.specular.color, vec3(GAMMA));
-	}
-	else {
-		specular *= spec * pow(material.specular.color, vec3(GAMMA));
-	}
+	specular *= spec * pow(material.specular, vec3(GAMMA));
 
 	return (ambient + diffuse + specular);
 }
