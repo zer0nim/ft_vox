@@ -3,6 +3,7 @@
 #include <map>
 #include "ft_vox.hpp"
 #include "AChunk.hpp"
+#include "Camera.hpp"
 
 std::string	vecToString(const wordIVec3 &vec);  // vec to string -> "x_y_z"
 wordIVec3	stringToVec(const std::string &s);  // string "x_y_z" to vec
@@ -17,7 +18,7 @@ class ChunkManager {
 
 		void	init(wordFVec3 camPos, glm::mat4 &projection);  // load the firsts chunks
 		void	update(wordFVec3 &camPos);  // global update (call each frame)
-		void	draw(glm::mat4 view);  // draw all chunks
+		void	draw(glm::mat4 view, Camera *cam);  // draw all chunks
 
 		std::string const						&getMapName() const;
 		tWinUser								*getWinU();
@@ -28,7 +29,7 @@ class ChunkManager {
 		TextureManager const					&getTextureManager() const;
 		glm::mat4 const							&getProjection() const;
 
-		std::vector<std::string>	toDelete;  // list of chunks to delete
+		std::vector<std::string>				toDelete;  // list of chunks to delete
 
 	private:
 		ChunkManager();

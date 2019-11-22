@@ -16,12 +16,19 @@
 #define CHUNK_SZ_Y 64  // [bloc] type: int
 #define CHUNK_SZ_Z 16  // [bloc] type: int
 
-#define RENDER_DISTANCE_CHUNK	3  // [chunk] type: int
+#define RENDER_DISTANCE_CHUNK	8  // [chunk] type: int
 #define MAX_Y_CHUNK				MAX_MAP_SIZE_Y / CHUNK_SZ_Y  // [chunk] type: int
 
 class Chunk;
 class GreedyChunk;
 #define CHUNK_OBJECT			GreedyChunk  // the chunk object used
+
+/*
+generation type
+*/
+#define GENERATION_VOID		0
+#define GENERATION_NORMAL	1
+#define GENERATION_TYPE GENERATION_NORMAL  // choose the generation type
 
 /*
 filesystem
@@ -31,13 +38,6 @@ filesystem
 #define CHUNK_PATH "chunks/"
 #define CHUNK_EXTENSION ".chunk"
 #define SEED_FILE "seed"
-
-/*
-generation type
-*/
-#define GENERATION_VOID		0
-#define GENERATION_NORMAL	1
-#define GENERATION_TYPE GENERATION_NORMAL  // choose the generation type
 
 typedef glm::tvec3<int8_t>	chunkVec3;   // used for chunk coordinate
 typedef glm::tvec3<int32_t>	wordIVec3;  // used for word coordinate in int (bloc)

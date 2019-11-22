@@ -68,7 +68,6 @@ void ChunkManager::init(wordFVec3 camPos, glm::mat4 &projection) {
 
 void ChunkManager::update(wordFVec3 &camPos) {
 	wordIVec3 lastChunkPos = _chunkActPos;
-
 	_updateChunkPos(camPos);
 
 	// add new chunks if needed
@@ -106,15 +105,20 @@ void ChunkManager::update(wordFVec3 &camPos) {
 	}
 }
 
-void ChunkManager::draw(glm::mat4 view) {
+void ChunkManager::draw(glm::mat4 view, Camera *cam) {
+	glm::vec3	chunkSize(CHUNK_SZ_X, CHUNK_SZ_Y, CHUNK_SZ_Z);
+
 	for (int32_t x = _chunkActPos.x - CHUNK_SZ_X * (RENDER_DISTANCE_CHUNK - 1);
 	x < _chunkActPos.x + CHUNK_SZ_X * RENDER_DISTANCE_CHUNK; x += CHUNK_SZ_X) {
 		for (int32_t z = _chunkActPos.z - CHUNK_SZ_Z * (RENDER_DISTANCE_CHUNK - 1);
 		z < _chunkActPos.z + CHUNK_SZ_Z * RENDER_DISTANCE_CHUNK; z += CHUNK_SZ_Z) {
 			for (int32_t y = 0; y < CHUNK_SZ_Y * MAX_Y_CHUNK; y += CHUNK_SZ_Y) {
 				wordIVec3 chunkPos(x, y, z);  // this is the position of the chunk
-				if (_isChunkExist(chunkPos))
-					_chunkMap[vecToString(chunkPos)]->draw(view);
+				if (_isChunkExist(chunkPos)) {  // if the chunk exist
+					if (FRCL_IS_INSIDE(cam->frustumCullingCheckCube(chunkPos, chunkSize))) {  // if inside the camera
+						_chunkMap[vecToString(chunkPos)]->draw(view);
+					}
+				}
 			}
 		}
 	}

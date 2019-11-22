@@ -61,8 +61,13 @@ TextRender &textRender, ChunkManager &chunkManager) {
 	ThreadupdateArgs			*threadUpdateArgs = new ThreadupdateArgs(window, chunkManager, winU->cam->pos);
 
 	// projection matrix
-	glm::mat4	projection = glm::perspective(
-		glm::radians(cam.zoom), winU->width / winU->height, 0.1f, 100.0f);
+	float angle = cam.zoom;
+	float ratio = winU->width / winU->height;
+	float nearD = 0.1f;
+	float farD = 300.0f;
+	glm::mat4	projection = glm::perspective(glm::radians(angle), ratio, nearD, farD);
+
+	winU->cam->frustumCullingInit(angle, ratio, nearD, farD);
 
 	chunkManager.init(winU->cam->pos, projection);
 
@@ -95,7 +100,7 @@ TextRender &textRender, ChunkManager &chunkManager) {
 		skybox.getShader().setMat4("view", skyView);
 
 		// draw here
-		chunkManager.draw(view);
+		chunkManager.draw(view, winU->cam);
 
 		// draw skybox
 		skybox.draw();

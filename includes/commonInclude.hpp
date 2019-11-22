@@ -3,7 +3,7 @@
 
 #define DEBUG true  // type: bool -> enable / disable the debug mode
 #define DEBUG_FPS_LOW DEBUG & false
-#define SCREEN_W 1400  // [px] type: int ->width of the screen in pixels
+#define SCREEN_W 1200  // [px] type: int ->width of the screen in pixels
 #define SCREEN_H 800  // [px] type: int -> height of the screen in pixels
 #define FPS 120  // [Hz] type: int -> fps of the main loop
 #define LOOP_TIME (1000 / FPS)  // [s] type: float -> duration in s for a loop
