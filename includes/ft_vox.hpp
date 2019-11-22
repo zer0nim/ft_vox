@@ -16,12 +16,12 @@
 #define CHUNK_SZ_Y 64  // [bloc] type: int
 #define CHUNK_SZ_Z 16  // [bloc] type: int
 
-#define RENDER_DISTANCE_CHUNK	3  // [chunk] type: int
+#define RENDER_DISTANCE_CHUNK	1  // [chunk] type: int
 #define MAX_Y_CHUNK				MAX_MAP_SIZE_Y / CHUNK_SZ_Y  // [chunk] type: int
 
 class Chunk;
 class GreedyChunk;
-#define CHUNK_OBJECT			GreedyChunk  // the chunk object used
+#define CHUNK_OBJECT			GreedyChunk2  // the chunk object used
 
 /*
 filesystem

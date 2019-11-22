@@ -171,6 +171,7 @@ void	GreedyChunk::update() {
 			}
 		}
 	}
+	std::cout << "meshs count: " << _meshDatas.size() << std::endl;
 }
 
 void	GreedyChunk::_draw(glm::mat4 &view) const {
