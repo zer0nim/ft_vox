@@ -8,6 +8,25 @@
 #include "ChunkManager.hpp"
 #include "TextRender.hpp"
 
+Settings s;
+
+bool	loadSettings(std::string settingFile) {
+	(void)settingFile;
+	s.g.renderDist = 8;
+	s.g.files.mapsPath = "/tmp/ft_vox/maps/";
+	s.g.files.chunkPath = "chunks/";
+	s.g.files.mapSettingsPath = "map_settings.json";
+	s.g.screen.width = 1200;
+	s.g.screen.height = 800;
+	s.g.screen.fps = 120;
+	s.m.seed = time(nullptr);
+	s.m.generationType = GENERATION_NORMAL;
+	s.m.cameraStartPos.x = 0;
+	s.m.cameraStartPos.y = 64;
+	s.m.cameraStartPos.z = 0;
+	return true;
+}
+
 std::chrono::milliseconds getMs() {
 	return std::chrono::duration_cast<std::chrono::milliseconds>(
 		std::chrono::system_clock::now().time_since_epoch());

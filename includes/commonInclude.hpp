@@ -17,6 +17,7 @@
 
 #include <string>
 #include <iostream>
+#include <map>
 
 // glm
 #include <glm/glm.hpp>

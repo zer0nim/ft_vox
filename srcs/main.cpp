@@ -166,6 +166,10 @@ int		main(int ac, char const **av) {
 	Camera			cam(startingPos);
 	TextureManager	*textureManager = nullptr;
 
+	if (loadSettings(std::string(SETTINGS_FILE)) == false) {
+		return 1;
+	}
+
 	uint32_t randSeed = time(nullptr);
 	std::string mapName = "";
 	uint32_t	seed = rand_r(&randSeed);
@@ -183,13 +187,12 @@ int		main(int ac, char const **av) {
 		std::cout << "[INFO]: map " << mapName << std::endl;
 		mapName = std::string(MAPS_PATH) + mapName;
 	}
-	setSeed(seed);
+	setSeed(s.m.seed);
 
 	std::cout << "[INFO]: starting at " << startingPos.x << " " << startingPos.y << " " << startingPos.z << std::endl;
-	std::cout << "[INFO]: random seed " << seed << std::endl;
+	std::cout << "[INFO]: random seed " << s.m.seed << std::endl;
 	std::cout << "[INFO]: chunk size " << CHUNK_SZ_X << " " << CHUNK_SZ_Y << " " << CHUNK_SZ_Z << std::endl;
 	std::cout << "[INFO]: render distance " << RENDER_DISTANCE_CHUNK << " chunks" << std::endl;
-
 
 	if (!init(&window, "ft_vox", &winU, &cam))
 		return (1);

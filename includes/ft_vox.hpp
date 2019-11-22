@@ -8,6 +8,8 @@
 #define checkError() checkError_(__FILE__, __LINE__)
 #define checkErrorExit() checkErrorExit_(__FILE__, __LINE__)
 
+#define SETTINGS_FILE "assets/settings.json"
+
 #define MAX_MAP_SIZE_X 2^16  // [bloc] type: int
 #define MAX_MAP_SIZE_Y 64  // [bloc] type: int
 #define MAX_MAP_SIZE_Z MAX_MAP_SIZE_X  // [bloc] type: int
@@ -91,5 +93,39 @@ struct ThreadupdateArgs {
 
 bool	initWindow(GLFWwindow **window, const char *name, tWinUser *winU);
 void	processInput(GLFWwindow *window);
+bool	loadSettings(std::string settingFile);
+
+struct Settings {
+	struct Global {
+		uint32_t	renderDist;
+		struct Files {
+			std::string	mapsPath;
+			std::string	chunkPath;
+			std::string mapSettingsPath;
+			bool		saveAllChunks;
+		};
+		Files	files;
+		struct Screen {
+			uint32_t	width;
+			uint32_t	height;
+			uint32_t	fps;
+			struct Text {
+				std::string	path;
+				uint32_t	size;
+			};
+			std::map<std::string, Text> text;
+		};
+		Screen	screen;
+	};
+	Global	g;  // global
+	struct Map {
+		uint32_t	seed;
+		uint32_t	generationType;
+		wordFVec3	cameraStartPos;
+	};
+	Map m;  // map
+};
+
+extern Settings s;
 
 #endif  // FT_VOX_HPP_
