@@ -27,9 +27,13 @@
 		"seed": 0,
 		"generationType": 1,
 		"cameraStartPos": {
-			"x": 0,
-			"y": 64,
-			"z": 0
+			"pos": {
+				"x": 0,
+				"y": 64,
+				"z": 0
+			},
+			"yaw": -90,
+			"pitch": 0
 		}
 	}
 }

@@ -162,12 +162,15 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
 }
 
 int		main(int ac, char const **av) {
+	setDefaultSettings();
 	try {
 		loadSettings(std::string(SETTINGS_FILE));
 	}
 	catch (Settings::SettingsError &e) {
 		return 1;
 	}
+	if (s.m.seed == 0)
+		s.m.seed = time(nullptr);
 
 	if (argparse(ac - 1, av + 1) == false) {
 		return 0;
@@ -186,11 +189,11 @@ int		main(int ac, char const **av) {
 
 	GLFWwindow		*window;
 	tWinUser		winU;
-	Camera			cam(s.m.cameraStartPos);
+	Camera			cam(s.m.cameraStartPos.pos, glm::vec3(0, 1, 0), s.m.cameraStartPos.yaw, s.m.cameraStartPos.pitch);
 	TextureManager	*textureManager = nullptr;
 
-	std::cout << "[INFO]: starting at " << s.m.cameraStartPos.x << " "
-	<< s.m.cameraStartPos.y << " " << s.m.cameraStartPos.z << std::endl;
+	std::cout << "[INFO]: starting at " << s.m.cameraStartPos.pos.x << " "
+	<< s.m.cameraStartPos.pos.y << " " << s.m.cameraStartPos.pos.z << std::endl;
 	std::cout << "[INFO]: random seed " << s.m.seed << std::endl;
 	std::cout << "[INFO]: chunk size " << CHUNK_SZ_X << " " << CHUNK_SZ_Y << " " << CHUNK_SZ_Z << std::endl;
 	std::cout << "[INFO]: render distance " << s.g.renderDist << " chunks" << std::endl;
@@ -234,6 +237,13 @@ int		main(int ac, char const **av) {
 	}
 	catch (const TextRender::TextRenderError & e) {
 		std::cerr << "TextRenderError: " << e.what() << std::endl;
+	}
+
+	if (s.m.mapName != "") {  // if we have a map
+		if (saveMap(cam))
+			std::cout << "[INFO]: settings saved" << std::endl;
+		else
+			std::cout << "[WARN]: unable to save settings" << std::endl;
 	}
 
 	delete textureManager;

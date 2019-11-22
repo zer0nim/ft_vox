@@ -18,7 +18,6 @@
 #define CHUNK_SZ_Y 64  // [bloc] type: int
 #define CHUNK_SZ_Z 16  // [bloc] type: int
 
-// #define RENDER_DISTANCE_CHUNK	8  // [chunk] type: int
 #define MAX_Y_CHUNK				MAX_MAP_SIZE_Y / CHUNK_SZ_Y  // [chunk] type: int
 
 class Chunk;
@@ -30,14 +29,10 @@ generation type
 */
 #define GENERATION_VOID		0
 #define GENERATION_NORMAL	1
-// #define GENERATION_TYPE GENERATION_NORMAL  // choose the generation type
 
 /*
 filesystem
 */
-// #define SAVE_ALL_CHUNKS false  // type: bool -> save all chunk in files (not only modified)
-// #define MAPS_PATH "/tmp/ft_vox/maps/"
-// #define CHUNK_PATH "chunks/"
 #define CHUNK_EXTENSION ".chunk"
 
 typedef glm::tvec3<int8_t>	chunkVec3;  // used for chunk coordinate
@@ -92,8 +87,18 @@ struct ThreadupdateArgs {
 
 bool	initWindow(GLFWwindow **window, const char *name, tWinUser *winU);
 void	processInput(GLFWwindow *window);
+std::chrono::milliseconds getMs();
+bool	usage();
+class TextRender;
+class ChunkManager;
+bool	argparse(int nbArgs, char const **args);
+void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManager &chunkManager);
+bool	createDir(std::string const &dirNames);
+bool	createDir(char const *dirNames);
+bool	createMapFiles();
 void	setDefaultSettings();
 void	loadSettings(std::string settingFile);
+bool	saveMap(Camera &cam);
 
 struct Settings {
 	struct Global {
@@ -119,11 +124,16 @@ struct Settings {
 	};
 	Global	g;  // global
 	struct Map {
-		std::string	mapName;
+		std::string	mapName;  // don't set it in settings.json
 		std::string fullMapName;  // don't set it in settings.json
 		uint32_t	seed;
 		uint32_t	generationType;
-		wordFVec3	cameraStartPos;
+		struct CameraStartPos {
+			glm::vec3	pos;
+			float		yaw;
+			float		pitch;
+		};
+		CameraStartPos	cameraStartPos;
 	};
 	Map m;  // map
 

@@ -26,9 +26,11 @@ void	setDefaultSettings() {
 		"title", {"assets/fonts/minecraft_title.ttf", 24}));
 	s.m.seed = time(nullptr);
 	s.m.generationType = GENERATION_NORMAL;
-	s.m.cameraStartPos.x = 0;
-	s.m.cameraStartPos.y = 64;
-	s.m.cameraStartPos.z = 0;
+	s.m.cameraStartPos.pos.x = 0;
+	s.m.cameraStartPos.pos.y = 64;
+	s.m.cameraStartPos.pos.z = 0;
+	s.m.cameraStartPos.yaw = -90;
+	s.m.cameraStartPos.pitch = 0;
 	s.m.mapName = "";
 }
 
@@ -73,12 +75,16 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		loadSettingElementFont(element, key);
 	else if (element.is_number() && key == ".map.generationType")
 		s.m.generationType = element.get<uint32_t>();
-	else if (element.is_number() && key == ".map.cameraStartPos.x")
-		s.m.cameraStartPos.x = element.get<float>();
-	else if (element.is_number() && key == ".map.cameraStartPos.y")
-		s.m.cameraStartPos.y = element.get<float>();
-	else if (element.is_number() && key == ".map.cameraStartPos.z")
-		s.m.cameraStartPos.z = element.get<float>();
+	else if (element.is_number() && key == ".map.cameraStartPos.pos.x")
+		s.m.cameraStartPos.pos.x = element.get<float>();
+	else if (element.is_number() && key == ".map.cameraStartPos.pos.y")
+		s.m.cameraStartPos.pos.y = element.get<float>();
+	else if (element.is_number() && key == ".map.cameraStartPos.pos.z")
+		s.m.cameraStartPos.pos.z = element.get<float>();
+	else if (element.is_number() && key == ".map.cameraStartPos.yaw")
+		s.m.cameraStartPos.yaw = element.get<float>();
+	else if (element.is_number() && key == ".map.cameraStartPos.pitch")
+		s.m.cameraStartPos.pitch = element.get<float>();
 	else if (element.is_number() && key == ".map.seed")
 		s.m.seed = element.get<uint32_t>();
 	else
@@ -97,8 +103,6 @@ static void	loadSettingsJson(nlohmann::json &data, std::string startKey = "") {
 }
 
 void	loadSettings(std::string settingFile) {
-	setDefaultSettings();
-
 	try {
 		std::ifstream fileStream(settingFile, std::ifstream::in);
 
@@ -116,6 +120,10 @@ void	loadSettings(std::string settingFile) {
 		std::cerr << "message: " << e.what() << std::endl;
 		std::cerr << "exception id: " << e.id << std::endl;
 		std::cerr << "byte position of error: " << e.byte << std::endl;
+		throw Settings::JsonParseException();
+	}
+	catch (std::exception &e) {
+		std::cerr << "unexpected exception in json loading" << std::endl;
 		throw Settings::JsonParseException();
 	}
 }
@@ -200,34 +208,61 @@ bool	createMapFiles() {
 		return false;
 	}
 
-	// check if the seed file exist
-	// std::string seedFilename = fullMapName + "/" + SEED_FILE;
-	// if (boost::filesystem::is_regular_file(seedFilename) == false) {
-	// 	// create the seed file
-	// 	std::ofstream seedFile(seedFilename);
-	// 	if (seedFile.fail()) {
-	// 		std::cout << "unable to save seed: " << seedFilename << " " << strerror(errno) << std::endl;
-	// 		return false;
-	// 	}
-	// 	seedFile << *seed << std::endl;
-	// 	if (seedFile.fail()) {
-	// 		std::cout << "unable to save seed: " << seedFilename << " " << strerror(errno) << std::endl;
-	// 		return false;
-	// 	}
-	// 	seedFile.close();
-	// }
-	// else {
-	// 	// load the seed
-	// 	std::ifstream seedFile(seedFilename);
-	// 	if (seedFile.fail()) {
-	// 		std::cout << "Error: " << strerror(errno) << std::endl;
-	// 		return false;
-	// 	}
-	// 	std::string line;
-	// 	std::getline(seedFile, line);
-	// 	*seed = static_cast<uint32_t>(std::atoi(line.c_str()));
-	// 	seedFile.close();
-	// }
+	// check if the settings file exist
+	std::string settingsFilename = s.m.fullMapName + "/" + s.g.files.mapSettingsPath;
+	if (boost::filesystem::is_regular_file(settingsFilename) == true) {
+		// load settings
+		try {
+			loadSettings(settingsFilename);
+		}
+		catch (Settings::SettingsError &e) {
+			std::cout << "[WARN]: unable to load settings from map" << std::endl;
+		}
+	}
+	else if (boost::filesystem::is_directory(s.m.fullMapName) == true) {
+		std::cout << "[WARN]: unable to load settings from map" << std::endl;
+	}
+	return true;
+}
+
+bool	saveMap(Camera &cam) {
+	std::string		settingsFilename = s.m.fullMapName + "/" + s.g.files.mapSettingsPath;
+	nlohmann::json	lastSettings;
+	try {
+		std::ifstream fileStream(settingsFilename, std::ifstream::in);
+		if (fileStream.is_open()) {
+			lastSettings << fileStream;
+		}
+	}
+	catch (const nlohmann::json::parse_error& e) {}
+	catch (std::exception &e) {}
+	nlohmann::json	settings = {
+		{"map", {
+			{"seed", s.m.seed},
+			{"generationType", s.m.generationType},
+			{"cameraStartPos", {
+				{"pos", {
+					{"x", cam.pos.x},
+					{"y", cam.pos.y},
+					{"z", cam.pos.z}
+				}},
+			    {"yaw", cam.yaw},
+			    {"pitch", cam.pitch}
+			}}
+		}
+	}};
+	lastSettings.merge_patch(settings);
+	std::ofstream settingsFile(settingsFilename);
+	if (settingsFile.fail()) {
+		std::cout << "unable to save map settings: " << settingsFilename << " " << strerror(errno) << std::endl;
+		return false;
+	}
+	settingsFile << std::setw(4) << lastSettings << std::endl;
+	if (settingsFile.fail()) {
+		std::cout << "unable to save map settigns: " << settingsFilename << " " << strerror(errno) << std::endl;
+		return false;
+	}
+	settingsFile.close();
 	return true;
 }
 
