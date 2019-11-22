@@ -21,7 +21,7 @@ bool	createDir(char const *dirNames) { return createDir(std::string(dirNames)); 
 
 bool	createMapFiles(std::string const &mapName) {
 	// create the maps directory
-	if (createDir(MAPS_PATH) == false) {
+	if (createDir(s.g.files.mapsPath) == false) {
 		return false;
 	}
 
@@ -31,7 +31,7 @@ bool	createMapFiles(std::string const &mapName) {
 	}
 
 	// create map (is needed)
-	if (createDir(mapName + "/" + CHUNK_PATH) == false) {
+	if (createDir(mapName + "/" + s.g.files.chunkPath) == false) {
 		return false;
 	}
 	return true;

@@ -160,39 +160,35 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
 }
 
 int		main(int ac, char const **av) {
-	GLFWwindow		*window;
-	tWinUser		winU;
-	glm::vec3		startingPos(0.0f, 64.0f, 19.0f);
-	Camera			cam(startingPos);
-	TextureManager	*textureManager = nullptr;
-
 	if (loadSettings(std::string(SETTINGS_FILE)) == false) {
 		return 1;
 	}
 
-	uint32_t randSeed = time(nullptr);
-	std::string mapName = "";
-	uint32_t	seed = rand_r(&randSeed);
-	if (argparse(ac - 1, av + 1, mapName, &seed) == false) {
+	if (argparse(ac - 1, av + 1) == false) {
 		return 0;
 	}
 
-	if (mapName == "") {  // load without mapName
+	if (s.m.mapName == "") {  // load without mapName
 		std::cout << "[WARN]: no mapname -> you can't save the map" << std::endl;
 	}
 	else {
-		if (createMapFiles(mapName, &seed) == false) {
+		if (createMapFiles() == false) {
 			return 1;
 		}
-		std::cout << "[INFO]: map " << mapName << std::endl;
-		mapName = std::string(MAPS_PATH) + mapName;
+		std::cout << "[INFO]: map " << s.m.mapName << std::endl;
 	}
 	setSeed(s.m.seed);
 
-	std::cout << "[INFO]: starting at " << startingPos.x << " " << startingPos.y << " " << startingPos.z << std::endl;
+	GLFWwindow		*window;
+	tWinUser		winU;
+	Camera			cam(s.m.cameraStartPos);
+	TextureManager	*textureManager = nullptr;
+
+	std::cout << "[INFO]: starting at " << s.m.cameraStartPos.x << " "
+	<< s.m.cameraStartPos.y << " " << s.m.cameraStartPos.z << std::endl;
 	std::cout << "[INFO]: random seed " << s.m.seed << std::endl;
 	std::cout << "[INFO]: chunk size " << CHUNK_SZ_X << " " << CHUNK_SZ_Y << " " << CHUNK_SZ_Z << std::endl;
-	std::cout << "[INFO]: render distance " << RENDER_DISTANCE_CHUNK << " chunks" << std::endl;
+	std::cout << "[INFO]: render distance " << s.g.renderDist << " chunks" << std::endl;
 
 	if (!init(&window, "ft_vox", &winU, &cam))
 		return (1);
@@ -214,7 +210,7 @@ int		main(int ac, char const **av) {
 		Skybox skybox(skyboxShader);
 
 		// create chunkManager
-		ChunkManager chunkManager(mapName, *textureManager, &winU);
+		ChunkManager chunkManager(*textureManager, &winU);
 
 		// run the game
 		gameLoop(window, cam, skybox, textRender, chunkManager);

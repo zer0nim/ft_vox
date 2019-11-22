@@ -10,7 +10,7 @@ wordIVec3	stringToVec(const std::string &s);  // string "x_y_z" to vec
 
 class ChunkManager {
 	public:
-		ChunkManager(std::string const &mapName, TextureManager const &textureManager, tWinUser *winU);
+		ChunkManager(TextureManager const &textureManager, tWinUser *winU);
 		explicit ChunkManager(ChunkManager const &src);
 		virtual ~ChunkManager();
 
@@ -20,7 +20,6 @@ class ChunkManager {
 		void	update(wordFVec3 &camPos);  // global update (call each frame)
 		void	draw(glm::mat4 view, Camera *cam);  // draw all chunks
 
-		std::string const						&getMapName() const;
 		tWinUser								*getWinU();
 		tWinUser								*getWinU() const;
 		std::map<std::string, AChunk*>			&getChunkMap();
@@ -40,7 +39,6 @@ class ChunkManager {
 		bool	_isChunkExist(std::string const &chunkPos) const;  // return true if the chunk exist
 		bool	_isChunkExist(wordIVec3 const &chunkPos) const;
 
-		std::string const	&_mapName;
 		tWinUser			*_winU;
 		/*
 		key: string -> "x_y_z" of the chunk (real pos: 0, 16, 32, ...)

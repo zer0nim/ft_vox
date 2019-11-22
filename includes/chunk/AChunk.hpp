@@ -22,8 +22,8 @@ class AChunk {
 
 		virtual void	draw(glm::mat4 &view) const;
 		virtual void	update() = 0;
-		void			createChunk(std::string const &mapName, wordIVec3 const &chunkPos);
-		void			createChunk(std::string const &mapName, std::string const &chunkPos);
+		void			createChunk(wordIVec3 const &chunkPos);
+		void			createChunk(std::string const &chunkPos);
 		void			updateBlock(chunkVec3 pos, uint8_t value);
 		void			save();
 

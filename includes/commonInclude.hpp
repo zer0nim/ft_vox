@@ -27,10 +27,10 @@ class TextRender;
 class ChunkManager;
 std::chrono::milliseconds getMs();
 bool	usage();
-bool	argparse(int nbArgs, char const **args, std::string &mapName, uint32_t *seed);
+bool	argparse(int nbArgs, char const **args);
 void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManager &chunkManager);
 bool	createDir(std::string const &dirNames);
 bool	createDir(char const *dirNames);
-bool	createMapFiles(std::string const &mapName, uint32_t *seed);
+bool	createMapFiles();
 
 #endif  // COMMONINCLUDE_HPP_

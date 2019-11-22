@@ -16,6 +16,7 @@ bool	loadSettings(std::string settingFile) {
 	s.g.files.mapsPath = "/tmp/ft_vox/maps/";
 	s.g.files.chunkPath = "chunks/";
 	s.g.files.mapSettingsPath = "map_settings.json";
+	s.g.files.saveAllChunks = false;
 	s.g.screen.width = 1200;
 	s.g.screen.height = 800;
 	s.g.screen.fps = 120;
@@ -24,6 +25,7 @@ bool	loadSettings(std::string settingFile) {
 	s.m.cameraStartPos.x = 0;
 	s.m.cameraStartPos.y = 64;
 	s.m.cameraStartPos.z = 0;
+	s.m.mapName = "";
 	return true;
 }
 
@@ -40,7 +42,7 @@ bool	usage() {
 	return false;
 }
 
-bool	argparse(int nbArgs, char const **args, std::string &mapName, uint32_t *seed) {
+bool	argparse(int nbArgs, char const **args) {
 	int i = 0;
 	while (i < nbArgs) {
 		if (strcmp(args[i], "--usage") == 0 || strcmp(args[i], "-u") == 0) {
@@ -50,14 +52,14 @@ bool	argparse(int nbArgs, char const **args, std::string &mapName, uint32_t *see
 			i++;
 			if (i == nbArgs || args[i][0] == '-')
 				return usage();
-			mapName = args[i];
+			s.m.mapName = args[i];
 		}
 		else if (strcmp(args[i], "--seed") == 0 || strcmp(args[i], "-s") == 0) {
 			i++;
 			if (i == nbArgs)
 				return usage();
-			*seed = static_cast<uint32_t>(atoi(args[i]));
-			if (*seed == 0)
+			s.m.seed = static_cast<uint32_t>(atoi(args[i]));
+			if (s.m.seed == 0)
 				return usage();
 		}
 		else {
@@ -86,55 +88,55 @@ bool	createDir(std::string const &dirNames) {
 }
 bool	createDir(char const *dirNames) { return createDir(std::string(dirNames)); }
 
-bool	createMapFiles(std::string const &mapName, uint32_t *seed) {
+bool	createMapFiles() {
 	// create the maps directory
-	if (createDir(MAPS_PATH) == false) {
+	if (createDir(s.g.files.mapsPath) == false) {
 		return false;
 	}
 
-	std::string fullMapName = std::string(MAPS_PATH) + mapName;
-	if (boost::filesystem::is_directory(fullMapName) == false)
-		std::cout << "[INFO]: create " << mapName << std::endl;
+	s.m.fullMapName = std::string(s.g.files.mapsPath) + s.m.mapName;
+	if (boost::filesystem::is_directory(s.m.fullMapName) == false)
+		std::cout << "[INFO]: create " << s.m.mapName << std::endl;
 	else
-		std::cout << "[INFO]: load " << mapName << std::endl;
+		std::cout << "[INFO]: load " << s.m.mapName << std::endl;
 	// create map (if needed)
-	if (createDir(fullMapName) == false) {
+	if (createDir(s.m.fullMapName) == false) {
 		return false;
 	}
 
 	// create map (if needed)
-	if (createDir(fullMapName + "/" + CHUNK_PATH) == false) {
+	if (createDir(s.m.fullMapName + "/" + s.g.files.chunkPath) == false) {
 		return false;
 	}
 
 	// check if the seed file exist
-	std::string seedFilename = fullMapName + "/" + SEED_FILE;
-	if (boost::filesystem::is_regular_file(seedFilename) == false) {
-		// create the seed file
-		std::ofstream seedFile(seedFilename);
-		if (seedFile.fail()) {
-			std::cout << "unable to save seed: " << seedFilename << " " << strerror(errno) << std::endl;
-			return false;
-		}
-		seedFile << *seed << std::endl;
-		if (seedFile.fail()) {
-			std::cout << "unable to save seed: " << seedFilename << " " << strerror(errno) << std::endl;
-			return false;
-		}
-		seedFile.close();
-	}
-	else {
-		// load the seed
-		std::ifstream seedFile(seedFilename);
-		if (seedFile.fail()) {
-			std::cout << "Error: " << strerror(errno) << std::endl;
-			return false;
-		}
-		std::string line;
-		std::getline(seedFile, line);
-		*seed = static_cast<uint32_t>(std::atoi(line.c_str()));
-		seedFile.close();
-	}
+	// std::string seedFilename = fullMapName + "/" + SEED_FILE;
+	// if (boost::filesystem::is_regular_file(seedFilename) == false) {
+	// 	// create the seed file
+	// 	std::ofstream seedFile(seedFilename);
+	// 	if (seedFile.fail()) {
+	// 		std::cout << "unable to save seed: " << seedFilename << " " << strerror(errno) << std::endl;
+	// 		return false;
+	// 	}
+	// 	seedFile << *seed << std::endl;
+	// 	if (seedFile.fail()) {
+	// 		std::cout << "unable to save seed: " << seedFilename << " " << strerror(errno) << std::endl;
+	// 		return false;
+	// 	}
+	// 	seedFile.close();
+	// }
+	// else {
+	// 	// load the seed
+	// 	std::ifstream seedFile(seedFilename);
+	// 	if (seedFile.fail()) {
+	// 		std::cout << "Error: " << strerror(errno) << std::endl;
+	// 		return false;
+	// 	}
+	// 	std::string line;
+	// 	std::getline(seedFile, line);
+	// 	*seed = static_cast<uint32_t>(std::atoi(line.c_str()));
+	// 	seedFile.close();
+	// }
 	return true;
 }
 

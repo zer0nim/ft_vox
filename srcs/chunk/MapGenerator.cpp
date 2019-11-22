@@ -64,9 +64,8 @@ uint8_t		getBlockNormal(wordIVec3 &chunkPos, uint8_t ix, uint8_t iy, uint8_t iz)
 }
 
 uint8_t		getBlock(wordIVec3 &chunkPos, uint8_t ix, uint8_t iy, uint8_t iz) {
-	#if GENERATION_TYPE == GENERATION_VOID
+	if (s.m.generationType == GENERATION_VOID)
 		return getBlockVoid(chunkPos, ix, iy, iz);
-	#else
+	else
 		return getBlockNormal(chunkPos, ix, iy, iz);
-	#endif
 }
