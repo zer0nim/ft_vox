@@ -216,7 +216,8 @@ bool	createMapFiles() {
 			loadSettings(settingsFilename);
 		}
 		catch (Settings::SettingsError &e) {
-			std::cout << "[WARN]: unable to load settings from map" << std::endl;
+			std::cout << "[ERROR]: unable to load settings from map" << std::endl;
+			return false;
 		}
 	}
 	else if (boost::filesystem::is_directory(s.m.fullMapName) == true) {

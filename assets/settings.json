@@ -3,7 +3,7 @@
 		"renderDist": 6,
 		"files": {
 			"mapsPath": "/tmp/ft_vox/maps/",
-			"chunkPath": "chunks",
+			"chunkPath": "chunks/",
 			"mapSettingsPath": "map_settings.json",
 			"saveAllChunks": false
 		},
