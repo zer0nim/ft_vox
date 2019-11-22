@@ -118,8 +118,8 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 
 void	mouseCb(GLFWwindow *window, double xPos, double yPos) {
 	tWinUser		*winU;
-	static float	lastX = SCREEN_W / 2.0;
-	static float	lastY = SCREEN_H / 2.0;
+	static float	lastX = s.g.screen.width / 2.0;
+	static float	lastY = s.g.screen.height / 2.0;
 	float			xOffset;
 	float			yOffset;
 
@@ -167,7 +167,7 @@ bool	initWindow(GLFWwindow **window, const char *name, tWinUser *winU) {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 4);  // anti aliasing
 
-	*window = glfwCreateWindow(SCREEN_W, SCREEN_H, name, NULL, NULL);
+	*window = glfwCreateWindow(s.g.screen.width, s.g.screen.height, name, NULL, NULL);
 	if (!(*window)) {
 		fprintf(stderr, "Fail to create glfw3 window\n");
 		glfwTerminate();

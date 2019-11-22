@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 #include "ft_vox.hpp"
 #include "ChunkManager.hpp"
@@ -10,8 +11,7 @@
 
 Settings s;
 
-bool	loadSettings(std::string settingFile) {
-	(void)settingFile;
+void	setDefaultSettings() {
 	s.g.renderDist = 8;
 	s.g.files.mapsPath = "/tmp/ft_vox/maps/";
 	s.g.files.chunkPath = "chunks/";
@@ -20,13 +20,104 @@ bool	loadSettings(std::string settingFile) {
 	s.g.screen.width = 1200;
 	s.g.screen.height = 800;
 	s.g.screen.fps = 120;
+	s.g.screen.text.insert(std::pair<std::string, Settings::Global::Screen::Text>(
+		"normal", {"assets/fonts/minecraft_normal.ttf", 20}));
+	s.g.screen.text.insert(std::pair<std::string, Settings::Global::Screen::Text>(
+		"title", {"assets/fonts/minecraft_title.ttf", 24}));
 	s.m.seed = time(nullptr);
 	s.m.generationType = GENERATION_NORMAL;
 	s.m.cameraStartPos.x = 0;
 	s.m.cameraStartPos.y = 64;
 	s.m.cameraStartPos.z = 0;
 	s.m.mapName = "";
-	return true;
+}
+
+static void	loadSettingElementFont(nlohmann::json &element, std::string &key) {
+	static std::string textFont = ".global.screen.text.";
+	if (element.is_string() && boost::ends_with(key, ".path")) {
+		std::string name = key.substr(textFont.size(), key.size() - textFont.size() - std::string(".path").size());
+		if (s.g.screen.text.find(name) == s.g.screen.text.end())
+			std::cout << "[WARN]: invalid font name: " << name << std::endl;
+		else
+			s.g.screen.text[name].path = element.get<std::string>();
+	}
+	else if (element.is_number() && boost::ends_with(key, ".size")) {
+		std::string name = key.substr(textFont.size(), key.size() - textFont.size() - std::string(".size").size());
+		if (s.g.screen.text.find(name) == s.g.screen.text.end())
+			std::cout << "[WARN]: invalid font name: " << name << std::endl;
+		else
+			s.g.screen.text[name].size = element.get<uint32_t>();
+	}
+	else
+		std::cout << "[WARN]: invalid argument or argument type in settings: " << key << ": " << element << std::endl;
+}
+
+static void	loadSettingElement(nlohmann::json &element, std::string key) {
+	if (element.is_number() && key == ".global.renderDist")
+		s.g.renderDist = element.get<uint32_t>();
+	else if (element.is_string() && key == ".global.files.mapsPath")
+		s.g.files.mapsPath = element.get<std::string>();
+	else if (element.is_string() && key == ".global.files.chunkPath")
+		s.g.files.chunkPath = element.get<std::string>();
+	else if (element.is_string() && key == ".global.files.mapSettingsPath")
+		s.g.files.mapSettingsPath = element.get<std::string>();
+	else if (element.is_boolean() && key == ".global.files.saveAllChunks")
+		s.g.files.saveAllChunks = element.get<bool>();
+	else if (element.is_number() && key == ".global.screen.width")
+		s.g.screen.width = element.get<uint32_t>();
+	else if (element.is_number() && key == ".global.screen.height")
+		s.g.screen.height = element.get<uint32_t>();
+	else if (element.is_number() && key == ".global.screen.fps")
+		s.g.screen.fps = element.get<uint32_t>();
+	else if (boost::starts_with(key, ".global.screen.text."))
+		loadSettingElementFont(element, key);
+	else if (element.is_number() && key == ".map.generationType")
+		s.m.generationType = element.get<uint32_t>();
+	else if (element.is_number() && key == ".map.cameraStartPos.x")
+		s.m.cameraStartPos.x = element.get<float>();
+	else if (element.is_number() && key == ".map.cameraStartPos.y")
+		s.m.cameraStartPos.y = element.get<float>();
+	else if (element.is_number() && key == ".map.cameraStartPos.z")
+		s.m.cameraStartPos.z = element.get<float>();
+	else if (element.is_number() && key == ".map.seed")
+		s.m.seed = element.get<uint32_t>();
+	else
+		std::cout << "[WARN]: invalid argument or argument type in settings: " << key << ": " << element << std::endl;
+}
+
+static void	loadSettingsJson(nlohmann::json &data, std::string startKey = "") {
+	for (auto it = data.begin(); it != data.end(); ++it) {
+		if (it->is_object()) {
+			loadSettingsJson(*it, startKey + "." + it.key());
+		}
+		else {
+			loadSettingElement(*it, startKey + "." + it.key());
+		}
+	}
+}
+
+void	loadSettings(std::string settingFile) {
+	setDefaultSettings();
+
+	try {
+		std::ifstream fileStream(settingFile, std::ifstream::in);
+
+		if (fileStream.is_open()) {
+			nlohmann::json	data;
+			data << fileStream;
+			loadSettingsJson(data);
+		}
+		else {
+			std::cout << "throw FailedToOpenException" << std::endl;
+			throw Settings::FailedToOpenException(std::string(settingFile));
+		}
+	}
+	catch (const nlohmann::json::parse_error& e) {
+		std::cerr << "message: " << e.what() << std::endl;
+		std::cerr << "exception id: " << e.id << std::endl;
+		std::cerr << "byte position of error: " << e.byte << std::endl;
+		throw Settings::JsonParseException();
+	}
 }
 
 std::chrono::milliseconds getMs() {

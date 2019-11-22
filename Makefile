@@ -54,7 +54,8 @@ LINTER_RULES =	--filter=-whitespace/tab,-legal/copyright,-build/c++11,-whitespac
 
 CC = g++
 DEBUG_FLAGS = -g3 -fsanitize=address
-LIBS_FLAGS	= -L ~/.brew/lib -framework OpenGL -lglfw -lboost_filesystem -L ~/.brew/opt/freetype/lib -lfreetype
+LIBS_FLAGS	=	-L ~/.brew/lib -framework OpenGL -lglfw -L ~/.brew/opt/freetype/lib -lfreetype \
+				-lboost_filesystem
 LIBS_INC	=	~/.brew/include \
 				$(INC_DIR)/lib/stb_image.h \
 				$(INC_DIR)/lib/json.hpp \

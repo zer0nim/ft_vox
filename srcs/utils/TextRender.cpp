@@ -1,9 +1,9 @@
 #include "TextRender.hpp"
 #include "debug.hpp"
 
-TextRender::TextRender(Shader &sh) :
+TextRender::TextRender(Shader &sh, uint32_t width, uint32_t height) :
 _shader(sh),
-_projection(glm::ortho(0.0f, static_cast<GLfloat>(SCREEN_W), 0.0f, static_cast<GLfloat>(SCREEN_H))) {
+_projection(glm::ortho(0.0f, static_cast<GLfloat>(width), 0.0f, static_cast<GLfloat>(height))) {
 	// create VAO & VBO
 	glGenVertexArrays(1, &_vao);
 	glGenBuffers(1, &_vbo);

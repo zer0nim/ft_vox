@@ -13,6 +13,7 @@
 #include "utils/TextRender.hpp"
 
 void	*threadUpdateFunction(void *args_) {
+	float						loopTime = 1000 / s.g.screen.fps;
 	ThreadupdateArgs			*args = reinterpret_cast<ThreadupdateArgs*>(args_);
 	std::chrono::milliseconds	time_start;
 	tWinUser					*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(args->window));
@@ -36,14 +37,14 @@ void	*threadUpdateFunction(void *args_) {
 
 		// fps
 		std::chrono::milliseconds time_loop = getMs() - time_start;
-		if (time_loop.count() > LOOP_TIME) {
+		if (time_loop.count() > loopTime) {
 			#if DEBUG_FPS_LOW == true
 				if (!firstLoop)
-					std::cerr << "update loop slow -> " << time_loop.count() << "ms / " << LOOP_TIME << "ms (" << FPS << "fps)\n";
+					std::cerr << "update loop slow -> " << time_loop.count() << "ms / " << loopTime << "ms (" << FPS << "fps)\n";
 			#endif
 		}
 		else {
-			usleep((LOOP_TIME - time_loop.count()) * 1000);
+			usleep((loopTime - time_loop.count()) * 1000);
 		}
 		firstLoop = false;
 	}
@@ -54,6 +55,7 @@ void	*threadUpdateFunction(void *args_) {
 
 void	gameLoop(GLFWwindow *window, Camera const &cam, Skybox &skybox, \
 TextRender &textRender, ChunkManager &chunkManager) {
+	float						loopTime = 1000 / s.g.screen.fps;
 	std::chrono::milliseconds	time_start;
 	int							lastFps = 0;
 	tWinUser					*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
@@ -128,16 +130,16 @@ TextRender &textRender, ChunkManager &chunkManager) {
 
 		// fps
 		std::chrono::milliseconds time_loop = getMs() - time_start;
-		if (time_loop.count() > LOOP_TIME) {
+		if (time_loop.count() > loopTime) {
 			lastFps = static_cast<int>(1000.0f / time_loop.count());
 			#if DEBUG_FPS_LOW == true
 				if (!firstLoop)
-					std::cerr << "loop slow -> " << time_loop.count() << "ms / " << LOOP_TIME << "ms (" << FPS << "fps)\n";
+					std::cerr << "loop slow -> " << time_loop.count() << "ms / " << loopTime << "ms (" << FPS << "fps)\n";
 			#endif
 		}
 		else {
-			lastFps = FPS;
-			usleep((LOOP_TIME - time_loop.count()) * 1000);
+			lastFps = s.g.screen.fps;
+			usleep((loopTime - time_loop.count()) * 1000);
 		}
 		firstLoop = false;
 	}
@@ -147,8 +149,8 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
 	winU->cam = cam;
 	winU->dtTime = 0.0f;
 	winU->lastFrame = 0.0f;
-	winU->width = SCREEN_W;
-	winU->height = SCREEN_H;
+	winU->width = s.g.screen.width;
+	winU->height = s.g.screen.height;
 	winU->showInfo = true;
 	winU->showHelp = true;
 	winU->freezeChunkUpdate = false;
@@ -160,7 +162,10 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
 }
 
 int		main(int ac, char const **av) {
-	if (loadSettings(std::string(SETTINGS_FILE)) == false) {
+	try {
+		loadSettings(std::string(SETTINGS_FILE));
+	}
+	catch (Settings::SettingsError &e) {
 		return 1;
 	}
 
@@ -202,9 +207,9 @@ int		main(int ac, char const **av) {
 		Shader skyboxShader("./shaders/skybox_vs.glsl", "./shaders/skybox_fs.glsl");
 
 		// load all fonts
-		TextRender textRender(textShader);
-		textRender.loadFont("title", "fonts/minecraft_title.ttf", TEXT_SIZE_TITLE);
-		textRender.loadFont("normal", "fonts/minecraft_normal.ttf", TEXT_SIZE_NORMAL);
+		TextRender textRender(textShader, s.g.screen.width, s.g.screen.height);
+		textRender.loadFont("title", s.g.screen.text["title"].path, s.g.screen.text["title"].size);
+		textRender.loadFont("normal", s.g.screen.text["normal"].path, s.g.screen.text["normal"].size);
 
 		// load skybox
 		Skybox skybox(skyboxShader);

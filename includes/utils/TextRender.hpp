@@ -9,7 +9,7 @@
 
 class TextRender {
 	public:
-		explicit TextRender(Shader &sh);
+		explicit TextRender(Shader &sh, uint32_t width, uint32_t height);
 		TextRender(TextRender const &src);
 		virtual ~TextRender();
 

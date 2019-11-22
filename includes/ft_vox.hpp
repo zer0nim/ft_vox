@@ -92,7 +92,8 @@ struct ThreadupdateArgs {
 
 bool	initWindow(GLFWwindow **window, const char *name, tWinUser *winU);
 void	processInput(GLFWwindow *window);
-bool	loadSettings(std::string settingFile);
+void	setDefaultSettings();
+void	loadSettings(std::string settingFile);
 
 struct Settings {
 	struct Global {
@@ -125,6 +126,32 @@ struct Settings {
 		wordFVec3	cameraStartPos;
 	};
 	Map m;  // map
+
+	class SettingsError : public std::exception {
+		public:
+			virtual const char* what() const throw() = 0;
+	};
+	class FailedToOpenException : public SettingsError {
+		public:
+			explicit FailedToOpenException(std::string const &msg) : _msg(msg) {
+				std::string s("Failed to open " + _msg);
+				s.resize(511);  // limit string size
+				s.copy(cstr, s.size() + 1);
+				cstr[s.size()] = '\0';
+			}
+			virtual const char * what() const throw() {
+				return cstr;
+			}
+		private:
+			std::string const _msg;
+			char	cstr[512];
+	};
+	class JsonParseException : public SettingsError {
+		public:
+			virtual const char* what() const throw() {
+				return ("Failed to parse json texture settings");
+			}
+	};
 };
 
 extern Settings s;
