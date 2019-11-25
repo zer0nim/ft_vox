@@ -240,7 +240,12 @@ int		main(int ac, char const **av) {
 		std::cerr << "TextRenderError: " << e.what() << std::endl;
 	}
 
+	glfwDestroyWindow(window);
+	glfwPollEvents();
+	glfwTerminate();
+
 	if (s.m.mapName != "") {  // if we have a map
+		std::cout << "[INFO]: saving..." << std::endl;
 		if (saveMap(cam))
 			std::cout << "[INFO]: settings saved" << std::endl;
 		else
@@ -248,9 +253,6 @@ int		main(int ac, char const **av) {
 	}
 
 	delete textureManager;
-	glfwDestroyWindow(window);
-	glfwPollEvents();
-	glfwTerminate();
 
 	return 0;
 }

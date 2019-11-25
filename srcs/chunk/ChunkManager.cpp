@@ -64,7 +64,7 @@ ChunkManager &ChunkManager::operator=(ChunkManager const &rhs) {
 
 void ChunkManager::init(wordFVec3 camPos, glm::mat4 &projection) {
 	_projection = projection;
-	update(camPos, true);  // call update once to create the chunks
+	update(camPos, LOAD_ALL_BEFORE_OPEN_WINDOW);  // call update once to create the chunks
 }
 
 void ChunkManager::update(wordFVec3 &camPos, bool createAll) {
@@ -123,6 +123,8 @@ void ChunkManager::update(wordFVec3 &camPos, bool createAll) {
 		}
 		else {  // we need to remove the chunk
 			toDelete.push_back(it->first);
+			if (s.g.files.saveAllChunks || it->second->isModifiedFromBegining())  // save (if needed)
+				it->second->save();
 		}
 	}
 	_nbChunkLoaded = chunkLoaded;

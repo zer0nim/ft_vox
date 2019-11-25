@@ -21,6 +21,7 @@
 #define MAX_Y_CHUNK				MAX_MAP_SIZE_Y / CHUNK_SZ_Y  // [chunk] type: int
 
 #define ENABLE_MAX_CREATED_CHUNK_UPDATE	true  // enable / disable option
+#define LOAD_ALL_BEFORE_OPEN_WINDOW		false
 #define MAX_CREATED_CHUNK_UPDATE_COUNT	5  // create max # chunks each update call (don't create all at the same update)
 
 class Chunk;
@@ -30,9 +31,9 @@ class GreedyChunk;
 /*
 generation type
 */
-#define GENERATION_VOID		0
-#define GENERATION_NORMAL	1
-#define GENERATION_FLAT_MAP	2
+#define GENERATION_VOID				0
+#define GENERATION_FLAT_MAP			1
+#define GENERATION_NORMAL			2
 
 /*
 filesystem

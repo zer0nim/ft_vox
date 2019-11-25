@@ -288,7 +288,10 @@ bool	saveMap(Camera &cam) {
 			{"flatMap", flatMapElem}
 		}
 	}};
-	lastSettings.erase("flatMap");
+	try {
+		lastSettings.erase("flatMap");
+	}
+	catch (nlohmann::detail::type_error & e) {}
 	lastSettings.merge_patch(settings);
 	std::ofstream settingsFile(settingsFilename);
 	if (settingsFile.fail()) {

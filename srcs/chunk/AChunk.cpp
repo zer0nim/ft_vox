@@ -28,11 +28,7 @@ AChunk::AChunk(AChunk const &src)
 	*this = src;
 }
 
-AChunk::~AChunk() {
-	if (s.g.files.saveAllChunks || _isModifiedFromBegining) {  // if we need to save
-		save();
-	}
-}
+AChunk::~AChunk() {}
 
 AChunk &AChunk::operator=(AChunk const &rhs) {
 	if (this != &rhs) {
@@ -161,4 +157,5 @@ void AChunk::save() {
 }
 
 AChunk::ChunkData const	&AChunk::getData() const { return _data; }
-TextureManager const &AChunk::getTextureManager() const { return _textureManager; }
+TextureManager const	&AChunk::getTextureManager() const { return _textureManager; }
+bool					AChunk::isModifiedFromBegining() const { return _isModifiedFromBegining; }
