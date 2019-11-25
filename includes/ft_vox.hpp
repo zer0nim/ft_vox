@@ -47,8 +47,6 @@ typedef struct	sWinUser {
 	Camera		*cam;
 	float		dtTime;
 	float		lastFrame;
-	float		width;
-	float		height;
 
 	bool		showInfo;  // show info module (F3)
 	bool		showHelp;  // show help module (F3 + H)
@@ -115,6 +113,7 @@ struct Settings {
 		};
 		Files	files;
 		struct Screen {
+			bool		fullscreen;
 			uint32_t	width;
 			uint32_t	height;
 			uint32_t	fps;

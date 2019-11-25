@@ -64,7 +64,7 @@ TextRender &textRender, ChunkManager &chunkManager) {
 
 	// projection matrix
 	float angle = cam.zoom;
-	float ratio = winU->width / winU->height;
+	float ratio = static_cast<float>(s.g.screen.width) / s.g.screen.height;
 	float nearD = 0.1f;
 	float farD = std::max(
 		static_cast<int>(std::sqrt(std::pow(CHUNK_SZ_X * s.g.renderDist, 2) + std::pow(CHUNK_SZ_Z * s.g.renderDist, 2))),
@@ -151,8 +151,6 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
 	winU->cam = cam;
 	winU->dtTime = 0.0f;
 	winU->lastFrame = 0.0f;
-	winU->width = s.g.screen.width;
-	winU->height = s.g.screen.height;
 	winU->showInfo = true;
 	winU->showHelp = true;
 	winU->freezeChunkUpdate = false;
@@ -202,6 +200,7 @@ int		main(int ac, char const **av) {
 
 	if (!init(&window, "ft_vox", &winU, &cam))
 		return (1);
+	std::cout << "[INFO]: window size " << s.g.screen.width << " * " << s.g.screen.height << std::endl;
 
 	try {
 		// load textures

@@ -17,6 +17,7 @@ void	setDefaultSettings() {
 	s.g.files.chunkPath = "chunks/";
 	s.g.files.mapSettingsPath = "map_settings.json";
 	s.g.files.saveAllChunks = false;
+	s.g.screen.fullscreen = true;
 	s.g.screen.width = 1200;
 	s.g.screen.height = 800;
 	s.g.screen.fps = 120;
@@ -84,6 +85,8 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		s.g.files.mapSettingsPath = element.get<std::string>();
 	else if (element.is_boolean() && key == ".global.files.saveAllChunks")
 		s.g.files.saveAllChunks = element.get<bool>();
+	else if (element.is_boolean() && key == ".global.screen.fullscreen")
+		s.g.screen.fullscreen = element.get<bool>();
 	else if (element.is_number() && key == ".global.screen.width")
 		s.g.screen.width = element.get<uint32_t>();
 	else if (element.is_number() && key == ".global.screen.height")
@@ -317,7 +320,7 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 
 	GLfloat lineSz = s.g.screen.text["normal"].size * 1.2;
 	GLfloat textX = 10;
-	GLfloat textY = winU->height - lineSz;
+	GLfloat textY = s.g.screen.height - lineSz;
 
 	// fps
 	std::string sFps = std::to_string(savedFps) + " fps";
