@@ -17,9 +17,9 @@ uint8_t		getBlockVoid(wordIVec3 &chunkPos, uint8_t ix, uint8_t iy, uint8_t iz) {
 }
 
 uint8_t		getBlockNormal(wordIVec3 &chunkPos, uint8_t ix, uint8_t iy, uint8_t iz) {
-	float	x = (chunkPos.x + ix) * mapInfo.xFactor + 0.5;
+	float	x = (chunkPos.x + ix) * mapInfo.xFactor * NORMALIZE_MULTIPLIER + 0.5;
 	float	y = (chunkPos.y + iy) * mapInfo.yFactor;
-	float	z = (chunkPos.z + iz) * mapInfo.zFactor + 0.5;
+	float	z = (chunkPos.z + iz) * mapInfo.zFactor * NORMALIZE_MULTIPLIER + 0.5;
 	uint8_t	result = 0;
 
 	// create normal montains
@@ -39,6 +39,7 @@ uint8_t		getBlockNormal(wordIVec3 &chunkPos, uint8_t ix, uint8_t iy, uint8_t iz)
 
 	// create cavern
 	float	cavern;
+	float	cavernY = y * MAP_CAVERN_Y_MULTIPLIER;
 	cavern = 1 * PERLIN(MAP_CAVERN_FREQ * x * 1, MAP_CAVERN_FREQ * z * 1)
 	+  0.5 * PERLIN(MAP_CAVERN_FREQ * x * 2, MAP_CAVERN_FREQ * z * 2)
 	+ 0.25 * PERLIN(MAP_CAVERN_FREQ * x * 4, MAP_CAVERN_FREQ * z * 4);
@@ -47,7 +48,7 @@ uint8_t		getBlockNormal(wordIVec3 &chunkPos, uint8_t ix, uint8_t iy, uint8_t iz)
 		// there is cavern
 		float cavernY1 = (PERLIN(x, y, z) + MAP_CAVERN_BASE_Y) * 0.5 + MAP_CAVERN_BASE_Y;
 		float cavernY2 = cavernY1 + (MAP_CAVERN_HEIGHT * 0.5 + (cavern - MAP_CAVERN_START) * 0.5);
-		if (y > cavernY1 && y < cavernY2) {
+		if (cavernY > cavernY1 && cavernY < cavernY2) {
 			result = 0;
 		}
 	}
