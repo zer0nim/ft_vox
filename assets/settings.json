@@ -1,0 +1,39 @@
+{
+	"global": {
+		"renderDist": 6,
+		"files": {
+			"mapsPath": "/tmp/ft_vox/maps/",
+			"chunkPath": "chunks/",
+			"mapSettingsPath": "map_settings.json",
+			"saveAllChunks": false
+		},
+		"screen": {
+			"width": 1200,
+			"height": 800,
+			"fps": 120,
+			"text": {
+				"normal": {
+					"path": "assets/fonts/minecraft_normal.ttf",
+					"size": 20
+				},
+				"title": {
+					"path": "assets/fonts/minecraft_title.ttf",
+					"size": 40
+				}
+			}
+		}
+	},
+	"map": {
+		"seed": 0,
+		"generationType": 1,
+		"cameraStartPos": {
+			"pos": {
+				"x": 0,
+				"y": 64,
+				"z": 0
+			},
+			"yaw": -90,
+			"pitch": 0
+		}
+	}
+}

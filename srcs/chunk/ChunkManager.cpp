@@ -24,8 +24,7 @@ wordIVec3 stringToVec(const std::string &s) {
     return vec;
 }
 
-ChunkManager::ChunkManager(std::string const &mapName, TextureManager const &textureManager, tWinUser *winU) :
-_mapName(mapName),
+ChunkManager::ChunkManager(TextureManager const &textureManager, tWinUser *winU) :
 _winU(winU),
 _chunkMap(),
 _chunkActPos(-1, -1, -1),
@@ -33,7 +32,6 @@ _textureManager(textureManager),
 _projection() {}
 
 ChunkManager::ChunkManager(ChunkManager const &src) :
-_mapName(src.getMapName()),
 _textureManager(src.getTextureManager()) {
 	*this = src;
 }
@@ -68,21 +66,20 @@ void ChunkManager::init(wordFVec3 camPos, glm::mat4 &projection) {
 
 void ChunkManager::update(wordFVec3 &camPos) {
 	wordIVec3 lastChunkPos = _chunkActPos;
-
 	_updateChunkPos(camPos);
 
 	// add new chunks if needed
 	if (lastChunkPos != _chunkActPos) {  // if we change the actual chunk
 		AChunk * newChunk;
-		for (int32_t x = _chunkActPos.x - CHUNK_SZ_X * (RENDER_DISTANCE_CHUNK - 1);
-		x < _chunkActPos.x + CHUNK_SZ_X * RENDER_DISTANCE_CHUNK; x += CHUNK_SZ_X) {
-			for (int32_t z = _chunkActPos.z - CHUNK_SZ_Z * (RENDER_DISTANCE_CHUNK - 1);
-			z < _chunkActPos.z + CHUNK_SZ_Z * RENDER_DISTANCE_CHUNK; z += CHUNK_SZ_Z) {
+		for (int32_t x = _chunkActPos.x - CHUNK_SZ_X * (s.g.renderDist - 1);
+		x < _chunkActPos.x + CHUNK_SZ_X * s.g.renderDist; x += CHUNK_SZ_X) {
+			for (int32_t z = _chunkActPos.z - CHUNK_SZ_Z * (s.g.renderDist - 1);
+			z < _chunkActPos.z + CHUNK_SZ_Z * s.g.renderDist; z += CHUNK_SZ_Z) {
 				for (int32_t y = 0; y < CHUNK_SZ_Y * MAX_Y_CHUNK; y += CHUNK_SZ_Y) {
 					wordIVec3 chunkPos(x, y, z);  // this is the position of the chunk
 					if (_isChunkExist(chunkPos) == false) {  // if the chunk doesnt exist (for now)
 						newChunk = instanciateNewChunk(_textureManager, _projection);  // create a chunk with the rihgt type
-						newChunk->createChunk(_mapName, chunkPos);  // init the chunk with the right values
+						newChunk->createChunk(chunkPos);  // init the chunk with the right values
 						_insertChunk(chunkPos, newChunk);
 					}
 				}
@@ -106,15 +103,20 @@ void ChunkManager::update(wordFVec3 &camPos) {
 	}
 }
 
-void ChunkManager::draw(glm::mat4 view) {
-	for (int32_t x = _chunkActPos.x - CHUNK_SZ_X * (RENDER_DISTANCE_CHUNK - 1);
-	x < _chunkActPos.x + CHUNK_SZ_X * RENDER_DISTANCE_CHUNK; x += CHUNK_SZ_X) {
-		for (int32_t z = _chunkActPos.z - CHUNK_SZ_Z * (RENDER_DISTANCE_CHUNK - 1);
-		z < _chunkActPos.z + CHUNK_SZ_Z * RENDER_DISTANCE_CHUNK; z += CHUNK_SZ_Z) {
+void ChunkManager::draw(glm::mat4 view, Camera *cam) {
+	glm::vec3	chunkSize(CHUNK_SZ_X, CHUNK_SZ_Y, CHUNK_SZ_Z);
+
+	for (int32_t x = _chunkActPos.x - CHUNK_SZ_X * (s.g.renderDist - 1);
+	x < _chunkActPos.x + CHUNK_SZ_X * s.g.renderDist; x += CHUNK_SZ_X) {
+		for (int32_t z = _chunkActPos.z - CHUNK_SZ_Z * (s.g.renderDist - 1);
+		z < _chunkActPos.z + CHUNK_SZ_Z * s.g.renderDist; z += CHUNK_SZ_Z) {
 			for (int32_t y = 0; y < CHUNK_SZ_Y * MAX_Y_CHUNK; y += CHUNK_SZ_Y) {
 				wordIVec3 chunkPos(x, y, z);  // this is the position of the chunk
-				if (_isChunkExist(chunkPos))
-					_chunkMap[vecToString(chunkPos)]->draw(view);
+				if (_isChunkExist(chunkPos)) {  // if the chunk exist
+					if (FRCL_IS_INSIDE(cam->frustumCullingCheckCube(chunkPos, chunkSize))) {  // if inside the camera
+						_chunkMap[vecToString(chunkPos)]->draw(view);
+					}
+				}
 			}
 		}
 	}
@@ -134,10 +136,10 @@ void	ChunkManager::_insertChunk(wordIVec3 chunkPos, AChunk * newChunk) {
 }
 
 bool	ChunkManager::_isInChunkLoaded(wordIVec3 const &chunkPos) const {
-	if (chunkPos.x <= _chunkActPos.x - RENDER_DISTANCE_CHUNK * CHUNK_SZ_X
-	|| chunkPos.x >= _chunkActPos.x + RENDER_DISTANCE_CHUNK * CHUNK_SZ_X
-	|| chunkPos.z <= _chunkActPos.z - RENDER_DISTANCE_CHUNK * CHUNK_SZ_Z
-	|| chunkPos.z >= _chunkActPos.z + RENDER_DISTANCE_CHUNK * CHUNK_SZ_Z)
+	if (chunkPos.x <= _chunkActPos.x - s.g.renderDist * CHUNK_SZ_X
+	|| chunkPos.x >= _chunkActPos.x + s.g.renderDist * CHUNK_SZ_X
+	|| chunkPos.z <= _chunkActPos.z - s.g.renderDist * CHUNK_SZ_Z
+	|| chunkPos.z >= _chunkActPos.z + s.g.renderDist * CHUNK_SZ_Z)
 		return false;
 	return true;
 }
@@ -149,7 +151,6 @@ bool	ChunkManager::_isChunkExist(wordIVec3 const &chunkPos) const {
 	return _isChunkExist(vecToString(chunkPos));
 }
 
-std::string const 						&ChunkManager::getMapName() const { return _mapName; }
 tWinUser								*ChunkManager::getWinU() { return _winU; }
 tWinUser								*ChunkManager::getWinU() const { return _winU; }
 std::map<std::string, AChunk*>			&ChunkManager::getChunkMap() { return _chunkMap; }

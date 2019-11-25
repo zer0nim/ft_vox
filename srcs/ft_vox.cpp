@@ -3,10 +3,130 @@
 #include <fstream>
 #include <sstream>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 #include "ft_vox.hpp"
 #include "ChunkManager.hpp"
 #include "TextRender.hpp"
+
+Settings s;
+
+void	setDefaultSettings() {
+	s.g.renderDist = 8;
+	s.g.files.mapsPath = "/tmp/ft_vox/maps/";
+	s.g.files.chunkPath = "chunks/";
+	s.g.files.mapSettingsPath = "map_settings.json";
+	s.g.files.saveAllChunks = false;
+	s.g.screen.width = 1200;
+	s.g.screen.height = 800;
+	s.g.screen.fps = 120;
+	s.g.screen.text.insert(std::pair<std::string, Settings::Global::Screen::Text>(
+		"normal", {"assets/fonts/minecraft_normal.ttf", 20}));
+	s.g.screen.text.insert(std::pair<std::string, Settings::Global::Screen::Text>(
+		"title", {"assets/fonts/minecraft_title.ttf", 24}));
+	s.m.seed = time(nullptr);
+	s.m.generationType = GENERATION_NORMAL;
+	s.m.cameraStartPos.pos.x = 0;
+	s.m.cameraStartPos.pos.y = 64;
+	s.m.cameraStartPos.pos.z = 0;
+	s.m.cameraStartPos.yaw = -90;
+	s.m.cameraStartPos.pitch = 0;
+	s.m.mapName = "";
+}
+
+static void	loadSettingElementFont(nlohmann::json &element, std::string &key) {
+	static std::string textFont = ".global.screen.text.";
+	if (element.is_string() && boost::ends_with(key, ".path")) {
+		std::string name = key.substr(textFont.size(), key.size() - textFont.size() - std::string(".path").size());
+		if (s.g.screen.text.find(name) == s.g.screen.text.end())
+			std::cout << "[WARN]: invalid font name: " << name << std::endl;
+		else
+			s.g.screen.text[name].path = element.get<std::string>();
+	}
+	else if (element.is_number() && boost::ends_with(key, ".size")) {
+		std::string name = key.substr(textFont.size(), key.size() - textFont.size() - std::string(".size").size());
+		if (s.g.screen.text.find(name) == s.g.screen.text.end())
+			std::cout << "[WARN]: invalid font name: " << name << std::endl;
+		else
+			s.g.screen.text[name].size = element.get<uint32_t>();
+	}
+	else
+		std::cout << "[WARN]: invalid argument or argument type in settings: " << key << ": " << element << std::endl;
+}
+
+static void	loadSettingElement(nlohmann::json &element, std::string key) {
+	if (element.is_number() && key == ".global.renderDist")
+		s.g.renderDist = element.get<uint32_t>();
+	else if (element.is_string() && key == ".global.files.mapsPath")
+		s.g.files.mapsPath = element.get<std::string>();
+	else if (element.is_string() && key == ".global.files.chunkPath")
+		s.g.files.chunkPath = element.get<std::string>();
+	else if (element.is_string() && key == ".global.files.mapSettingsPath")
+		s.g.files.mapSettingsPath = element.get<std::string>();
+	else if (element.is_boolean() && key == ".global.files.saveAllChunks")
+		s.g.files.saveAllChunks = element.get<bool>();
+	else if (element.is_number() && key == ".global.screen.width")
+		s.g.screen.width = element.get<uint32_t>();
+	else if (element.is_number() && key == ".global.screen.height")
+		s.g.screen.height = element.get<uint32_t>();
+	else if (element.is_number() && key == ".global.screen.fps")
+		s.g.screen.fps = element.get<uint32_t>();
+	else if (boost::starts_with(key, ".global.screen.text."))
+		loadSettingElementFont(element, key);
+	else if (element.is_number() && key == ".map.generationType")
+		s.m.generationType = element.get<uint32_t>();
+	else if (element.is_number() && key == ".map.cameraStartPos.pos.x")
+		s.m.cameraStartPos.pos.x = element.get<float>();
+	else if (element.is_number() && key == ".map.cameraStartPos.pos.y")
+		s.m.cameraStartPos.pos.y = element.get<float>();
+	else if (element.is_number() && key == ".map.cameraStartPos.pos.z")
+		s.m.cameraStartPos.pos.z = element.get<float>();
+	else if (element.is_number() && key == ".map.cameraStartPos.yaw")
+		s.m.cameraStartPos.yaw = element.get<float>();
+	else if (element.is_number() && key == ".map.cameraStartPos.pitch")
+		s.m.cameraStartPos.pitch = element.get<float>();
+	else if (element.is_number() && key == ".map.seed")
+		s.m.seed = element.get<uint32_t>();
+	else
+		std::cout << "[WARN]: invalid argument or argument type in settings: " << key << ": " << element << std::endl;
+}
+
+static void	loadSettingsJson(nlohmann::json &data, std::string startKey = "") {
+	for (auto it = data.begin(); it != data.end(); ++it) {
+		if (it->is_object()) {
+			loadSettingsJson(*it, startKey + "." + it.key());
+		}
+		else {
+			loadSettingElement(*it, startKey + "." + it.key());
+		}
+	}
+}
+
+void	loadSettings(std::string settingFile) {
+	try {
+		std::ifstream fileStream(settingFile, std::ifstream::in);
+
+		if (fileStream.is_open()) {
+			nlohmann::json	data;
+			data << fileStream;
+			loadSettingsJson(data);
+		}
+		else {
+			std::cout << "throw FailedToOpenException" << std::endl;
+			throw Settings::FailedToOpenException(std::string(settingFile));
+		}
+	}
+	catch (const nlohmann::json::parse_error& e) {
+		std::cerr << "message: " << e.what() << std::endl;
+		std::cerr << "exception id: " << e.id << std::endl;
+		std::cerr << "byte position of error: " << e.byte << std::endl;
+		throw Settings::JsonParseException();
+	}
+	catch (std::exception &e) {
+		std::cerr << "unexpected exception in json loading" << std::endl;
+		throw Settings::JsonParseException();
+	}
+}
 
 std::chrono::milliseconds getMs() {
 	return std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -21,7 +141,7 @@ bool	usage() {
 	return false;
 }
 
-bool	argparse(int nbArgs, char const **args, std::string &mapName, uint32_t *seed) {
+bool	argparse(int nbArgs, char const **args) {
 	int i = 0;
 	while (i < nbArgs) {
 		if (strcmp(args[i], "--usage") == 0 || strcmp(args[i], "-u") == 0) {
@@ -31,14 +151,14 @@ bool	argparse(int nbArgs, char const **args, std::string &mapName, uint32_t *see
 			i++;
 			if (i == nbArgs || args[i][0] == '-')
 				return usage();
-			mapName = args[i];
+			s.m.mapName = args[i];
 		}
 		else if (strcmp(args[i], "--seed") == 0 || strcmp(args[i], "-s") == 0) {
 			i++;
 			if (i == nbArgs)
 				return usage();
-			*seed = static_cast<uint32_t>(atoi(args[i]));
-			if (*seed == 0)
+			s.m.seed = static_cast<uint32_t>(atoi(args[i]));
+			if (s.m.seed == 0)
 				return usage();
 		}
 		else {
@@ -67,55 +187,83 @@ bool	createDir(std::string const &dirNames) {
 }
 bool	createDir(char const *dirNames) { return createDir(std::string(dirNames)); }
 
-bool	createMapFiles(std::string const &mapName, uint32_t *seed) {
+bool	createMapFiles() {
 	// create the maps directory
-	if (createDir(MAPS_PATH) == false) {
+	if (createDir(s.g.files.mapsPath) == false) {
 		return false;
 	}
 
-	std::string fullMapName = std::string(MAPS_PATH) + mapName;
-	if (boost::filesystem::is_directory(fullMapName) == false)
-		std::cout << "[INFO]: create " << mapName << std::endl;
+	s.m.fullMapName = std::string(s.g.files.mapsPath) + s.m.mapName;
+	if (boost::filesystem::is_directory(s.m.fullMapName) == false)
+		std::cout << "[INFO]: create " << s.m.mapName << std::endl;
 	else
-		std::cout << "[INFO]: load " << mapName << std::endl;
+		std::cout << "[INFO]: load " << s.m.mapName << std::endl;
 	// create map (if needed)
-	if (createDir(fullMapName) == false) {
+	if (createDir(s.m.fullMapName) == false) {
 		return false;
 	}
 
 	// create map (if needed)
-	if (createDir(fullMapName + "/" + CHUNK_PATH) == false) {
+	if (createDir(s.m.fullMapName + "/" + s.g.files.chunkPath) == false) {
 		return false;
 	}
 
-	// check if the seed file exist
-	std::string seedFilename = fullMapName + "/" + SEED_FILE;
-	if (boost::filesystem::is_regular_file(seedFilename) == false) {
-		// create the seed file
-		std::ofstream seedFile(seedFilename);
-		if (seedFile.fail()) {
-			std::cout << "unable to save seed: " << seedFilename << " " << strerror(errno) << std::endl;
+	// check if the settings file exist
+	std::string settingsFilename = s.m.fullMapName + "/" + s.g.files.mapSettingsPath;
+	if (boost::filesystem::is_regular_file(settingsFilename) == true) {
+		// load settings
+		try {
+			loadSettings(settingsFilename);
+		}
+		catch (Settings::SettingsError &e) {
+			std::cout << "[ERROR]: unable to load settings from map" << std::endl;
 			return false;
 		}
-		seedFile << *seed << std::endl;
-		if (seedFile.fail()) {
-			std::cout << "unable to save seed: " << seedFilename << " " << strerror(errno) << std::endl;
-			return false;
-		}
-		seedFile.close();
 	}
-	else {
-		// load the seed
-		std::ifstream seedFile(seedFilename);
-		if (seedFile.fail()) {
-			std::cout << "Error: " << strerror(errno) << std::endl;
-			return false;
-		}
-		std::string line;
-		std::getline(seedFile, line);
-		*seed = static_cast<uint32_t>(std::atoi(line.c_str()));
-		seedFile.close();
+	else if (boost::filesystem::is_directory(s.m.fullMapName) == true) {
+		std::cout << "[WARN]: unable to load settings from map" << std::endl;
 	}
+	return true;
+}
+
+bool	saveMap(Camera &cam) {
+	std::string		settingsFilename = s.m.fullMapName + "/" + s.g.files.mapSettingsPath;
+	nlohmann::json	lastSettings;
+	try {
+		std::ifstream fileStream(settingsFilename, std::ifstream::in);
+		if (fileStream.is_open()) {
+			lastSettings << fileStream;
+		}
+	}
+	catch (const nlohmann::json::parse_error& e) {}
+	catch (std::exception &e) {}
+	nlohmann::json	settings = {
+		{"map", {
+			{"seed", s.m.seed},
+			{"generationType", s.m.generationType},
+			{"cameraStartPos", {
+				{"pos", {
+					{"x", cam.pos.x},
+					{"y", cam.pos.y},
+					{"z", cam.pos.z}
+				}},
+			    {"yaw", cam.yaw},
+			    {"pitch", cam.pitch}
+			}}
+		}
+	}};
+	lastSettings.merge_patch(settings);
+	std::ofstream settingsFile(settingsFilename);
+	if (settingsFile.fail()) {
+		std::cout << "unable to save map settings: " << settingsFilename << " " << strerror(errno) << std::endl;
+		return false;
+	}
+	settingsFile << std::setw(4) << lastSettings << std::endl;
+	if (settingsFile.fail()) {
+		std::cout << "unable to save map settigns: " << settingsFilename << " " << strerror(errno) << std::endl;
+		return false;
+	}
+	settingsFile.close();
 	return true;
 }
 

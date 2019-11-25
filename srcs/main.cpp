@@ -13,6 +13,7 @@
 #include "utils/TextRender.hpp"
 
 void	*threadUpdateFunction(void *args_) {
+	float						loopTime = 1000 / s.g.screen.fps;
 	ThreadupdateArgs			*args = reinterpret_cast<ThreadupdateArgs*>(args_);
 	std::chrono::milliseconds	time_start;
 	tWinUser					*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(args->window));
@@ -36,14 +37,14 @@ void	*threadUpdateFunction(void *args_) {
 
 		// fps
 		std::chrono::milliseconds time_loop = getMs() - time_start;
-		if (time_loop.count() > LOOP_TIME) {
+		if (time_loop.count() > loopTime) {
 			#if DEBUG_FPS_LOW == true
 				if (!firstLoop)
-					std::cerr << "update loop slow -> " << time_loop.count() << "ms / " << LOOP_TIME << "ms (" << FPS << "fps)\n";
+					std::cerr << "update loop slow -> " << time_loop.count() << "ms / " << loopTime << "ms (" << FPS << "fps)\n";
 			#endif
 		}
 		else {
-			usleep((LOOP_TIME - time_loop.count()) * 1000);
+			usleep((loopTime - time_loop.count()) * 1000);
 		}
 		firstLoop = false;
 	}
@@ -54,6 +55,7 @@ void	*threadUpdateFunction(void *args_) {
 
 void	gameLoop(GLFWwindow *window, Camera const &cam, Skybox &skybox, \
 TextRender &textRender, ChunkManager &chunkManager) {
+	float						loopTime = 1000 / s.g.screen.fps;
 	std::chrono::milliseconds	time_start;
 	int							lastFps = 0;
 	tWinUser					*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
@@ -61,8 +63,13 @@ TextRender &textRender, ChunkManager &chunkManager) {
 	ThreadupdateArgs			*threadUpdateArgs = new ThreadupdateArgs(window, chunkManager, winU->cam->pos);
 
 	// projection matrix
-	glm::mat4	projection = glm::perspective(
-		glm::radians(cam.zoom), winU->width / winU->height, 0.1f, 100.0f);
+	float angle = cam.zoom;
+	float ratio = winU->width / winU->height;
+	float nearD = 0.1f;
+	float farD = 300.0f;
+	glm::mat4	projection = glm::perspective(glm::radians(angle), ratio, nearD, farD);
+
+	winU->cam->frustumCullingInit(angle, ratio, nearD, farD);
 
 	chunkManager.init(winU->cam->pos, projection);
 
@@ -95,7 +102,7 @@ TextRender &textRender, ChunkManager &chunkManager) {
 		skybox.getShader().setMat4("view", skyView);
 
 		// draw here
-		chunkManager.draw(view);
+		chunkManager.draw(view, winU->cam);
 
 		// draw skybox
 		skybox.draw();
@@ -123,16 +130,16 @@ TextRender &textRender, ChunkManager &chunkManager) {
 
 		// fps
 		std::chrono::milliseconds time_loop = getMs() - time_start;
-		if (time_loop.count() > LOOP_TIME) {
+		if (time_loop.count() > loopTime) {
 			lastFps = static_cast<int>(1000.0f / time_loop.count());
 			#if DEBUG_FPS_LOW == true
 				if (!firstLoop)
-					std::cerr << "loop slow -> " << time_loop.count() << "ms / " << LOOP_TIME << "ms (" << FPS << "fps)\n";
+					std::cerr << "loop slow -> " << time_loop.count() << "ms / " << loopTime << "ms (" << FPS << "fps)\n";
 			#endif
 		}
 		else {
-			lastFps = FPS;
-			usleep((LOOP_TIME - time_loop.count()) * 1000);
+			lastFps = s.g.screen.fps;
+			usleep((loopTime - time_loop.count()) * 1000);
 		}
 		firstLoop = false;
 	}
@@ -142,8 +149,8 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
 	winU->cam = cam;
 	winU->dtTime = 0.0f;
 	winU->lastFrame = 0.0f;
-	winU->width = SCREEN_W;
-	winU->height = SCREEN_H;
+	winU->width = s.g.screen.width;
+	winU->height = s.g.screen.height;
 	winU->showInfo = true;
 	winU->showHelp = true;
 	winU->freezeChunkUpdate = false;
@@ -155,36 +162,41 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
 }
 
 int		main(int ac, char const **av) {
-	GLFWwindow		*window;
-	tWinUser		winU;
-	glm::vec3		startingPos(0.0f, 64.0f, 19.0f);
-	Camera			cam(startingPos);
-	TextureManager	*textureManager = nullptr;
+	setDefaultSettings();
+	try {
+		loadSettings(std::string(SETTINGS_FILE));
+	}
+	catch (Settings::SettingsError &e) {
+		return 1;
+	}
+	if (s.m.seed == 0)
+		s.m.seed = time(nullptr);
 
-	uint32_t randSeed = time(nullptr);
-	std::string mapName = "";
-	uint32_t	seed = rand_r(&randSeed);
-	if (argparse(ac - 1, av + 1, mapName, &seed) == false) {
+	if (argparse(ac - 1, av + 1) == false) {
 		return 0;
 	}
 
-	if (mapName == "") {  // load without mapName
+	if (s.m.mapName == "") {  // load without mapName
 		std::cout << "[WARN]: no mapname -> you can't save the map" << std::endl;
 	}
 	else {
-		if (createMapFiles(mapName, &seed) == false) {
+		if (createMapFiles() == false) {
 			return 1;
 		}
-		std::cout << "[INFO]: map " << mapName << std::endl;
-		mapName = std::string(MAPS_PATH) + mapName;
+		std::cout << "[INFO]: map " << s.m.mapName << std::endl;
 	}
-	setSeed(seed);
+	setSeed(s.m.seed);
 
-	std::cout << "[INFO]: starting at " << startingPos.x << " " << startingPos.y << " " << startingPos.z << std::endl;
-	std::cout << "[INFO]: random seed " << seed << std::endl;
+	GLFWwindow		*window;
+	tWinUser		winU;
+	Camera			cam(s.m.cameraStartPos.pos, glm::vec3(0, 1, 0), s.m.cameraStartPos.yaw, s.m.cameraStartPos.pitch);
+	TextureManager	*textureManager = nullptr;
+
+	std::cout << "[INFO]: starting at " << s.m.cameraStartPos.pos.x << " "
+	<< s.m.cameraStartPos.pos.y << " " << s.m.cameraStartPos.pos.z << std::endl;
+	std::cout << "[INFO]: random seed " << s.m.seed << std::endl;
 	std::cout << "[INFO]: chunk size " << CHUNK_SZ_X << " " << CHUNK_SZ_Y << " " << CHUNK_SZ_Z << std::endl;
-	std::cout << "[INFO]: render distance " << RENDER_DISTANCE_CHUNK << " chunks" << std::endl;
-
+	std::cout << "[INFO]: render distance " << s.g.renderDist << " chunks" << std::endl;
 
 	if (!init(&window, "ft_vox", &winU, &cam))
 		return (1);
@@ -198,15 +210,15 @@ int		main(int ac, char const **av) {
 		Shader skyboxShader("./shaders/skybox_vs.glsl", "./shaders/skybox_fs.glsl");
 
 		// load all fonts
-		TextRender textRender(textShader);
-		textRender.loadFont("title", "fonts/minecraft_title.ttf", TEXT_SIZE_TITLE);
-		textRender.loadFont("normal", "fonts/minecraft_normal.ttf", TEXT_SIZE_NORMAL);
+		TextRender textRender(textShader, s.g.screen.width, s.g.screen.height);
+		textRender.loadFont("title", s.g.screen.text["title"].path, s.g.screen.text["title"].size);
+		textRender.loadFont("normal", s.g.screen.text["normal"].path, s.g.screen.text["normal"].size);
 
 		// load skybox
 		Skybox skybox(skyboxShader);
 
 		// create chunkManager
-		ChunkManager chunkManager(mapName, *textureManager, &winU);
+		ChunkManager chunkManager(*textureManager, &winU);
 
 		// run the game
 		gameLoop(window, cam, skybox, textRender, chunkManager);
@@ -225,6 +237,13 @@ int		main(int ac, char const **av) {
 	}
 	catch (const TextRender::TextRenderError & e) {
 		std::cerr << "TextRenderError: " << e.what() << std::endl;
+	}
+
+	if (s.m.mapName != "") {  // if we have a map
+		if (saveMap(cam))
+			std::cout << "[INFO]: settings saved" << std::endl;
+		else
+			std::cout << "[WARN]: unable to save settings" << std::endl;
 	}
 
 	delete textureManager;

@@ -30,7 +30,7 @@ AChunk::AChunk(AChunk const &src)
 }
 
 AChunk::~AChunk() {
-	if (SAVE_ALL_CHUNKS || _isModifiedFromBegining) {  // if we need to save
+	if (s.g.files.saveAllChunks || _isModifiedFromBegining) {  // if we need to save
 		save();
 	}
 }
@@ -105,15 +105,15 @@ void	AChunk::_createChunk() {
 	}
 }
 
-void	AChunk::createChunk(std::string const &mapName, std::string const &chunkPos) {
-	createChunk(mapName, stringToVec(chunkPos));
+void	AChunk::createChunk(std::string const &chunkPos) {
+	createChunk(stringToVec(chunkPos));
 }
-void	AChunk::createChunk(std::string const &mapName, wordIVec3 const &chunkPos) {
+void	AChunk::createChunk(wordIVec3 const &chunkPos) {
 	bool normalLoad = true;
 
 	_chunkPos = chunkPos;
-	if (mapName != "") {  // if there is a map
-		_filename = mapName + "/" + CHUNK_PATH + vecToString(chunkPos) + CHUNK_EXTENSION;
+	if (s.m.mapName != "") {  // if there is a map
+		_filename = s.m.fullMapName + "/" + s.g.files.chunkPath + vecToString(chunkPos) + CHUNK_EXTENSION;
 		if (boost::filesystem::is_regular_file(_filename)) {
 			normalLoad = false;
 			if (_createChunkFromFile() == false) {
