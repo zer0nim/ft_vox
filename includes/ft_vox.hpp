@@ -32,6 +32,7 @@ generation type
 */
 #define GENERATION_VOID		0
 #define GENERATION_NORMAL	1
+#define GENERATION_FLAT_MAP	2
 
 /*
 filesystem
@@ -137,6 +138,13 @@ struct Settings {
 			float		pitch;
 		};
 		CameraStartPos	cameraStartPos;
+
+		struct FlatMap {
+			uint32_t	fromY;  // included
+			uint32_t	toY;    // included
+			std::string	blockName;
+		};
+		std::vector<FlatMap>	flatMap;
 	};
 	Map m;  // map
 

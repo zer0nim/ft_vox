@@ -64,9 +64,23 @@ uint8_t		getBlockNormal(wordIVec3 &chunkPos, uint8_t ix, uint8_t iy, uint8_t iz)
 	return result;
 }
 
+uint8_t		getBlockFlatMap(wordIVec3 &chunkPos, uint8_t ix, uint8_t iy, uint8_t iz) {
+	(void)ix;
+	(void)iz;
+	uint32_t y = chunkPos.y + iy;
+	for (auto it = s.m.flatMap.begin(); it != s.m.flatMap.end(); it++) {
+		if (it->fromY <= y && y <= it->toY) {
+			return TextureManager::blocksNames[it->blockName];
+		}
+	}
+	return 0;
+}
+
 uint8_t		getBlock(wordIVec3 &chunkPos, uint8_t ix, uint8_t iy, uint8_t iz) {
 	if (s.m.generationType == GENERATION_VOID)
 		return getBlockVoid(chunkPos, ix, iy, iz);
-	else
+	if (s.m.generationType == GENERATION_NORMAL)
 		return getBlockNormal(chunkPos, ix, iy, iz);
+	else
+		return getBlockFlatMap(chunkPos, ix, iy, iz);
 }

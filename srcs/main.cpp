@@ -66,7 +66,9 @@ TextRender &textRender, ChunkManager &chunkManager) {
 	float angle = cam.zoom;
 	float ratio = winU->width / winU->height;
 	float nearD = 0.1f;
-	float farD = 300.0f;
+	float farD = std::max(
+		static_cast<int>(std::sqrt(std::pow(CHUNK_SZ_X * s.g.renderDist, 2) + std::pow(CHUNK_SZ_Z * s.g.renderDist, 2))),
+		200);
 	glm::mat4	projection = glm::perspective(glm::radians(angle), ratio, nearD, farD);
 
 	winU->cam->frustumCullingInit(angle, ratio, nearD, farD);

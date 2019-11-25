@@ -34,6 +34,23 @@
 			},
 			"yaw": -90,
 			"pitch": 0
-		}
+		},
+		"flatMap": [
+			{
+				"fromY": 0,
+				"toY": 0,
+				"blockName": "bedrock"
+			},
+			{
+				"fromY": 1,
+				"toY": 2,
+				"blockName": "stone"
+			},
+			{
+				"fromY": 3,
+				"toY": 3,
+				"blockName": "grass"
+			}
+		]
 	}
 }
