@@ -3,9 +3,9 @@
 #define MAX_TEXTURES 12
 
 layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aNormal;
-layout (location = 2) in vec2 aTexCoords;
-layout (location = 3) in float aFaceId;
+layout (location = 1) in vec2 aTexCoords;
+layout (location = 2) in float aFaceId;
+layout (location = 3) in float blockId;
 
 out VS_OUT {
 	vec2 TexCoords;
@@ -22,39 +22,39 @@ struct	BlockTexture {
 uniform BlockTexture[4] blockTexturesInfo;
 uniform sampler2D[MAX_TEXTURES] blockTextures;
 
-uniform int blockId;
-uniform vec3 size;
-
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+
+// TODO(zer0nim): need to compare speed with uniform
+const vec3 normals[6] = vec3[6](
+	vec3(0.0f, 0.0f, 1.0f),
+	vec3(1.0f, 0.0f, 0.0f),
+	vec3(0.0f, 0.0f, -1.0f),
+	vec3(-1.0f, 0.0f, 0.0f),
+	vec3(0.0f, 1.0f, 0.0f),
+	vec3(0.0f, -1.0f, 0.0f)
+);
 
 void main() {
 	vec4 pos = vec4(aPos, 1.0);
 
 	// vs_out.FragPos = vec3(aPos);
 	vs_out.FragPos = vec3(model * vec4(aPos, 1.0));
-	vs_out.Normal = mat3(transpose(inverse(model))) * aNormal;
+	vs_out.Normal = mat3(transpose(inverse(model))) * normals[int(aFaceId)];
 
+	BlockTexture bt = blockTexturesInfo[int(blockId)];
 	if (aFaceId == 4.0) {  // top
-		vs_out.TextureId = blockTexturesInfo[blockId].textureTop;
+		vs_out.TextureId = bt.textureTop;
 	}
 	else if  (aFaceId == 5.0) {  // bottom
-		vs_out.TextureId = blockTexturesInfo[blockId].textureBottom;
+		vs_out.TextureId = bt.textureBottom;
 	}
 	else {
-		vs_out.TextureId = blockTexturesInfo[blockId].textureSide;
+		vs_out.TextureId = bt.textureSide;
 	}
 
-	if (aFaceId == 4 || aFaceId == 5) {
-		vs_out.TexCoords = aTexCoords * size.xz;
-	}
-	else if (aFaceId == 0 || aFaceId == 2) {
-		vs_out.TexCoords = aTexCoords * size.xy;
-	}
-	else if (aFaceId == 1 || aFaceId == 3) {
-		vs_out.TexCoords = aTexCoords * size.zy;
-	}
+	vs_out.TexCoords = aTexCoords;
 
 	gl_Position = projection * view * model * pos;
 }

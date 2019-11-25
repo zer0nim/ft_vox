@@ -4,71 +4,16 @@
 #include "GreedyChunk2.hpp"
 #include "utils/Material.hpp"
 
-const float	GreedyChunk2::_cubeData[] = {
-	// positions			// normals				// texture coords
-	1.0f, 1.0f, 1.0f,		0.0f, 0.0f, 1.0f,		0.0f, 0.0f,		0.0f,  // 0l
-	0.0f, 1.0f, 1.0f,		0.0f, 0.0f, 1.0f,		1.0f, 0.0f,		0.0f,  // 0l
-	0.0f, 0.0f, 1.0f,		0.0f, 0.0f, 1.0f,		1.0f, 1.0f,		0.0f,  // 0l
-
-	0.0f, 0.0f, 1.0f,		0.0f, 0.0f, 1.0f,		1.0f, 1.0f,		0.0f,  // 0r
-	1.0f, 0.0f, 1.0f,		0.0f, 0.0f, 1.0f,		0.0f, 1.0f,		0.0f,  // 0r
-	1.0f, 1.0f, 1.0f,		0.0f, 0.0f, 1.0f,		0.0f, 0.0f,		0.0f,  // 0r
-
-
-	1.0f, 0.0f, 0.0f,		1.0f, 0.0f, 0.0f,		1.0f, 1.0f,		1.0f,  // 1l
-	1.0f, 0.0f, 1.0f,		1.0f, 0.0f, 0.0f,		0.0f, 1.0f,		1.0f,  // 1l
-	1.0f, 1.0f, 1.0f,		1.0f, 0.0f, 0.0f,		0.0f, 0.0f,		1.0f,  // 1l
-
-	1.0f, 1.0f, 1.0f,		1.0f, 0.0f, 0.0f,		0.0f, 0.0f,		1.0f,  // 1r
-	1.0f, 1.0f, 0.0f,		1.0f, 0.0f, 0.0f,		1.0f, 0.0f,		1.0f,  // 1r
-	1.0f, 0.0f, 0.0f,		1.0f, 0.0f, 0.0f,		1.0f, 1.0f,		1.0f,  // 1r
-
-
-	0.0f, 0.0f, 0.0f,	0.0f, 0.0f, -1.0f,		1.0f, 1.0f,		2.0f,  // 2l
-	1.0f, 0.0f, 0.0f,		0.0f, 0.0f, -1.0f,		0.0f, 1.0f,		2.0f,  // 2l
-	1.0f, 1.0f, 0.0f,		0.0f, 0.0f, -1.0f,		0.0f, 0.0f,		2.0f,  // 2l
-
-	1.0f, 1.0f, 0.0f,		0.0f, 0.0f, -1.0f,		0.0f, 0.0f,		2.0f,  // 2r
-	0.0f, 1.0f, 0.0f,		0.0f, 0.0f, -1.0f,		1.0f, 0.0f,		2.0f,  // 2r
-	0.0f, 0.0f, 0.0f,	0.0f, 0.0f, -1.0f,		1.0f, 1.0f,		2.0f,  // 2r
-
-
-	0.0f, 1.0f, 1.0f,		-1.0f, 0.0f, 0.0f,		1.0f, 0.0f,		3.0f,  // 3l
-	0.0f, 1.0f, 0.0f,		-1.0f, 0.0f, 0.0f,		0.0f, 0.0f,		3.0f,  // 3l
-	0.0f, 0.0f, 0.0f,	-1.0f, 0.0f, 0.0f,		0.0f, 1.0f,		3.0f,  // 3l
-
-	0.0f, 0.0f, 0.0f,	-1.0f, 0.0f, 0.0f,		0.0f, 1.0f,		3.0f,  // 3r
-	0.0f, 0.0f, 1.0f,		-1.0f, 0.0f, 0.0f,		1.0f, 1.0f,		3.0f,  // 3r
-	0.0f, 1.0f, 1.0f,		-1.0f, 0.0f, 0.0f,		1.0f, 0.0f,		3.0f,  // 3r
-
-
-	0.0f, 1.0f, 0.0f,		0.0f, 1.0f, 0.0f,		1.0f, 0.0f,		4.0f,  // 4l
-	1.0f, 1.0f, 0.0f,		0.0f, 1.0f, 0.0f,		0.0f, 0.0f,		4.0f,  // 4l
-	1.0f, 1.0f, 1.0f,		0.0f, 1.0f, 0.0f,		0.0f, 1.0f,		4.0f,  // 4l
-
-	1.0f, 1.0f, 1.0f,		0.0f, 1.0f, 0.0f,		0.0f, 1.0f,		4.0f,  // 4r
-	0.0f, 1.0f, 1.0f,		0.0f, 1.0f, 0.0f,		1.0f, 1.0f,		4.0f,  // 4r
-	0.0f, 1.0f, 0.0f,		0.0f, 1.0f, 0.0f,		1.0f, 0.0f,		4.0f,  // 4r
-
-
-	0.0f, 0.0f, 0.0f,	0.0f, -1.0f, 0.0f,		0.0f, 1.0f,		5.0f,  // 5l
-	1.0f, 0.0f, 0.0f,		0.0f, -1.0f, 0.0f,		1.0f, 1.0f,		5.0f,  // 5l
-	1.0f, 0.0f, 1.0f,		0.0f, -1.0f, 0.0f,		1.0f, 0.0f,		5.0f,  // 5l
-
-	1.0f, 0.0f, 1.0f,		0.0f, -1.0f, 0.0f,		1.0f, 0.0f,		5.0f,  // 5r
-	0.0f, 0.0f, 1.0f,		0.0f, -1.0f, 0.0f,		0.0f, 0.0f,		5.0f,  // 5r
-	0.0f, 0.0f, 0.0f,	0.0f, -1.0f, 0.0f,		0.0f, 1.0f,		5.0f  // 5r
-};
-
 std::unique_ptr<GreedyChunk2::ShaderData>	GreedyChunk2::_shaderData = std::unique_ptr<GreedyChunk2::ShaderData>();
 
 GreedyChunk2::GreedyChunk2(TextureManager const &textureManager, glm::mat4 &projection)
 : AChunk(textureManager, projection) {
+	_nbVertices = 0;
 	if (!_shaderData) {
 		_shaderData = std::unique_ptr<ShaderData>(new ShaderData());
-		_shaderData->naiveShader->use();
-		_shaderData->naiveShader->setMat4("projection", projection);
-		sendCubeData();
+		_shaderData->greedyShader->use();
+		_shaderData->greedyShader->setMat4("projection", projection);
+		sendConstUniforms();
 	}
 }
 
@@ -123,6 +68,7 @@ void	GreedyChunk2::calcGreedyChunk() {
 	/*
 		This loop runs twice, and the inner loop 3 times - totally 6 iterations
 		one for each voxel face.
+		backFace is equal to true on the first loop and false on the second
 	*/
 	for (bool backFace = true, b2 = false; b2 != backFace; backFace = backFace && b2, b2 = !b2) {
 		// loop over 3-axes
@@ -136,19 +82,19 @@ void	GreedyChunk2::calcGreedyChunk() {
 
 			// keep track of the side
 			if (d == 0) {
-				side = backFace ? Direction::WEST : Direction::EAST;
+				side = backFace ? Direction::LEFT : Direction::RIGHT;
 			}
 			else if (d == 1) {
 				side = backFace ? Direction::BOTTOM : Direction::TOP;
 			}
 			else if (d == 2) {
-				side = backFace ? Direction::SOUTH : Direction::NORTH;
+				side = backFace ? Direction::FRONT : Direction::BACK;
 			}
 
 			// iterate through the dimension from front to back
 			for (it[d] = -1; it[d] < dims[d]; ++(it[d])) {
 				// compute the mask ___________________________________________
-				uint8_t n = 0;
+				int n = 0;
 				for (it[v] = 0; it[v] < dims[v]; ++(it[v])) {
 					for (it[u] = 0; it[u] < dims[u]; ++(it[u]), ++n) {
 						// get curent block
@@ -219,7 +165,7 @@ void	GreedyChunk2::calcGreedyChunk() {
 								quad.height = h;
 								quad.backFace = backFace;
 								quad.bottomLeft = chunkVec3(it[0],					it[1],					it[2]);
-								quad.topLeft = chunkVec3(it[0] + du[0],			it[1] + du[1],			it[2] + du[2]);
+								quad.topLeft = chunkVec3(it[0] + du[0],				it[1] + du[1],			it[2] + du[2]);
 								quad.topRight = chunkVec3(it[0] + du[0] + dv[0],	it[1] + du[1] + dv[1],	it[2] + du[2] + dv[2]);
 								quad.bottomRight = chunkVec3(it[0] + dv[0],			it[1] + dv[1],			it[2] + dv[2]);
 
@@ -251,6 +197,23 @@ void	GreedyChunk2::calcGreedyChunk() {
 	}
 }
 
+void	GreedyChunk2::fillVectLine(std::vector<float> &vertices, int & i, \
+chunkVec3 const &pos, glm::tvec2<int8_t> textUv, Quad const &q) {
+	// std::cout << "pos: " << glm::to_string(pos) << std::endl;
+
+	// position
+	vertices[++i] = pos.x;
+	vertices[++i] = pos.y;
+	vertices[++i] = pos.z;
+	// texture coords
+	vertices[++i] = textUv.x * q.width;
+	vertices[++i] = textUv.y * q.height;
+	// faceId
+	vertices[++i] = static_cast<float>(q.voxFace.side);
+	// blockId
+	vertices[++i] = static_cast<float>(q.voxFace.type);
+}
+
 void	GreedyChunk2::update() {
 	if (_data.isModified == false)
 		return;  // GreedyChunk2 not modified -> don't update it
@@ -258,70 +221,73 @@ void	GreedyChunk2::update() {
 
 	calcGreedyChunk();
 
-	std::cout << "_quads: " << _quads.size() << std::endl;
-	for (Quad &q : _quads) {
-		std::cout << "quads_____" << std::endl;
-		std::cout << "type: " << static_cast<int>(q.voxFace.type) << std::endl;
-		std::cout << "width: " << static_cast<int>(q.width) << std::endl;
-		std::cout << "height: " << static_cast<int>(q.height) << std::endl;
-		std::cout << "backFace: " << q.backFace << std::endl;
-		std::cout << "bottomLeft: " << glm::to_string(q.bottomLeft) << std::endl;
-		std::cout << "topLeft: " << glm::to_string(q.topLeft) << std::endl;
-		std::cout << "topRight: " << glm::to_string(q.topRight) << std::endl;
-		std::cout << "bottomRight: " << glm::to_string(q.bottomRight) << std::endl;
+	if (_quads.size() > 0) {
+		int const rowSize = 7;
+		_nbVertices = _quads.size() * 6;
+		int const size = _nbVertices * rowSize;
+		std::vector<float> vertices(size);
+
+		// fill vertices array
+		int i = -1;
+		for (Quad &q : _quads) {
+			fillVectLine(vertices, i, q.topLeft, glm::tvec2<int8_t>(0, 0), q);
+			fillVectLine(vertices, i, q.bottomLeft, glm::tvec2<int8_t>(0, 1), q);
+			fillVectLine(vertices, i, q.bottomRight, glm::tvec2<int8_t>(1, 1), q);
+
+			fillVectLine(vertices, i, q.topLeft, glm::tvec2<int8_t>(0, 0), q);
+			fillVectLine(vertices, i, q.bottomRight, glm::tvec2<int8_t>(1, 1), q);
+			fillVectLine(vertices, i, q.topRight, glm::tvec2<int8_t>(1, 0), q);
+		}
+
+		if (_nbVertices > 0) {
+			glGenVertexArrays(1, &_shaderData->vao);
+			glGenBuffers(1, &(_shaderData->vbo));
+
+			glBindBuffer(GL_ARRAY_BUFFER, _shaderData->vbo);
+			glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
+
+			glBindVertexArray(_shaderData->vao);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), reinterpret_cast<void*>(0));
+			glEnableVertexAttribArray(0);
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
+			glEnableVertexAttribArray(1);
+			glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 7 * sizeof(float), reinterpret_cast<void*>(5 * sizeof(float)));
+			glEnableVertexAttribArray(2);
+			glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 7 * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
+			glEnableVertexAttribArray(3);
+		}
 	}
 }
 
 void	GreedyChunk2::_draw(glm::mat4 &view) const {
-	_textureManager.activateTextures();
+	if (_nbVertices > 0) {
+		_textureManager.activateTextures();
 
-	// _shaderData->naiveShader->use();
-	// _shaderData->naiveShader->setMat4("view", view);
-	// glBindVertexArray(_shaderData->cubeVao);
+		_shaderData->greedyShader->use();
+		_shaderData->greedyShader->setMat4("view", view);
 
-	// glm::mat4 baseModel = glm::translate(glm::mat4(1.0), glm::vec3(_chunkPos));
-	// for (MeshData const &md : _meshDatas) {
-	// 	_shaderData->naiveShader->setInt("blockId", md.blockId - 1);
-	// 	_shaderData->naiveShader->setVec3("size", glm::vec3(md.size));
+		glm::mat4 model = glm::translate(glm::mat4(1.0), glm::vec3(_chunkPos));
+		_shaderData->greedyShader->setMat4("model", model);
 
-	// 	glm::mat4 model = glm::translate(baseModel, glm::vec3(md.pos));
-	// 	model = glm::scale(model, glm::vec3(md.size));
-	// 	_shaderData->naiveShader->setMat4("model", model);
-
-	// 	glDrawArrays(GL_TRIANGLES, 0, 36);
-	// }
+		glBindVertexArray(_shaderData->vao);
+		glDrawArrays(GL_TRIANGLES, 0, _nbVertices);
+	}
 }
 
-void	GreedyChunk2::sendCubeData() {
-    glGenVertexArrays(1, &_shaderData->cubeVao);
-    glGenBuffers(1, &(_shaderData->cubeVbo));
+void	GreedyChunk2::sendConstUniforms() {
+	_shaderData->greedyShader->use();
 
-    glBindBuffer(GL_ARRAY_BUFFER, _shaderData->cubeVbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GreedyChunk2::_cubeData), GreedyChunk2::_cubeData, GL_STATIC_DRAW);
-
-    glBindVertexArray(_shaderData->cubeVao);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), reinterpret_cast<void*>(0));
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 9 * sizeof(float), reinterpret_cast<void*>(8 * sizeof(float)));
-    glEnableVertexAttribArray(3);
-
-	_shaderData->naiveShader->use();
 	// set cube material
 	Material material;
-	_shaderData->naiveShader->use();
-	_shaderData->naiveShader->setBool("material.specular.isTexture", false);
-	_shaderData->naiveShader->setVec3("material.specular.color", material.specular);
-	_shaderData->naiveShader->setFloat("material.shininess", material.shininess);
+	_shaderData->greedyShader->setVec3("material.specular", material.specular);
+	_shaderData->greedyShader->setFloat("material.shininess", material.shininess);
 
 	// set direction light
-	_shaderData->naiveShader->setVec3("dirLight.direction", -0.2f, -0.8f, -0.6f);
-	_shaderData->naiveShader->setVec3("dirLight.ambient", 0.4f, 0.4f, 0.4f);
-	_shaderData->naiveShader->setVec3("dirLight.diffuse", 1.5f, 1.5f, 1.5f);
-	_shaderData->naiveShader->setVec3("dirLight.specular", 1, 1, 1);
+	_shaderData->greedyShader->setVec3("dirLight.direction", -0.2f, -0.8f, -0.6f);
+	_shaderData->greedyShader->setVec3("dirLight.ambient", 0.4f, 0.4f, 0.4f);
+	_shaderData->greedyShader->setVec3("dirLight.diffuse", 1.5f, 1.5f, 1.5f);
+	_shaderData->greedyShader->setVec3("dirLight.specular", 1, 1, 1);
 
-	_textureManager.setUniform(*_shaderData->naiveShader);
+	// send textures
+	_textureManager.setUniform(*_shaderData->greedyShader);
 }

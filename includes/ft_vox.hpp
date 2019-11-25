@@ -43,6 +43,15 @@ typedef glm::tvec3<int8_t>	chunkVec3;   // used for chunk coordinate
 typedef glm::tvec3<int32_t>	wordIVec3;  // used for word coordinate in int (bloc)
 typedef glm::tvec3<float>	wordFVec3;    // user for word coordinate in float (camera)
 
+enum class Direction {
+	FRONT,
+	RIGHT,
+	BACK,
+	LEFT,
+	TOP,
+	BOTTOM
+};
+
 typedef struct	sWinUser {
 	Camera		*cam;
 	float		dtTime;

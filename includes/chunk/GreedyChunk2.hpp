@@ -24,37 +24,20 @@ class GreedyChunk2 : public AChunk {
 		virtual void	_draw(glm::mat4 &view) const;
 
 	private:
-		void	sendCubeData();
-
 		struct ShaderData {
-			Shader		*naiveShader;
-			u_int32_t	cubeVbo;
-			u_int32_t	cubeVao;
+			Shader		*greedyShader;
+			u_int32_t	vbo;
+			u_int32_t	vao;
 
 			ShaderData() {
-				naiveShader = new Shader("shaders/greedyChunk2_vs.glsl", "shaders/naive_fs.glsl");
-				cubeVbo = 0;
-				cubeVao = 0;
+				greedyShader = new Shader("shaders/greedyChunk2_vs.glsl", "shaders/naive_fs.glsl");
+				vbo = 0;
+				vao = 0;
 			}
 
 			~ShaderData() {
-				delete naiveShader;
+				delete greedyShader;
 			}
-		};
-
-		struct MeshData {
-			chunkVec3	pos;
-			chunkVec3	size;
-			uint8_t		blockId;
-		};
-
-		enum class Direction {
-			SOUTH,
-			NORTH,
-			EAST,
-			WEST,
-			TOP,
-			BOTTOM
 		};
 
 		struct VoxFace {
@@ -80,12 +63,15 @@ class GreedyChunk2 : public AChunk {
 			chunkVec3	topRight;
 			chunkVec3	bottomRight;
 		};
-		std::vector<Quad>	_quads;
 
+		void	sendConstUniforms();
 		VoxFace	*getVoxFace(chunkVec3 const pos, Direction const side);
 		void	calcGreedyChunk();
+		void	fillVectLine(std::vector<float> &vertices, int & i, \
+		chunkVec3 const &pos, glm::tvec2<int8_t> textUv, Quad const &q);
 
-		std::vector<MeshData>	_meshDatas;
+		std::vector<Quad>		_quads;
+		int						_nbVertices;
 
 		static const float	_cubeData[];
 		static std::unique_ptr<ShaderData>	_shaderData;
