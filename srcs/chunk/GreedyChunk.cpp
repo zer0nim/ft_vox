@@ -22,14 +22,12 @@ const float	GreedyChunk::_cubeData[] = {
 
 
 	0.0f, 0.0f, 0.0f,		0.0f, 0.0f, -1.0f,		1.0f, 1.0f,		2.0f,  // 2l
-	1.0f, 0.0f, 0.0f,		0.0f, 0.0f, -1.0f,		0.0f, 1.0f,		2.0f,  // 2l
 	1.0f, 1.0f, 0.0f,		0.0f, 0.0f, -1.0f,		0.0f, 0.0f,		2.0f,  // 2l
 	1.0f, 0.0f, 0.0f,		0.0f, 0.0f, -1.0f,		0.0f, 1.0f,		2.0f,  // 2l
 
 	1.0f, 1.0f, 0.0f,		0.0f, 0.0f, -1.0f,		0.0f, 0.0f,		2.0f,  // 2r
 	0.0f, 0.0f, 0.0f,		0.0f, 0.0f, -1.0f,		1.0f, 1.0f,		2.0f,  // 2r
 	0.0f, 1.0f, 0.0f,		0.0f, 0.0f, -1.0f,		1.0f, 0.0f,		2.0f,  // 2r
-	0.0f, 0.0f, 0.0f,		0.0f, 0.0f, -1.0f,		1.0f, 1.0f,		2.0f,  // 2r
 
 
 	0.0f, 1.0f, 1.0f,		-1.0f, 0.0f, 0.0f,		1.0f, 0.0f,		3.0f,  // 3l
@@ -56,7 +54,7 @@ const float	GreedyChunk::_cubeData[] = {
 
 	1.0f, 0.0f, 1.0f,		0.0f, -1.0f, 0.0f,		1.0f, 0.0f,		5.0f,  // 5r
 	0.0f, 0.0f, 1.0f,		0.0f, -1.0f, 0.0f,		0.0f, 0.0f,		5.0f,  // 5r
-	0.0f, 0.0f, 0.0f,		0.0f, -1.0f, 0.0f,		0.0f, 1.0f,		5.0f  // 5r
+	0.0f, 0.0f, 0.0f,		0.0f, -1.0f, 0.0f,		0.0f, 1.0f,		5.0f   // 5r
 };
 
 std::unique_ptr<GreedyChunk::ShaderData>	GreedyChunk::_shaderData = std::unique_ptr<GreedyChunk::ShaderData>();
