@@ -25,11 +25,13 @@ wordIVec3 stringToVec(const std::string &s) {
 }
 
 ChunkManager::ChunkManager(TextureManager const &textureManager, tWinUser *winU) :
+toDelete(),
 _winU(winU),
 _chunkMap(),
 _chunkActPos(-1, -1, -1),
 _textureManager(textureManager),
-_projection() {}
+_projection(),
+_toCreate() {}
 
 ChunkManager::ChunkManager(ChunkManager const &src) :
 _textureManager(src.getTextureManager()) {
@@ -61,16 +63,16 @@ ChunkManager &ChunkManager::operator=(ChunkManager const &rhs) {
 
 void ChunkManager::init(wordFVec3 camPos, glm::mat4 &projection) {
 	_projection = projection;
-	update(camPos);  // call update once to create the chunks
+	update(camPos, true);  // call update once to create the chunks
 }
 
-void ChunkManager::update(wordFVec3 &camPos) {
+void ChunkManager::update(wordFVec3 &camPos, bool createAll) {
 	wordIVec3 lastChunkPos = _chunkActPos;
+	AChunk * newChunk;
 	_updateChunkPos(camPos);
 
 	// add new chunks if needed
 	if (lastChunkPos != _chunkActPos) {  // if we change the actual chunk
-		AChunk * newChunk;
 		for (int32_t x = _chunkActPos.x - CHUNK_SZ_X * (s.g.renderDist - 1);
 		x < _chunkActPos.x + CHUNK_SZ_X * s.g.renderDist; x += CHUNK_SZ_X) {
 			for (int32_t z = _chunkActPos.z - CHUNK_SZ_Z * (s.g.renderDist - 1);
@@ -78,13 +80,32 @@ void ChunkManager::update(wordFVec3 &camPos) {
 				for (int32_t y = 0; y < CHUNK_SZ_Y * MAX_Y_CHUNK; y += CHUNK_SZ_Y) {
 					wordIVec3 chunkPos(x, y, z);  // this is the position of the chunk
 					if (_isChunkExist(chunkPos) == false) {  // if the chunk doesnt exist (for now)
-						newChunk = instanciateNewChunk(_textureManager, _projection);  // create a chunk with the rihgt type
-						newChunk->createChunk(chunkPos);  // init the chunk with the right values
-						_insertChunk(chunkPos, newChunk);
+						auto it = std::find(_toCreate.begin(), _toCreate.end(), chunkPos);
+						if (it == _toCreate.end()) {  // if the chunk is not already in creation queue
+							_toCreate.push_back(chunkPos);
+						}
 					}
 				}
 			}
 		}
+	}
+
+	int i = 0;
+	while (i < MAX_CREATED_CHUNK_UPDATE_COUNT) {
+		while (_toCreate.empty() == false && _isInChunkLoaded(_toCreate.front()) == false) {  // old chunk
+			_toCreate.pop_front();
+		}
+		if (_toCreate.empty())
+			break;
+		wordIVec3 chunkPos = _toCreate.front();
+		_toCreate.pop_front();
+		if (_isChunkExist(chunkPos) == false) {  // if the chunk doesnt exist (for now)
+			newChunk = instanciateNewChunk(_textureManager, _projection);  // create a chunk with the rihgt type
+			newChunk->createChunk(chunkPos);  // init the chunk with the right values
+			_insertChunk(chunkPos, newChunk);
+		}
+		if (ENABLE_MAX_CREATED_CHUNK_UPDATE && createAll == false)
+			i++;
 	}
 
 	// update all chunks

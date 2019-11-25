@@ -20,6 +20,9 @@
 
 #define MAX_Y_CHUNK				MAX_MAP_SIZE_Y / CHUNK_SZ_Y  // [chunk] type: int
 
+#define ENABLE_MAX_CREATED_CHUNK_UPDATE	true  // enable / disable option
+#define MAX_CREATED_CHUNK_UPDATE_COUNT	5  // create max # chunks each update call (don't create all at the same update)
+
 class Chunk;
 class GreedyChunk;
 #define CHUNK_OBJECT			GreedyChunk  // the chunk object used
