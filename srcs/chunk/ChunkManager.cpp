@@ -31,7 +31,8 @@ _chunkMap(),
 _chunkActPos(-1, -1, -1),
 _textureManager(textureManager),
 _projection(),
-_toCreate() {}
+_toCreate(),
+_nbChunkLoaded(0) {}
 
 ChunkManager::ChunkManager(ChunkManager const &src) :
 _textureManager(src.getTextureManager()) {
@@ -109,7 +110,9 @@ void ChunkManager::update(wordFVec3 &camPos, bool createAll) {
 	}
 
 	// update all chunks
+	uint32_t	chunkLoaded = 0;
 	for (auto it = _chunkMap.begin(); it != _chunkMap.end(); it++) {
+		chunkLoaded++;
 		if (_isInChunkLoaded(stringToVec(it->first))) {
 			while (it->second->isDrawing) {
 				usleep(10);
@@ -122,10 +125,12 @@ void ChunkManager::update(wordFVec3 &camPos, bool createAll) {
 			toDelete.push_back(it->first);
 		}
 	}
+	_nbChunkLoaded = chunkLoaded;
 }
 
 void ChunkManager::draw(glm::mat4 view, Camera *cam) {
 	glm::vec3	chunkSize(CHUNK_SZ_X, CHUNK_SZ_Y, CHUNK_SZ_Z);
+	uint32_t	chunkRendered = 0;
 
 	for (int32_t x = _chunkActPos.x - CHUNK_SZ_X * (s.g.renderDist - 1);
 	x < _chunkActPos.x + CHUNK_SZ_X * s.g.renderDist; x += CHUNK_SZ_X) {
@@ -135,12 +140,14 @@ void ChunkManager::draw(glm::mat4 view, Camera *cam) {
 				wordIVec3 chunkPos(x, y, z);  // this is the position of the chunk
 				if (_isChunkExist(chunkPos)) {  // if the chunk exist
 					if (FRCL_IS_INSIDE(cam->frustumCullingCheckCube(chunkPos, chunkSize))) {  // if inside the camera
+						chunkRendered++;
 						_chunkMap[vecToString(chunkPos)]->draw(view);
 					}
 				}
 			}
 		}
 	}
+	_nbChunkRendered = chunkRendered;
 }
 
 void ChunkManager::_updateChunkPos(wordFVec3 const &pos) {
@@ -179,3 +186,5 @@ std::map<std::string, AChunk*> const	&ChunkManager::getChunkMap() const { return
 wordIVec3 const							&ChunkManager::getChunkActPos() const { return _chunkActPos; }
 TextureManager const					&ChunkManager::getTextureManager() const { return _textureManager; };
 glm::mat4 const							&ChunkManager::getProjection() const { return _projection; };
+uint32_t								ChunkManager::getNbChunkLoaded() const { return _nbChunkLoaded; }
+uint32_t								ChunkManager::getNbChunkRendered() const { return _nbChunkRendered; }

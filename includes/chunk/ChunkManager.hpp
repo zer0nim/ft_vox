@@ -28,6 +28,8 @@ class ChunkManager {
 		wordIVec3 const							&getChunkActPos() const;
 		TextureManager const					&getTextureManager() const;
 		glm::mat4 const							&getProjection() const;
+		uint32_t								getNbChunkLoaded() const;
+		uint32_t								getNbChunkRendered() const;
 
 		std::vector<std::string>				toDelete;  // list of chunks to delete
 
@@ -50,4 +52,6 @@ class ChunkManager {
 		TextureManager const			&_textureManager;
 		glm::mat4						_projection;
 		std::deque<wordIVec3>			_toCreate;  // list of chunks to create
+		uint32_t						_nbChunkLoaded;  // number of chunks loaded in memory
+		uint32_t						_nbChunkRendered;  // number of chunks rendered on screen
 };

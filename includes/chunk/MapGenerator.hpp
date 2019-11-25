@@ -13,7 +13,7 @@
 #define MAP_CAVERN_Y_MULTIPLIER	3		// multiply Y by ... in cavern
 #define MAP_CAVERN_FREQ			0.3		// frequency of caverns
 #define MAP_CAVERN_BASE_Y		0.1		// [0..1] base y for cavern height
-#define MAP_CAVERN_HEIGHT		0.15	// [0..1] height of a cavern
+#define MAP_CAVERN_HEIGHT		0.15    // [0..1] height of a cavern
 #define MAP_CAVERN_START		0.15    // [0..1] start cavern at this perlin value
 #define MAP_CAVERN_END			0.4		// [0..1] end cavern at this perlin value
 /* bedrock */
