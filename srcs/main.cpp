@@ -153,7 +153,7 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
 	winU->height = s.g.screen.height;
 	winU->showInfo = true;
 	winU->showHelp = true;
-	winU->freezeChunkUpdate = false;
+	winU->freezeChunkUpdate = true;
 	winU->polygonRenderMode = 0;
 
 	if (!initWindow(window, name, winU))

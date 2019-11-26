@@ -88,7 +88,7 @@ void	GreedyChunk2::calcGreedyChunk() {
 				side = backFace ? Direction::BOTTOM : Direction::TOP;
 			}
 			else if (d == 2) {
-				side = backFace ? Direction::FRONT : Direction::BACK;
+				side = backFace ? Direction::BACK : Direction::FRONT;
 			}
 
 			// iterate through the dimension from front to back
@@ -159,6 +159,8 @@ void	GreedyChunk2::calcGreedyChunk() {
 								std::array<uint8_t, 3> dv = {0, 0, 0};
 								dv[v] = h;
 
+								++it[d];  // increment curent direction to get correct position
+
 								Quad	quad;
 								quad.voxFace = *(mask[n]);
 								quad.width = w;
@@ -168,6 +170,8 @@ void	GreedyChunk2::calcGreedyChunk() {
 								quad.topLeft = chunkVec3(it[0] + du[0],				it[1] + du[1],			it[2] + du[2]);
 								quad.topRight = chunkVec3(it[0] + du[0] + dv[0],	it[1] + du[1] + dv[1],	it[2] + du[2] + dv[2]);
 								quad.bottomRight = chunkVec3(it[0] + dv[0],			it[1] + dv[1],			it[2] + dv[2]);
+
+								--it[d];  // reset curent direction
 
 								_quads.push_back(quad);
 							}
