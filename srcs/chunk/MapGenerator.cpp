@@ -35,8 +35,8 @@ float cavernY1, float cavernY2, float bedrockElevation) {
 	// mountains creation
 	if (fy <= montainsElevation) {
 		if (biome == MAP_BIOME_MOUNTAINS) {
-			// if (fy + mapInfo.yFactor * 1 >= montainsElevation)
-				// return TextureManager::blocksNames["grass"];
+			if (realY >= MAP_MOUNTAINS_SNOW_HEIGHT && fy + mapInfo.yFactor * 1 >= montainsElevation)
+				return TextureManager::blocksNames["snow"];
 			return TextureManager::blocksNames["stone"];
 		}
 		else if (biome == MAP_BIOME_DESERT) {

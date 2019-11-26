@@ -9,7 +9,8 @@ std::map<std::string, uint8_t>	TextureManager::blocksNames = {
 	{"stone",	2},
 	{"grass",	3},
 	{"sand",	4},
-	{"bedrock",	5}
+	{"bedrock",	5},
+	{"snow",	6}
 };
 
 TextureManager::TextureManager(std::string const &texturesSettings) {

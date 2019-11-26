@@ -8,7 +8,7 @@
 #include "utils/Shader.hpp"
 #include "commonInclude.hpp"
 
-#define NB_TYPE_BLOCKS 5  // number of blocks types
+#define NB_TYPE_BLOCKS 6  // number of blocks types
 
 class TextureManager {
 	public:

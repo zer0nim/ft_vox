@@ -16,6 +16,9 @@
 		},
 		"sand": {
 			"default": "./assets/textures/block/sand.png"
+		},
+		"snow": {
+			"default": "./assets/textures/block/snow.png"
 		}
 	}
 }

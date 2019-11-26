@@ -30,6 +30,8 @@
 #define MAP_HEIGHT_DIV_MOUNTAINS	10		// height divisor (to avoid big montains)
 // for plain it if btw desert and mountains
 
+#define MAP_MOUNTAINS_SNOW_HEIGHT	60		// after # height, the surface is snow
+
 
 // biomes ID
 #define MAP_BIOME_PLAIN		0
