@@ -26,9 +26,9 @@
 #define PLAIN_OFFSET				0.005 	// less numer == larger plain biome (transition biome)
 
 // biomes mountains height (bigger nb == smaller mountains)
-#define MAP_HEIGHT_DIV_PLAIN		20		// height divisor (to avoid big montains)
 #define MAP_HEIGHT_DIV_DESERT		40		// height divisor (to avoid big montains)
 #define MAP_HEIGHT_DIV_MOUNTAINS	10		// height divisor (to avoid big montains)
+// for plain it if btw desert and mountains
 
 
 // biomes ID

@@ -110,9 +110,10 @@ void		getChunkNormal(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_SZ_Y][C
 				biome = MAP_BIOME_MOUNTAINS;
 				heightDiv = MAP_HEIGHT_DIV_MOUNTAINS;
 			}
-			else if (-PLAIN_OFFSET < subf1f2 && subf1f2 < PLAIN_OFFSET) {
+			else if (-PLAIN_OFFSET < subf1f2) {
+				float factor = -subf1f2 / PLAIN_OFFSET;  // btw 0 & 1
 				biome = MAP_BIOME_PLAIN;
-				heightDiv = MAP_HEIGHT_DIV_PLAIN;
+				heightDiv = MAP_HEIGHT_DIV_MOUNTAINS + (MAP_HEIGHT_DIV_DESERT - MAP_HEIGHT_DIV_MOUNTAINS) * factor;
 			}
 			else {
 				biome = MAP_BIOME_DESERT;
