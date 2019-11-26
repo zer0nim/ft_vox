@@ -20,7 +20,7 @@ class AChunk {
 
 		AChunk &operator=(AChunk const &rhs);
 
-		virtual void	draw(glm::mat4 &view) const;
+		virtual void	draw(glm::mat4 &view);
 		virtual void	update() = 0;
 		void			createChunk(wordIVec3 const &chunkPos);
 		void			createChunk(std::string const &chunkPos);
@@ -34,7 +34,7 @@ class AChunk {
 		mutable bool	isUpdating;  // true if the chunk is actually in updating process
 
 	protected:
-		virtual void	_draw(glm::mat4 &view) const = 0;
+		virtual void	_draw(glm::mat4 &view) = 0;
 		bool			_createChunkFromFile();
 		virtual void	_createChunk();
 

@@ -21,20 +21,15 @@ class GreedyChunk2 : public AChunk {
 		virtual void	update();
 
 	protected:
-		virtual void	_draw(glm::mat4 &view) const;
+		virtual void	_draw(glm::mat4 &view);
 
 	private:
 		struct ShaderData {
 			Shader		*greedyShader;
-			u_int32_t	vbo;
-			u_int32_t	vao;
 
 			ShaderData() {
 				greedyShader = new Shader("shaders/greedyChunk2_vs.glsl", "shaders/naive_fs.glsl");
-				vbo = 0;
-				vao = 0;
 			}
-
 			~ShaderData() {
 				delete greedyShader;
 			}
@@ -64,12 +59,17 @@ class GreedyChunk2 : public AChunk {
 			chunkVec3	bottomRight;
 		};
 
+		void	sendMeshData();
 		void	sendConstUniforms();
 		VoxFace	*getVoxFace(chunkVec3 const pos, Direction const side);
 		void	calcGreedyChunk();
 		void	fillVectLine(std::vector<float> &vertices, int & i, \
 		chunkVec3 const &pos, glm::tvec2<int8_t> textUv, Quad const &q);
 
+		bool					_meshUpdated;
+		bool					_needInitVao;
+		u_int32_t				_vbo;
+		u_int32_t				_vao;
 		std::vector<Quad>		_quads;
 		int						_nbVertices;
 

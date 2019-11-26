@@ -21,7 +21,7 @@ class GreedyChunk : public AChunk {
 		virtual void	update();
 
 	protected:
-		virtual void	_draw(glm::mat4 &view) const;
+		virtual void	_draw(glm::mat4 &view);
 
 	private:
 		void	sendCubeData();

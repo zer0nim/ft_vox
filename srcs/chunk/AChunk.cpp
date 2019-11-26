@@ -43,7 +43,7 @@ AChunk &AChunk::operator=(AChunk const &rhs) {
 	return *this;
 }
 
-void	AChunk::draw(glm::mat4 &view) const {
+void	AChunk::draw(glm::mat4 &view) {
 	while (isUpdating) {
 		usleep(10);
 	}

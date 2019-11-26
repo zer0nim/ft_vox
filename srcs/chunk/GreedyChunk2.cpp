@@ -9,6 +9,10 @@ std::unique_ptr<GreedyChunk2::ShaderData>	GreedyChunk2::_shaderData = std::uniqu
 GreedyChunk2::GreedyChunk2(TextureManager const &textureManager, glm::mat4 &projection)
 : AChunk(textureManager, projection) {
 	_nbVertices = 0;
+	_needInitVao = true;
+	_meshUpdated = false;
+	_vao = 0;
+	_vbo = 0;
 	if (!_shaderData) {
 		_shaderData = std::unique_ptr<ShaderData>(new ShaderData());
 		_shaderData->greedyShader->use();
@@ -25,6 +29,7 @@ GreedyChunk2::~GreedyChunk2() {
 }
 
 GreedyChunk2 &GreedyChunk2::operator=(GreedyChunk2 const &rhs) {
+	// TODO(zer0nim): need to fill the copy operator
 	(void)rhs;
 	// if (this != &rhs) {}
 	return *this;
@@ -231,8 +236,12 @@ void	GreedyChunk2::update() {
 		return;  // GreedyChunk2 not modified -> don't update it
 	_data.isModified = false;
 
+	// update mesh
 	calcGreedyChunk();
+	_meshUpdated = true;
+}
 
+void	GreedyChunk2::sendMeshData() {
 	if (_quads.size() > 0) {
 		int const rowSize = 7;
 		_nbVertices = _quads.size() * 6;
@@ -263,13 +272,19 @@ void	GreedyChunk2::update() {
 		}
 
 		if (_nbVertices > 0) {
-			glGenVertexArrays(1, &_shaderData->vao);
-			glGenBuffers(1, &(_shaderData->vbo));
+			_shaderData->greedyShader->use();
 
-			glBindBuffer(GL_ARRAY_BUFFER, _shaderData->vbo);
+			// generate vao vbo only on first call
+			if (_needInitVao) {
+				_needInitVao = false;
+				glGenVertexArrays(1, &_vao);
+				glGenBuffers(1, &_vbo);
+			}
+
+			glBindBuffer(GL_ARRAY_BUFFER, _vbo);
 			glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
 
-			glBindVertexArray(_shaderData->vao);
+			glBindVertexArray(_vao);
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), reinterpret_cast<void*>(0));
 			glEnableVertexAttribArray(0);
 			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
@@ -282,7 +297,13 @@ void	GreedyChunk2::update() {
 	}
 }
 
-void	GreedyChunk2::_draw(glm::mat4 &view) const {
+void	GreedyChunk2::_draw(glm::mat4 &view) {
+	if (_meshUpdated) {
+		_meshUpdated = false;
+		_nbVertices = 0;
+		sendMeshData();
+	}
+
 	if (_nbVertices > 0) {
 		_textureManager.activateTextures();
 
@@ -292,7 +313,7 @@ void	GreedyChunk2::_draw(glm::mat4 &view) const {
 		glm::mat4 model = glm::translate(glm::mat4(1.0), glm::vec3(_chunkPos));
 		_shaderData->greedyShader->setMat4("model", model);
 
-		glBindVertexArray(_shaderData->vao);
+		glBindVertexArray(_vao);
 		glDrawArrays(GL_TRIANGLES, 0, _nbVertices);
 	}
 }
