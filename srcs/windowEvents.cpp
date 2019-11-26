@@ -183,7 +183,7 @@ bool	initWindow(GLFWwindow **window, const char *name, tWinUser *winU) {
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);  // anti aliasing
-	// glEnable(GL_CULL_FACE);  // face culling
+	glEnable(GL_CULL_FACE);  // face culling
 	glEnable(GL_BLEND);  // enable blending (used in textRender)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

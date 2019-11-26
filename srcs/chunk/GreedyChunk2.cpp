@@ -163,13 +163,21 @@ void	GreedyChunk2::calcGreedyChunk() {
 
 								Quad	quad;
 								quad.voxFace = *(mask[n]);
-								quad.width = w;
-								quad.height = h;
+								quad.width = (d != 2) ? h : w;
+								quad.height = (d != 2) ? w : h;
 								quad.backFace = backFace;
-								quad.bottomLeft = chunkVec3(it[0],					it[1],					it[2]);
-								quad.topLeft = chunkVec3(it[0] + du[0],				it[1] + du[1],			it[2] + du[2]);
-								quad.topRight = chunkVec3(it[0] + du[0] + dv[0],	it[1] + du[1] + dv[1],	it[2] + du[2] + dv[2]);
-								quad.bottomRight = chunkVec3(it[0] + dv[0],			it[1] + dv[1],			it[2] + dv[2]);
+								if (d != 2) {
+									quad.bottomLeft = chunkVec3(it[0],					it[1],					it[2]);
+									quad.topLeft = chunkVec3(it[0] + du[0],				it[1] + du[1],			it[2] + du[2]);
+									quad.topRight = chunkVec3(it[0] + du[0] + dv[0],	it[1] + du[1] + dv[1],	it[2] + du[2] + dv[2]);
+									quad.bottomRight = chunkVec3(it[0] + dv[0],			it[1] + dv[1],			it[2] + dv[2]);
+								}
+								else {
+									quad.bottomRight = chunkVec3(it[0],					it[1],					it[2]);
+									quad.bottomLeft = chunkVec3(it[0] + du[0],				it[1] + du[1],			it[2] + du[2]);
+									quad.topLeft = chunkVec3(it[0] + du[0] + dv[0],	it[1] + du[1] + dv[1],	it[2] + du[2] + dv[2]);
+									quad.topRight = chunkVec3(it[0] + dv[0],			it[1] + dv[1],			it[2] + dv[2]);
+								}
 
 								--it[d];  // reset curent direction
 
@@ -234,13 +242,24 @@ void	GreedyChunk2::update() {
 		// fill vertices array
 		int i = -1;
 		for (Quad &q : _quads) {
-			fillVectLine(vertices, i, q.topLeft, glm::tvec2<int8_t>(0, 0), q);
-			fillVectLine(vertices, i, q.bottomLeft, glm::tvec2<int8_t>(0, 1), q);
-			fillVectLine(vertices, i, q.bottomRight, glm::tvec2<int8_t>(1, 1), q);
+			if (q.backFace) {
+				fillVectLine(vertices, i, q.topLeft, glm::tvec2<int8_t>(0, 0), q);
+				fillVectLine(vertices, i, q.bottomLeft, glm::tvec2<int8_t>(0, 1), q);
+				fillVectLine(vertices, i, q.bottomRight, glm::tvec2<int8_t>(1, 1), q);
 
-			fillVectLine(vertices, i, q.topLeft, glm::tvec2<int8_t>(0, 0), q);
-			fillVectLine(vertices, i, q.bottomRight, glm::tvec2<int8_t>(1, 1), q);
-			fillVectLine(vertices, i, q.topRight, glm::tvec2<int8_t>(1, 0), q);
+				fillVectLine(vertices, i, q.bottomRight, glm::tvec2<int8_t>(1, 1), q);
+				fillVectLine(vertices, i, q.topRight, glm::tvec2<int8_t>(1, 0), q);
+				fillVectLine(vertices, i, q.topLeft, glm::tvec2<int8_t>(0, 0), q);
+			}
+			else {
+				fillVectLine(vertices, i, q.topLeft, glm::tvec2<int8_t>(0, 0), q);
+				fillVectLine(vertices, i, q.topRight, glm::tvec2<int8_t>(1, 0), q);
+				fillVectLine(vertices, i, q.bottomRight, glm::tvec2<int8_t>(1, 1), q);
+
+				fillVectLine(vertices, i, q.bottomRight, glm::tvec2<int8_t>(1, 1), q);
+				fillVectLine(vertices, i, q.bottomLeft, glm::tvec2<int8_t>(0, 1), q);
+				fillVectLine(vertices, i, q.topLeft, glm::tvec2<int8_t>(0, 0), q);
+			}
 		}
 
 		if (_nbVertices > 0) {
