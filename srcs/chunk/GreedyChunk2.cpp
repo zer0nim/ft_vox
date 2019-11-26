@@ -215,7 +215,7 @@ chunkVec3 const &pos, glm::tvec2<int8_t> textUv, Quad const &q) {
 	// faceId
 	vertices[++i] = static_cast<float>(q.voxFace.side);
 	// blockId
-	vertices[++i] = static_cast<float>(q.voxFace.type);
+	vertices[++i] = static_cast<float>(q.voxFace.type - 1);
 }
 
 void	GreedyChunk2::update() {

@@ -19,7 +19,7 @@ struct	BlockTexture {
 	int	textureTop;
 	int	textureBottom;
 };
-uniform BlockTexture[4] blockTexturesInfo;
+uniform BlockTexture[5] blockTexturesInfo;
 uniform sampler2D[MAX_TEXTURES] blockTextures;
 
 uniform mat4 model;
