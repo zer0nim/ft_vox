@@ -14,9 +14,9 @@
 #define MAX_MAP_SIZE_Y 256    // [bloc] type: int
 #define MAX_MAP_SIZE_Z MAX_MAP_SIZE_X  // [bloc] type: int
 
-#define CHUNK_SZ_X 16  // [bloc] type: int
+#define CHUNK_SZ_X 16   // [bloc] type: int
 #define CHUNK_SZ_Y 128  // [bloc] type: int
-#define CHUNK_SZ_Z 16  // [bloc] type: int
+#define CHUNK_SZ_Z 16   // [bloc] type: int
 
 #define MAX_Y_CHUNK				MAX_MAP_SIZE_Y / CHUNK_SZ_Y  // [chunk] type: int
 

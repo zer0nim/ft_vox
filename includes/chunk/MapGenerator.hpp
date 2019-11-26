@@ -19,7 +19,7 @@
 /* bedrock */
 #define MAP_MAX_BEDROCK_HEIGHT	3		// [block] max bedrock height
 
-#define PERLIN mapInfo.perlin.noise  // shortcut to perlin call
+#define PERLIN mapInfo.perlin.noise     // shortcut to perlin call
 
 struct MapInfo {
 	float				xFactor;
@@ -39,3 +39,9 @@ uint8_t		getBlockVoid(wordIVec3 &chunkPos, uint8_t ix, uint8_t iy, uint8_t iz);
 uint8_t		getBlockNormal(wordIVec3 &chunkPos, uint8_t ix, uint8_t iy, uint8_t iz);
 uint8_t		getBlockFlatMap(wordIVec3 &chunkPos, uint8_t ix, uint8_t iy, uint8_t iz);
 uint8_t		getBlock(wordIVec3 &chunkPos, uint8_t ix, uint8_t iy, uint8_t iz);
+
+
+void		getChunkVoid(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_SZ_Y][CHUNK_SZ_Z]);
+void		getChunkFlatMap(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_SZ_Y][CHUNK_SZ_Z]);
+void		getChunkNormal(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_SZ_Y][CHUNK_SZ_Z]);
+void		getChunk(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_SZ_Y][CHUNK_SZ_Z]);

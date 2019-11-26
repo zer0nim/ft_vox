@@ -91,13 +91,7 @@ bool	AChunk::_createChunkFromFile() {
 }
 
 void	AChunk::_createChunk() {
-	for (uint8_t ix = 0; ix < CHUNK_SZ_X; ix++) {
-		for (uint8_t iy = 0; iy < CHUNK_SZ_Y; iy++) {
-			for (uint8_t iz = 0; iz < CHUNK_SZ_Z; iz++) {
-				_data.data[ix][iy][iz] = getBlock(_chunkPos, ix, iy, iz);
-			}
-		}
-	}
+	getChunk(_chunkPos, _data.data);
 }
 
 void	AChunk::createChunk(std::string const &chunkPos) {
