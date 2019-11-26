@@ -19,12 +19,19 @@
 /* bedrock */
 #define MAP_MAX_BEDROCK_HEIGHT	3		// [block] max bedrock height
 
-
+/* biomes */
+// biome size and offsets
 #define MAP_BIOME_SIZE				0.04 	// reverse of the size
+#define MOUNTAIN_OFFSET				0.003 	// less number == larger mountains biomes
+#define PLAIN_OFFSET				0.005 	// less numer == larger plain biome (transition biome)
+
+// biomes mountains height (bigger nb == smaller mountains)
 #define MAP_HEIGHT_DIV_PLAIN		20		// height divisor (to avoid big montains)
 #define MAP_HEIGHT_DIV_DESERT		40		// height divisor (to avoid big montains)
 #define MAP_HEIGHT_DIV_MOUNTAINS	10		// height divisor (to avoid big montains)
 
+
+// biomes ID
 #define MAP_BIOME_PLAIN		0
 #define MAP_BIOME_DESERT	1
 #define MAP_BIOME_MOUNTAINS	2

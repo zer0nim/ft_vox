@@ -34,14 +34,7 @@ float cavernY1, float cavernY2, float bedrockElevation) {
 
 	// mountains creation
 	if (fy <= montainsElevation) {
-		if (biome == MAP_BIOME_PLAIN) {
-			if (fy + mapInfo.yFactor * 1 >= montainsElevation)
-				return TextureManager::blocksNames["grass"];
-			else if (fy + mapInfo.yFactor * 2 >= montainsElevation)
-				return TextureManager::blocksNames["dirt"];
-			return TextureManager::blocksNames["stone"];
-		}
-		else if (biome == MAP_BIOME_MOUNTAINS) {
+		if (biome == MAP_BIOME_MOUNTAINS) {
 			// if (fy + mapInfo.yFactor * 1 >= montainsElevation)
 				// return TextureManager::blocksNames["grass"];
 			return TextureManager::blocksNames["stone"];
@@ -49,6 +42,13 @@ float cavernY1, float cavernY2, float bedrockElevation) {
 		else if (biome == MAP_BIOME_DESERT) {
 			if (fy + mapInfo.yFactor * 1 >= montainsElevation)
 				return TextureManager::blocksNames["sand"];
+			return TextureManager::blocksNames["stone"];
+		}
+		else {  // plain (transition)
+			if (fy + mapInfo.yFactor * 1 >= montainsElevation)
+				return TextureManager::blocksNames["grass"];
+			else if (fy + mapInfo.yFactor * 2 >= montainsElevation)
+				return TextureManager::blocksNames["dirt"];
 			return TextureManager::blocksNames["stone"];
 		}
 	}
@@ -90,7 +90,7 @@ void		getChunkNormal(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_SZ_Y][C
 	float	x;
 	float	y;
 	float	z;
-	uint8_t	biome = MAP_BIOME_DESERT;
+	uint8_t	biome;
 	for (uint8_t ix = 0; ix < CHUNK_SZ_X; ix++) {
 		x = (chunkPos.x + ix) * mapInfo.xFactor * NORMALIZE_MULTIPLIER + 0.5;
 		for (uint8_t iz = 0; iz < CHUNK_SZ_Z; iz++) {
@@ -103,23 +103,22 @@ void		getChunkNormal(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_SZ_Y][C
 			float	biomef2 = 1 * PERLIN(MAP_BIOME_SIZE * (x + 0.1) * 1, MAP_BIOME_SIZE * (z + 0.1) * 1)
 				+  0.5 * PERLIN(MAP_BIOME_SIZE * (x + 0.1) * 2, MAP_BIOME_SIZE * (z + 0.1) * 2)
 				+ 0.25 * PERLIN(MAP_BIOME_SIZE * (x + 0.1) * 4, MAP_BIOME_SIZE * (z + 0.1) * 4);
-			// float	biomef3 = 1 * PERLIN(MAP_BIOME_SIZE * (x + 0.3) * 1, MAP_BIOME_SIZE * (z + 0.3) * 1)
-			// 	+  0.5 * PERLIN(MAP_BIOME_SIZE * (x + 0.3) * 2, MAP_BIOME_SIZE * (z + 0.3) * 2)
-			// 	+ 0.25 * PERLIN(MAP_BIOME_SIZE * (x + 0.3) * 4, MAP_BIOME_SIZE * (z + 0.3) * 4);
-			float mountainsBiome = 0.003;  // less number, larger mountains biomes
-			float desertOffset = 0.005;  // less number, larger desert biome
-			if (biomef1 - biomef2 > mountainsBiome)
-				biome = MAP_BIOME_MOUNTAINS;
-			else if (biomef1 - biomef2 < -(desertOffset + mountainsBiome) || biomef1 - biomef2 > (desertOffset + mountainsBiome))
-				biome = MAP_BIOME_DESERT;
-			else
-				biome = MAP_BIOME_PLAIN;
+			float subf1f2 = biomef1 - biomef2 - MOUNTAIN_OFFSET;  // substraction of f1 & f2
 
-			float heightDiv = MAP_HEIGHT_DIV_PLAIN;
-			if (biome == MAP_BIOME_MOUNTAINS)
+			float heightDiv;
+			if (subf1f2 > 0) {
+				biome = MAP_BIOME_MOUNTAINS;
 				heightDiv = MAP_HEIGHT_DIV_MOUNTAINS;
-			else if (biome == MAP_BIOME_DESERT)
+			}
+			else if (-PLAIN_OFFSET < subf1f2 && subf1f2 < PLAIN_OFFSET) {
+				biome = MAP_BIOME_PLAIN;
+				heightDiv = MAP_HEIGHT_DIV_PLAIN;
+			}
+			else {
+				biome = MAP_BIOME_DESERT;
 				heightDiv = MAP_HEIGHT_DIV_DESERT;
+			}
+
 			// create normal montains
 			float	montainElevation = 1 * PERLIN(MAP_FREQ_MONTAIN * x * 1, MAP_FREQ_MONTAIN * z * 1)
 				+  0.5 * PERLIN(MAP_FREQ_MONTAIN * x * 2, MAP_FREQ_MONTAIN * z * 2)
