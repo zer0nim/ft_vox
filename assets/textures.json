@@ -19,6 +19,14 @@
 		},
 		"snow": {
 			"default": "./assets/textures/block/snow.png"
+		},
+		"snow-stone": {
+			"top": "./assets/textures/block/snow.png",
+			"default": "./assets/textures/block/snow-stone.png"
+		},
+		"snow-dirt": {
+			"top": "./assets/textures/block/snow.png",
+			"default": "./assets/textures/block/snow-dirt.png"
 		}
 	}
 }

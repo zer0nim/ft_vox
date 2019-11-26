@@ -35,8 +35,12 @@ float cavernY1, float cavernY2, float bedrockElevation) {
 	// mountains creation
 	if (fy <= montainsElevation) {
 		if (biome == MAP_BIOME_MOUNTAINS) {
-			if (realY >= MAP_MOUNTAINS_SNOW_HEIGHT && fy + mapInfo.yFactor * 1 >= montainsElevation)
+			if (realY >= MAP_FULL_SNOW_HEIGHT && fy + mapInfo.yFactor * 1 >= montainsElevation)
 				return TextureManager::blocksNames["snow"];
+			else if (realY >= MAP_FULL_SNOW_HEIGHT - 1 && fy + mapInfo.yFactor * 2 >= montainsElevation)
+				return TextureManager::blocksNames["snow-stone"];
+			else if (realY >= MAP_TOP_SNOW_HEIGHT && fy + mapInfo.yFactor * 1 >= montainsElevation)
+				return TextureManager::blocksNames["snow-stone"];
 			return TextureManager::blocksNames["stone"];
 		}
 		else if (biome == MAP_BIOME_DESERT) {
@@ -45,7 +49,13 @@ float cavernY1, float cavernY2, float bedrockElevation) {
 			return TextureManager::blocksNames["stone"];
 		}
 		else {  // plain (transition)
-			if (fy + mapInfo.yFactor * 1 >= montainsElevation)
+			if (realY >= MAP_FULL_SNOW_HEIGHT && fy + mapInfo.yFactor * 1 >= montainsElevation)
+				return TextureManager::blocksNames["snow"];
+			else if (realY >= MAP_FULL_SNOW_HEIGHT - 1 && fy + mapInfo.yFactor * 2 >= montainsElevation)
+				return TextureManager::blocksNames["snow-dirt"];
+			else if (realY >= MAP_TOP_SNOW_HEIGHT && fy + mapInfo.yFactor * 1 >= montainsElevation)
+				return TextureManager::blocksNames["snow-dirt"];
+			else if (fy + mapInfo.yFactor * 1 >= montainsElevation)
 				return TextureManager::blocksNames["grass"];
 			else if (fy + mapInfo.yFactor * 2 >= montainsElevation)
 				return TextureManager::blocksNames["dirt"];

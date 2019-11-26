@@ -5,12 +5,14 @@
 #include "utils/Texture.hpp"
 
 std::map<std::string, uint8_t>	TextureManager::blocksNames = {
-	{"dirt",	1},
-	{"stone",	2},
-	{"grass",	3},
-	{"sand",	4},
-	{"bedrock",	5},
-	{"snow",	6}
+	{"dirt",		1},
+	{"stone",		2},
+	{"grass",		3},
+	{"sand",		4},
+	{"bedrock",		5},
+	{"snow",		6},
+	{"snow-stone",	7},
+	{"snow-dirt",	8},
 };
 
 TextureManager::TextureManager(std::string const &texturesSettings) {
