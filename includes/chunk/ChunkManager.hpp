@@ -20,6 +20,7 @@ class ChunkManager {
 		void	init(wordFVec3 camPos, glm::mat4 &projection);  // load the firsts chunks
 		void	update(wordFVec3 &camPos, bool createAll = false);  // global update (call each frame)
 		void	draw(glm::mat4 view, Camera *cam);  // draw all chunks
+		void	saveAndQuit();  // save all chunks (if needed) and destroy them
 
 		tWinUser								*getWinU();
 		tWinUser								*getWinU() const;

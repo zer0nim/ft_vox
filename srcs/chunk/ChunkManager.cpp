@@ -152,6 +152,19 @@ void ChunkManager::draw(glm::mat4 view, Camera *cam) {
 	_nbChunkRendered = chunkRendered;
 }
 
+void ChunkManager::saveAndQuit() {
+	for (auto it = _chunkMap.begin(); it != _chunkMap.end(); it++) {
+		toDelete.push_back(it->first);
+		if (s.g.files.saveAllChunks || it->second->isModifiedFromBegining())  // save (if needed)
+			it->second->save();
+	}
+	for (auto it = toDelete.begin(); it != toDelete.end(); it++) {
+		delete _chunkMap[*it];
+		_chunkMap.erase(*it);
+	}
+	toDelete.clear();
+}
+
 void ChunkManager::_updateChunkPos(wordFVec3 const &pos) {
 	_updateChunkPos(wordIVec3(pos));
 }

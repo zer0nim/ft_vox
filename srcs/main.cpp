@@ -223,6 +223,9 @@ int		main(int ac, char const **av) {
 
 		// run the game
 		gameLoop(window, cam, skybox, textRender, chunkManager);
+
+		// save and quit all chunks
+		chunkManager.saveAndQuit();
 	}
 	catch(const TextureManager::TextureManagerError& e) {
 		std::cerr << e.what() << std::endl;
