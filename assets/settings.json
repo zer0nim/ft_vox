@@ -1,6 +1,6 @@
 {
 	"global": {
-		"renderDist": 8,
+		"renderDist": 16,
 		"files": {
 			"mapsPath": "/tmp/ft_vox/maps/",
 			"chunkPath": "chunks/",

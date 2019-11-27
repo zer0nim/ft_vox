@@ -81,7 +81,7 @@ void	GreedyChunk2::calcGreedyChunk() {
 			uint8_t u = (d + 1) % 3;  // direction + 1	example for x direction u = y direction
 			uint8_t v = (d + 2) % 3;  // direction + 2	example for x direction u = z direction
 
-			std::array<int8_t, 3> it = {0, 0, 0};  // vec3 iterator, x, y, z
+			std::array<int16_t, 3> it = {0, 0, 0};  // vec3 iterator, x, y, z
 			std::array<uint8_t, 3> dir = {0, 0, 0};  // vec3 direction, x, y, z
 			dir[d] = 1;
 
