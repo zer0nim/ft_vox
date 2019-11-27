@@ -157,7 +157,7 @@ void		getChunkNormal(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_SZ_Y][C
 				// create cavern 2/2
 				if ((cavern > MAP_CAVERN_START && cavern < MAP_CAVERN_END)) {
 					// there is cavern
-					cavernY1 = (PERLIN(x, y, z) + MAP_CAVERN_BASE_Y) * 0.5 + MAP_CAVERN_BASE_Y;
+					cavernY1 = (PERLIN(x, y, z) + MAP_CAVERN_BASE_Y) * 0.2 + MAP_CAVERN_BASE_Y;
 					cavernY2 = cavernY1 + (MAP_CAVERN_HEIGHT * 0.5 + (cavern - MAP_CAVERN_START) * 0.5);
 				}
 				data[ix][iy][iz] = _getBlockElevation(chunkPos.y + iy, y, biome, montainElevation, cavernY1, cavernY2,
