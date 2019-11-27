@@ -1,6 +1,7 @@
 #version 410 core
 
 #define MAX_TEXTURES 12
+#define NB_BLOCK_TYPES 8
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec2 aTexCoords;
@@ -19,7 +20,7 @@ struct	BlockTexture {
 	int	textureTop;
 	int	textureBottom;
 };
-uniform BlockTexture[5] blockTexturesInfo;
+uniform BlockTexture[NB_BLOCK_TYPES] blockTexturesInfo;
 uniform sampler2D[MAX_TEXTURES] blockTextures;
 
 uniform mat4 model;

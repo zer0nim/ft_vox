@@ -64,9 +64,11 @@ TextRender &textRender, ChunkManager &chunkManager) {
 
 	// projection matrix
 	float angle = cam.zoom;
-	float ratio = winU->width / winU->height;
+	float ratio = static_cast<float>(s.g.screen.width) / s.g.screen.height;
 	float nearD = 0.1f;
-	float farD = 300.0f;
+	float farD = std::max(
+		static_cast<int>(std::sqrt(std::pow(CHUNK_SZ_X * s.g.renderDist, 2) + std::pow(CHUNK_SZ_Z * s.g.renderDist, 2))),
+		200);
 	glm::mat4	projection = glm::perspective(glm::radians(angle), ratio, nearD, farD);
 
 	winU->cam->frustumCullingInit(angle, ratio, nearD, farD);
@@ -149,8 +151,6 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
 	winU->cam = cam;
 	winU->dtTime = 0.0f;
 	winU->lastFrame = 0.0f;
-	winU->width = s.g.screen.width;
-	winU->height = s.g.screen.height;
 	winU->showInfo = true;
 	winU->showHelp = true;
 	winU->freezeChunkUpdate = false;
@@ -200,6 +200,7 @@ int		main(int ac, char const **av) {
 
 	if (!init(&window, "ft_vox", &winU, &cam))
 		return (1);
+	std::cout << "[INFO]: window size " << s.g.screen.width << " * " << s.g.screen.height << std::endl;
 
 	try {
 		// load textures
@@ -222,6 +223,9 @@ int		main(int ac, char const **av) {
 
 		// run the game
 		gameLoop(window, cam, skybox, textRender, chunkManager);
+
+		// save and quit all chunks
+		chunkManager.saveAndQuit();
 	}
 	catch(const TextureManager::TextureManagerError& e) {
 		std::cerr << e.what() << std::endl;
@@ -239,7 +243,12 @@ int		main(int ac, char const **av) {
 		std::cerr << "TextRenderError: " << e.what() << std::endl;
 	}
 
+	glfwDestroyWindow(window);
+	glfwPollEvents();
+	glfwTerminate();
+
 	if (s.m.mapName != "") {  // if we have a map
+		std::cout << "[INFO]: saving..." << std::endl;
 		if (saveMap(cam))
 			std::cout << "[INFO]: settings saved" << std::endl;
 		else
@@ -247,9 +256,6 @@ int		main(int ac, char const **av) {
 	}
 
 	delete textureManager;
-	glfwDestroyWindow(window);
-	glfwPollEvents();
-	glfwTerminate();
 
 	return 0;
 }

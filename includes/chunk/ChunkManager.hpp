@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <deque>
 #include "ft_vox.hpp"
 #include "AChunk.hpp"
 #include "Camera.hpp"
@@ -17,8 +18,9 @@ class ChunkManager {
 		ChunkManager &operator=(ChunkManager const &rhs);
 
 		void	init(wordFVec3 camPos, glm::mat4 &projection);  // load the firsts chunks
-		void	update(wordFVec3 &camPos);  // global update (call each frame)
+		void	update(wordFVec3 &camPos, bool createAll = false);  // global update (call each frame)
 		void	draw(glm::mat4 view, Camera *cam);  // draw all chunks
+		void	saveAndQuit();  // save all chunks (if needed) and destroy them
 
 		tWinUser								*getWinU();
 		tWinUser								*getWinU() const;
@@ -27,6 +29,8 @@ class ChunkManager {
 		wordIVec3 const							&getChunkActPos() const;
 		TextureManager const					&getTextureManager() const;
 		glm::mat4 const							&getProjection() const;
+		uint32_t								getNbChunkLoaded() const;
+		uint32_t								getNbChunkRendered() const;
 
 		std::vector<std::string>				toDelete;  // list of chunks to delete
 
@@ -48,4 +52,7 @@ class ChunkManager {
 		wordIVec3						_chunkActPos;  // actual chunk position
 		TextureManager const			&_textureManager;
 		glm::mat4						_projection;
+		std::deque<wordIVec3>			_toCreate;  // list of chunks to create
+		uint32_t						_nbChunkLoaded;  // number of chunks loaded in memory
+		uint32_t						_nbChunkRendered;  // number of chunks rendered on screen
 };

@@ -10,15 +10,19 @@
 
 #define SETTINGS_FILE "assets/settings.json"
 
-#define MAX_MAP_SIZE_X 2^16  // [bloc] type: int
-#define MAX_MAP_SIZE_Y 64  // [bloc] type: int
+#define MAX_MAP_SIZE_X 16384  // [bloc] type: int
+#define MAX_MAP_SIZE_Y 256    // [bloc] type: int
 #define MAX_MAP_SIZE_Z MAX_MAP_SIZE_X  // [bloc] type: int
 
-#define CHUNK_SZ_X 16  // [bloc] type: int
-#define CHUNK_SZ_Y 64  // [bloc] type: int
-#define CHUNK_SZ_Z 16  // [bloc] type: int
+#define CHUNK_SZ_X 16   // [bloc] type: int
+#define CHUNK_SZ_Y 128  // [bloc] type: int
+#define CHUNK_SZ_Z 16   // [bloc] type: int
 
 #define MAX_Y_CHUNK				MAX_MAP_SIZE_Y / CHUNK_SZ_Y  // [chunk] type: int
+
+#define ENABLE_MAX_CREATED_CHUNK_UPDATE	true  // enable / disable option
+#define LOAD_ALL_BEFORE_OPEN_WINDOW		false
+#define MAX_CREATED_CHUNK_UPDATE_COUNT	5  // create max # chunks each update call (don't create all at the same update)
 
 class Chunk;
 class GreedyChunk;
@@ -27,15 +31,16 @@ class GreedyChunk;
 /*
 generation type
 */
-#define GENERATION_VOID		0
-#define GENERATION_NORMAL	1
+#define GENERATION_VOID				0
+#define GENERATION_FLAT_MAP			1
+#define GENERATION_NORMAL			2
 
 /*
 filesystem
 */
 #define CHUNK_EXTENSION ".chunk"
 
-typedef glm::tvec3<int8_t>	chunkVec3;  // used for chunk coordinate
+typedef glm::tvec3<uint8_t>	chunkVec3;  // used for chunk coordinate
 typedef glm::tvec3<int32_t>	wordIVec3;  // used for word coordinate in int (bloc)
 typedef glm::tvec3<float>	wordFVec3;  // user for word coordinate in float (camera)
 
@@ -52,8 +57,6 @@ typedef struct	sWinUser {
 	Camera		*cam;
 	float		dtTime;
 	float		lastFrame;
-	float		width;
-	float		height;
 
 	bool		showInfo;  // show info module (F3)
 	bool		showHelp;  // show help module (F3 + H)
@@ -120,6 +123,7 @@ struct Settings {
 		};
 		Files	files;
 		struct Screen {
+			bool		fullscreen;
 			uint32_t	width;
 			uint32_t	height;
 			uint32_t	fps;
@@ -143,6 +147,13 @@ struct Settings {
 			float		pitch;
 		};
 		CameraStartPos	cameraStartPos;
+
+		struct FlatMap {
+			uint32_t	fromY;  // included
+			uint32_t	toY;    // included
+			std::string	blockName;
+		};
+		std::vector<FlatMap>	flatMap;
 	};
 	Map m;  // map
 

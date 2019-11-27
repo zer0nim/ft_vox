@@ -117,13 +117,11 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 }
 
 void	mouseCb(GLFWwindow *window, double xPos, double yPos) {
-	tWinUser		*winU;
+	tWinUser		*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
 	static float	lastX = s.g.screen.width / 2.0;
 	static float	lastY = s.g.screen.height / 2.0;
 	float			xOffset;
 	float			yOffset;
-
-	winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
 
 	if (firstTwoCall) {
 		lastX = xPos;
@@ -147,8 +145,8 @@ void	frambuffResizeCb(GLFWwindow *window, int width, int height) {
 	tWinUser	*winU;
 
 	winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
-	winU->width = width;
-	winU->height = height;
+	s.g.screen.width = width;
+	s.g.screen.height = height;
 	glViewport(0, 0, width, height);
 }
 
@@ -167,7 +165,24 @@ bool	initWindow(GLFWwindow **window, const char *name, tWinUser *winU) {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 4);  // anti aliasing
 
-	*window = glfwCreateWindow(s.g.screen.width, s.g.screen.height, name, NULL, NULL);
+	GLFWmonitor *		monitor = nullptr;
+	monitor = glfwGetPrimaryMonitor();
+	const GLFWvidmode *	mode = glfwGetVideoMode(monitor);
+	glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+	glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+	glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+
+	if (s.g.screen.fullscreen) {
+		s.g.screen.width = mode->width;
+		s.g.screen.height = mode->height;
+	}
+	else {
+		monitor = nullptr;
+	}
+
+	// *window = glfwCreateWindow(s.g.screen.width, s.g.screen.height, name, monitor, NULL);
+	*window = glfwCreateWindow(s.g.screen.width, s.g.screen.height, name, monitor, NULL);
 	if (!(*window)) {
 		fprintf(stderr, "Fail to create glfw3 window\n");
 		glfwTerminate();

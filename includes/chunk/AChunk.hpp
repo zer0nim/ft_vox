@@ -28,7 +28,8 @@ class AChunk {
 		void			save();
 
 		AChunk::ChunkData const	&getData() const;
-		TextureManager const &getTextureManager() const;
+		TextureManager const	&getTextureManager() const;
+		bool					isModifiedFromBegining() const;
 
 		mutable bool	isDrawing;  // true if the chunk is actually in drawing process
 		mutable bool	isUpdating;  // true if the chunk is actually in updating process

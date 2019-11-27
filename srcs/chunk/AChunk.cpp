@@ -29,11 +29,7 @@ AChunk::AChunk(AChunk const &src)
 	*this = src;
 }
 
-AChunk::~AChunk() {
-	if (s.g.files.saveAllChunks || _isModifiedFromBegining) {  // if we need to save
-		save();
-	}
-}
+AChunk::~AChunk() {}
 
 AChunk &AChunk::operator=(AChunk const &rhs) {
 	if (this != &rhs) {
@@ -96,13 +92,7 @@ bool	AChunk::_createChunkFromFile() {
 }
 
 void	AChunk::_createChunk() {
-	for (uint8_t ix = 0; ix < CHUNK_SZ_X; ix++) {
-		for (uint8_t iy = 0; iy < CHUNK_SZ_Y; iy++) {
-			for (uint8_t iz = 0; iz < CHUNK_SZ_Z; iz++) {
-				_data.data[ix][iy][iz] = getBlock(_chunkPos, ix, iy, iz);
-			}
-		}
-	}
+	getChunk(_chunkPos, _data.data);
 }
 
 void	AChunk::createChunk(std::string const &chunkPos) {
@@ -162,4 +152,5 @@ void AChunk::save() {
 }
 
 AChunk::ChunkData const	&AChunk::getData() const { return _data; }
-TextureManager const &AChunk::getTextureManager() const { return _textureManager; }
+TextureManager const	&AChunk::getTextureManager() const { return _textureManager; }
+bool					AChunk::isModifiedFromBegining() const { return _isModifiedFromBegining; }

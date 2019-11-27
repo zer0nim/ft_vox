@@ -17,6 +17,7 @@ void	setDefaultSettings() {
 	s.g.files.chunkPath = "chunks/";
 	s.g.files.mapSettingsPath = "map_settings.json";
 	s.g.files.saveAllChunks = false;
+	s.g.screen.fullscreen = true;
 	s.g.screen.width = 1200;
 	s.g.screen.height = 800;
 	s.g.screen.fps = 120;
@@ -32,6 +33,9 @@ void	setDefaultSettings() {
 	s.m.cameraStartPos.yaw = -90;
 	s.m.cameraStartPos.pitch = 0;
 	s.m.mapName = "";
+	s.m.flatMap.push_back({0, 0, "bedrock"});
+	s.m.flatMap.push_back({1, 2, "stone"});
+	s.m.flatMap.push_back({3, 3, "grass"});
 }
 
 static void	loadSettingElementFont(nlohmann::json &element, std::string &key) {
@@ -54,6 +58,22 @@ static void	loadSettingElementFont(nlohmann::json &element, std::string &key) {
 		std::cout << "[WARN]: invalid argument or argument type in settings: " << key << ": " << element << std::endl;
 }
 
+static void	loadFlatMap(nlohmann::json &element) {
+	for (auto it = element.begin(); it != element.end(); ++it) {
+		try {
+			Settings::Map::FlatMap flatMapElem;
+			flatMapElem.fromY = it->at("fromY").get<uint32_t>();
+			flatMapElem.toY = it->at("toY").get<uint32_t>();
+			flatMapElem.blockName = it->at("blockName").get<std::string>();
+			s.m.flatMap.push_back(flatMapElem);
+		}
+		catch (std::exception & e) {
+			std::cerr << "[WARN]: flatMap need fromY, toY and blockName keys";
+			return;
+		}
+	}
+}
+
 static void	loadSettingElement(nlohmann::json &element, std::string key) {
 	if (element.is_number() && key == ".global.renderDist")
 		s.g.renderDist = element.get<uint32_t>();
@@ -65,6 +85,8 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		s.g.files.mapSettingsPath = element.get<std::string>();
 	else if (element.is_boolean() && key == ".global.files.saveAllChunks")
 		s.g.files.saveAllChunks = element.get<bool>();
+	else if (element.is_boolean() && key == ".global.screen.fullscreen")
+		s.g.screen.fullscreen = element.get<bool>();
 	else if (element.is_number() && key == ".global.screen.width")
 		s.g.screen.width = element.get<uint32_t>();
 	else if (element.is_number() && key == ".global.screen.height")
@@ -87,17 +109,25 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		s.m.cameraStartPos.pitch = element.get<float>();
 	else if (element.is_number() && key == ".map.seed")
 		s.m.seed = element.get<uint32_t>();
+	else if (element.is_array() && key == ".map.flatMap")
+		loadFlatMap(element);
 	else
 		std::cout << "[WARN]: invalid argument or argument type in settings: " << key << ": " << element << std::endl;
 }
 
 static void	loadSettingsJson(nlohmann::json &data, std::string startKey = "") {
+	bool	hasFlatMap = false;
 	for (auto it = data.begin(); it != data.end(); ++it) {
 		if (it->is_object()) {
 			loadSettingsJson(*it, startKey + "." + it.key());
 		}
 		else {
-			loadSettingElement(*it, startKey + "." + it.key());
+			std::string key = startKey + "." + it.key();
+			if (hasFlatMap == false && key == ".map.flatMap") {
+				hasFlatMap = true;
+				s.m.flatMap.clear();
+			}
+			loadSettingElement(*it, key);
 		}
 	}
 }
@@ -123,7 +153,7 @@ void	loadSettings(std::string settingFile) {
 		throw Settings::JsonParseException();
 	}
 	catch (std::exception &e) {
-		std::cerr << "unexpected exception in json loading" << std::endl;
+		std::cerr << "[ERROR]: unexpected exception in json loading" << std::endl;
 		throw Settings::JsonParseException();
 	}
 }
@@ -237,6 +267,11 @@ bool	saveMap(Camera &cam) {
 	}
 	catch (const nlohmann::json::parse_error& e) {}
 	catch (std::exception &e) {}
+	// create flatMapFiles
+	std::vector<nlohmann::json> flatMapElem;
+	for (auto it = s.m.flatMap.begin(); it != s.m.flatMap.end(); it++) {
+		flatMapElem.push_back({{"fromY", it->fromY}, {"toY", it->toY}, {"blockName", it->blockName}});
+	}
 	nlohmann::json	settings = {
 		{"map", {
 			{"seed", s.m.seed},
@@ -249,9 +284,14 @@ bool	saveMap(Camera &cam) {
 				}},
 			    {"yaw", cam.yaw},
 			    {"pitch", cam.pitch}
-			}}
+			}},
+			{"flatMap", flatMapElem}
 		}
 	}};
+	try {
+		lastSettings.erase("flatMap");
+	}
+	catch (nlohmann::detail::type_error & e) {}
 	lastSettings.merge_patch(settings);
 	std::ofstream settingsFile(settingsFilename);
 	if (settingsFile.fail()) {
@@ -281,9 +321,9 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 	}
 	counter++;
 
-	GLfloat lineSz = TEXT_SIZE_NORMAL * 1.2;
+	GLfloat lineSz = s.g.screen.text["normal"].size * 1.2;
 	GLfloat textX = 10;
-	GLfloat textY = winU->height - lineSz;
+	GLfloat textY = s.g.screen.height - lineSz;
 
 	// fps
 	std::string sFps = std::to_string(savedFps) + " fps";
@@ -307,8 +347,10 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 
 	// actual chunk
 	textY -= lineSz;
-	std::string sPosChunk = std::string("Chunk: ") + std::to_string(chunkManager.getChunkActPos().x) + " " +
-		std::to_string(chunkManager.getChunkActPos().y) + " " +std::to_string(chunkManager.getChunkActPos().z);
+	std::string sPosChunk = std::string("Chunk: ") + std::to_string(chunkManager.getChunkActPos().x) + " "
+		+ std::to_string(chunkManager.getChunkActPos().y) + " " +std::to_string(chunkManager.getChunkActPos().z)
+		+ " (" + std::to_string(chunkManager.getNbChunkRendered()) + " chunks rendered on "
+		+ std::to_string(chunkManager.getNbChunkLoaded()) + " loaded)";
 	textRender.write("normal", sPosChunk, textX, textY);
 
 	if (winU->freezeChunkUpdate) {

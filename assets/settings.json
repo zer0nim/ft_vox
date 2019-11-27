@@ -8,6 +8,7 @@
 			"saveAllChunks": false
 		},
 		"screen": {
+			"fullscreen": false,
 			"width": 1200,
 			"height": 800,
 			"fps": 120,
@@ -25,7 +26,7 @@
 	},
 	"map": {
 		"seed": 0,
-		"generationType": 1,
+		"generationType": 2,
 		"cameraStartPos": {
 			"pos": {
 				"x": 0,
@@ -34,6 +35,23 @@
 			},
 			"yaw": -90,
 			"pitch": 0
-		}
+		},
+		"flatMap": [
+			{
+				"fromY": 0,
+				"toY": 0,
+				"blockName": "bedrock"
+			},
+			{
+				"fromY": 1,
+				"toY": 2,
+				"blockName": "stone"
+			},
+			{
+				"fromY": 3,
+				"toY": 3,
+				"blockName": "grass"
+			}
+		]
 	}
 }
