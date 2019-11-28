@@ -77,11 +77,12 @@ define PRE_COMMIT
 
 git stash -q --keep-index
 
-make check -j8 || true
+make check -j8
+lol=$$?
 
 git stash pop -q
 
-exit 0
+exit $${lol}
 endef
 export PRE_COMMIT
 
