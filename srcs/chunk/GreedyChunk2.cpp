@@ -55,37 +55,65 @@ GreedyChunk2::VoxFace	*GreedyChunk2::getVoxFace(chunkVec3 const pos, Direction c
 	return voxFace;
 }
 
+/*
+	generate faces by merging consecutive identicals blocks
+*/
 void	GreedyChunk2::calcGreedyChunk() {
-	/*
-		mask, this will contain the groups of matching voxel faces
-		as we proceed through the chunk in 6 directions
-		once for each face.
-	*/
+	chunkVec3 chunkSz = {CHUNK_SZ_X, CHUNK_SZ_Y, CHUNK_SZ_Z};
+
 	std::array<VoxFace *, CHUNK_SZ_Y * CHUNK_SZ_X>	mask = { nullptr };
+	/*
+		the greedy chunk algorithm work with a mask.
+		the mask will contain the faces position, size, and type for the current
+		working direction.
 
-	std::array<uint8_t, 3> dims = {CHUNK_SZ_X, CHUNK_SZ_Y, CHUNK_SZ_Z};
-	uint8_t i, j, k;  // pos
-	uint8_t l, w, h;  // size
-	Direction	side = Direction::BOTTOM;
-	VoxFace	*a = nullptr;
-	VoxFace	*b = nullptr;
+		example with chunk size { 3, 3, 3 }:
+
+		chunk content:
+		(number define block type, 0 mean empty block)
+								|	2  2  0
+								|	 2  2  0
+		    7 Y-axis			|	  0  0  0
+		   /					|
+		  /						|	2  2  0
+		 /						|	 2  2  0
+		+- - - - - - > X-axis	|	  0  0  0
+		 \						|
+		  \						|	2  2  0
+		   \					|	 2  2  0
+		    v Z-axis			|	  1  0  0
+
+
+		example of mask usage when working on the LEFTS faces:
+		d == 0 (x),   u == 1 (y),   v == 2 (z)
+
+					u (y)
+				- - - - >
+		mask = {2, 2, 2,	|
+				2, 2, 2,	|	v (z)
+				1, 0, 0}	v
+
+		that means with have two faces stored in this mask:
+			{ type: 2, width: 3, height: 2, pos: { 0(d), 0(u), 0(v) } }
+		and
+			{ type: 1, width: 1, height: 1, pos: { 0(d), 0(u), 2(v) } }
+	*/
 
 	/*
-		This loop runs twice, and the inner loop 3 times - totally 6 iterations
-		one for each voxel face.
-		backFace is equal to true on the first loop and false on the second
+		flip flop loop, run twice:
+		1st loop: backFace == true, 2nd loop backFace == false
+
+		The inner loop 3 times, totally 6 iterations, one for each voxel face.
 	*/
-	for (bool backFace = true, b2 = false; b2 != backFace; backFace = backFace && b2, b2 = !b2) {
+	bool backFace = true;
+	for (uint8_t i = 0; i < 2; ++i, backFace = !backFace) {
 		// loop over 3-axes
 		for (uint8_t d = 0; d < 3; ++d) {
-			uint8_t u = (d + 1) % 3;  // direction + 1	example for x direction u = y direction
-			uint8_t v = (d + 2) % 3;  // direction + 2	example for x direction u = z direction
+			uint8_t u = (d + 1) % 3;  // d+1, if d == 0(x)  =>  u == 1(y)
+			uint8_t v = (d + 2) % 3;  // d+2, if d == 0(x)  =>  v == 2(z)
 
-			std::array<int16_t, 3> it = {0, 0, 0};  // vec3 iterator, x, y, z
-			std::array<uint8_t, 3> dir = {0, 0, 0};  // vec3 direction, x, y, z
-			dir[d] = 1;
-
-			// keep track of the side
+			// get the side we are currently working on
+			Direction	side = Direction::BOTTOM;
 			if (d == 0) {
 				side = backFace ? Direction::LEFT : Direction::RIGHT;
 			}
@@ -96,21 +124,29 @@ void	GreedyChunk2::calcGreedyChunk() {
 				side = backFace ? Direction::BACK : Direction::FRONT;
 			}
 
+			// one iterator per dimension
+			std::array<int16_t, 3> it = {0, 0, 0};
+
 			// iterate through the dimension from front to back
-			for (it[d] = -1; it[d] < dims[d]; ++(it[d])) {
-				// compute the mask ___________________________________________
-				int n = 0;
-				for (it[v] = 0; it[v] < dims[v]; ++(it[v])) {
-					for (it[u] = 0; it[u] < dims[u]; ++(it[u]), ++n) {
+			for (it[d] = -1; it[d] < chunkSz[d]; ++(it[d])) {
+				// compute the mask ___________________________
+				int n = 0;  // mask iterator
+				for (it[v] = 0; it[v] < chunkSz[v]; ++it[v]) {
+					for (it[u] = 0; it[u] < chunkSz[u]; ++it[u], ++n) {
+						chunkVec3 voxPos = {it[0], it[1], it[2]};
+
 						// get curent block
-						a = (it[d] >= 0)
-							? getVoxFace(chunkVec3{ it[0], it[1], it[2] }, side)
-							: nullptr;
-						// get next block
-						b = (it[d] < dims[d] - 1)
-							? getVoxFace(chunkVec3{ it[0] + dir[0], it[1] + dir[1], it[2] + dir[2] }, side)
+						VoxFace	*a = (it[d] >= 0)
+							? getVoxFace(voxPos, side)
 							: nullptr;
 
+						// get next block
+						voxPos[d] += 1;  // next block
+						VoxFace	*b = (it[d] < chunkSz[d] - 1)
+							? getVoxFace(voxPos, side)
+							: nullptr;
+
+						// fill the mask
 						if (a != nullptr && b != nullptr && *a == *b) {
 							mask[n] = nullptr;
 						}
@@ -125,22 +161,23 @@ void	GreedyChunk2::calcGreedyChunk() {
 					}
 				}
 
-				// generate the mesh from the mask ____________________________
-
+				// generate the mesh from the mask ____________
 				n = 0;
-				for (j = 0; j < dims[v]; ++j) {
-					for (i = 0; i < dims[u];) {
+				for (uint8_t j = 0; j < chunkSz[v]; ++j) {
+					for (uint8_t i = 0; i < chunkSz[u];) {
 						if (mask[n] != nullptr) {
+							uint8_t w, h;  // face size
+
 							// compute the width
-							for (w = 1; i + w < dims[u] && mask[n + w] != nullptr && \
+							for (w = 1; i + w < chunkSz[u] && mask[n + w] != nullptr && \
 							*(mask[n + w]) == *(mask[n]); ++w) {}
 
 							// compute the height
 							bool done = false;
-							for (h = 1; j + h < dims[v]; ++h) {
-								for (k = 0; k < w; ++k) {
-									if (mask[n + k + h * dims[u]] == nullptr || \
-										*(mask[n + k + h * dims[u]]) != *(mask[n])) {
+							for (h = 1; j + h < chunkSz[v]; ++h) {
+								for (uint8_t k = 0; k < w; ++k) {
+									if (mask[n + k + h * chunkSz[u]] == nullptr || \
+										*(mask[n + k + h * chunkSz[u]]) != *(mask[n])) {
 										done = true;
 										break;
 									}
@@ -166,6 +203,7 @@ void	GreedyChunk2::calcGreedyChunk() {
 
 								++it[d];  // increment curent direction to get correct position
 
+								// create and save the face
 								Quad	quad;
 								quad.voxFace = *(mask[n]);
 								quad.width = (d != 2) ? h : w;
@@ -190,11 +228,11 @@ void	GreedyChunk2::calcGreedyChunk() {
 							}
 
 							// zero out the mask
-							for (l = 0; l < h; ++l) {
-								for (k = 0; k < w; ++k) {
-									if (mask[n + k + l * dims[u]] != nullptr) {
-										delete mask[n + k + l * dims[u]];
-										mask[n + k + l * dims[u]] = nullptr;
+							for (uint8_t l = 0; l < h; ++l) {
+								for (uint8_t k = 0; k < w; ++k) {
+									if (mask[n + k + l * chunkSz[u]] != nullptr) {
+										delete mask[n + k + l * chunkSz[u]];
+										mask[n + k + l * chunkSz[u]] = nullptr;
 									}
 								}
 							}
@@ -214,6 +252,16 @@ void	GreedyChunk2::calcGreedyChunk() {
 	}
 }
 
+void	GreedyChunk2::update() {
+	if (_data.isModified == false)
+		return;  // GreedyChunk2 not modified -> don't update it
+	_data.isModified = false;
+
+	// update mesh
+	calcGreedyChunk();
+	_meshUpdated = true;
+}
+
 void	GreedyChunk2::fillVectLine(std::vector<float> &vertices, int & i, \
 chunkVec3 const &pos, glm::tvec2<int8_t> textUv, Quad const &q) {
 	// std::cout << "pos: " << glm::to_string(pos) << std::endl;
@@ -229,16 +277,6 @@ chunkVec3 const &pos, glm::tvec2<int8_t> textUv, Quad const &q) {
 	vertices[++i] = static_cast<float>(q.voxFace.side);
 	// blockId
 	vertices[++i] = static_cast<float>(q.voxFace.type - 1);
-}
-
-void	GreedyChunk2::update() {
-	if (_data.isModified == false)
-		return;  // GreedyChunk2 not modified -> don't update it
-	_data.isModified = false;
-
-	// update mesh
-	calcGreedyChunk();
-	_meshUpdated = true;
 }
 
 void	GreedyChunk2::sendMeshData() {
