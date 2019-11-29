@@ -95,15 +95,12 @@ void	AChunk::_createChunk() {
 	getChunk(_chunkPos, _data.data);
 }
 
-void	AChunk::createChunk(std::string const &chunkPos) {
-	createChunk(stringToVec(chunkPos));
-}
 void	AChunk::createChunk(wordIVec3 const &chunkPos) {
 	bool normalLoad = true;
 
 	_chunkPos = chunkPos;
 	if (s.m.mapName != "") {  // if there is a map
-		_filename = s.m.fullMapName + "/" + s.g.files.chunkPath + vecToString(chunkPos) + CHUNK_EXTENSION;
+		_filename = s.m.fullMapName + "/" + s.g.files.chunkPath + glm::to_string(chunkPos) + CHUNK_EXTENSION;
 		if (boost::filesystem::is_regular_file(_filename)) {
 			normalLoad = false;
 			if (_createChunkFromFile() == false) {

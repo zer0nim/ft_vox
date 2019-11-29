@@ -1,28 +1,6 @@
 #include <unistd.h>
-#include <sstream>
 #include <vector>
 #include "ChunkManager.hpp"
-
-std::string vecToString(const wordIVec3 &vec) {
-	std::string res;
-	res += std::to_string(vec.x) + "_";
-	res += std::to_string(vec.y) + "_";
-	res += std::to_string(vec.z);
-	return res;
-}
-
-wordIVec3 stringToVec(const std::string &s) {
-    wordIVec3 vec;
-    std::stringstream ss(s);
-    std::string number;
-    std::getline(ss, number, '_');
-	vec.x = std::stoi(number);
-    std::getline(ss, number, '_');
-	vec.y = std::stoi(number);
-    std::getline(ss, number, '_');
-	vec.z = std::stoi(number);
-    return vec;
-}
 
 ChunkManager::ChunkManager(TextureManager const &textureManager, tWinUser *winU) :
 toDelete(),
@@ -40,7 +18,7 @@ _textureManager(src.getTextureManager()) {
 }
 
 ChunkManager::~ChunkManager() {
-	std::vector<std::string> toDelete;
+	std::vector<wordIVec3> toDelete;
 
 	// update all chunks
 	for (auto it = _chunkMap.begin(); it != _chunkMap.end(); it++) {
@@ -103,7 +81,7 @@ void ChunkManager::update(wordFVec3 &camPos, bool createAll) {
 		if (_isChunkExist(chunkPos) == false) {  // if the chunk doesnt exist (for now)
 			newChunk = instanciateNewChunk(_textureManager, _projection);  // create a chunk with the rihgt type
 			newChunk->createChunk(chunkPos);  // init the chunk with the right values
-			_insertChunk(chunkPos, newChunk);
+			_chunkMap[chunkPos] = newChunk;
 		}
 		if (ENABLE_MAX_CREATED_CHUNK_UPDATE && createAll == false)
 			i++;
@@ -113,7 +91,7 @@ void ChunkManager::update(wordFVec3 &camPos, bool createAll) {
 	uint32_t	chunkLoaded = 0;
 	for (auto it = _chunkMap.begin(); it != _chunkMap.end(); it++) {
 		chunkLoaded++;
-		if (_isInChunkLoaded(stringToVec(it->first))) {
+		if (_isInChunkLoaded(it->first)) {
 			while (it->second->isDrawing) {
 				usleep(10);
 			}
@@ -141,9 +119,10 @@ void ChunkManager::draw(glm::mat4 view, Camera *cam) {
 			for (int32_t y = 0; y < CHUNK_SZ_Y * MAX_Y_CHUNK; y += CHUNK_SZ_Y) {
 				wordIVec3 chunkPos(x, y, z);  // this is the position of the chunk
 				if (_isChunkExist(chunkPos)) {  // if the chunk exist
-					if (FRCL_IS_INSIDE(cam->frustumCullingCheckCube(chunkPos, chunkSize))) {  // if inside the camera
-						chunkRendered++;
-						_chunkMap[vecToString(chunkPos)]->draw(view);
+					// if inside the camera
+					if (FRCL_IS_INSIDE(cam->frustumCullingCheckCube(chunkPos, chunkSize))) {
+						++chunkRendered;
+						_chunkMap[chunkPos]->draw(view);
 					}
 				}
 			}
@@ -174,10 +153,6 @@ void ChunkManager::_updateChunkPos(wordIVec3 const &pos) {
 	_chunkActPos.z = pos.z - pos.z % CHUNK_SZ_Z + ((pos.z < 0) ? -CHUNK_SZ_Z : 0);
 }
 
-void	ChunkManager::_insertChunk(wordIVec3 chunkPos, AChunk * newChunk) {
-	_chunkMap.insert(std::pair<std::string, AChunk*>(vecToString(chunkPos), newChunk));
-}
-
 bool	ChunkManager::_isInChunkLoaded(wordIVec3 const &chunkPos) const {
 	if (chunkPos.x <= _chunkActPos.x - s.g.renderDist * CHUNK_SZ_X
 	|| chunkPos.x >= _chunkActPos.x + s.g.renderDist * CHUNK_SZ_X
@@ -187,17 +162,14 @@ bool	ChunkManager::_isInChunkLoaded(wordIVec3 const &chunkPos) const {
 	return true;
 }
 
-bool	ChunkManager::_isChunkExist(std::string const &chunkPos) const {
-	return _chunkMap.find(chunkPos) != _chunkMap.end();
-}
 bool	ChunkManager::_isChunkExist(wordIVec3 const &chunkPos) const {
-	return _isChunkExist(vecToString(chunkPos));
+	return _chunkMap.find(chunkPos) != _chunkMap.end();
 }
 
 tWinUser								*ChunkManager::getWinU() { return _winU; }
 tWinUser								*ChunkManager::getWinU() const { return _winU; }
-std::map<std::string, AChunk*>			&ChunkManager::getChunkMap() { return _chunkMap; }
-std::map<std::string, AChunk*> const	&ChunkManager::getChunkMap() const { return _chunkMap; }
+std::map<wordIVec3, AChunk*>			&ChunkManager::getChunkMap() { return _chunkMap; }
+std::map<wordIVec3, AChunk*> const	&ChunkManager::getChunkMap() const { return _chunkMap; }
 wordIVec3 const							&ChunkManager::getChunkActPos() const { return _chunkActPos; }
 TextureManager const					&ChunkManager::getTextureManager() const { return _textureManager; };
 glm::mat4 const							&ChunkManager::getProjection() const { return _projection; };
