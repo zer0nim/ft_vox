@@ -30,8 +30,8 @@ class AChunk {
 		TextureManager const	&getTextureManager() const;
 		bool					isModifiedFromBegining() const;
 
-		mutable bool	isDrawing;  // true if the chunk is actually in drawing process
-		mutable bool	isUpdating;  // true if the chunk is actually in updating process
+		bool	isDrawing;  // true if the chunk is actually in drawing process
+		bool	isUpdating;  // true if the chunk is actually in updating process
 
 	protected:
 		virtual void	_draw(glm::mat4 &view) = 0;
