@@ -81,8 +81,9 @@ TextRender &textRender, ChunkManager &chunkManager) {
 	pthread_t threadUpdate;
 	int rc = pthread_create(&threadUpdate, NULL, threadUpdateFunction, reinterpret_cast<void*>(threadUpdateArgs));
 	if (rc) {
-         std::cout << "Error: unable to create thread," << rc << std::endl;
-         return;
+		std::cout << "Error: unable to create thread," << rc << std::endl;
+		delete threadUpdateArgs;
+		return;
 	}
 
 	glClearColor(0.11373f, 0.17647f, 0.27059f, 1.0f);
@@ -145,6 +146,8 @@ TextRender &textRender, ChunkManager &chunkManager) {
 		}
 		firstLoop = false;
 	}
+	pthread_join(threadUpdate, NULL);  // waiting for the thread to finish
+	delete threadUpdateArgs;
 }
 
 bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
