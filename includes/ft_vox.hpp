@@ -22,12 +22,16 @@
 
 #define ENABLE_MAX_CREATED_CHUNK_UPDATE	true  // enable / disable option
 #define LOAD_ALL_BEFORE_OPEN_WINDOW		false
-#define MAX_CREATED_CHUNK_UPDATE_COUNT	5  // create max # chunks each update call (don't create all at the same update)
+#define MAX_CREATED_CHUNK_UPDATE_COUNT	6  // create max # chunks each update call (don't create all at the same update)
 
-class Chunk;
-class GreedyChunk;
-class GreedyChunk2;
-class GreedyChunk3;
+#define NB_UPDATE_THREADS				15
+
+/*
+Chunk
+GreedyChunk
+GreedyChunk2
+GreedyChunk3
+*/
 #define CHUNK_OBJECT			GreedyChunk2  // the chunk object used
 
 /*
@@ -185,6 +189,12 @@ struct Settings {
 				return ("Failed to parse json texture settings");
 			}
 	};
+
+	/* global variables */
+	std::mutex	mutexChunkMap;
+	std::mutex	mutexToCreate;
+	std::mutex	mutexToDelete;
+	std::mutex	mutexOthers;
 };
 
 extern Settings s;

@@ -27,10 +27,12 @@ void	*threadUpdateFunction(void *args_) {
 		if (args->deleteLocker.isLocked == false) {  // thread is unlocked
 			// update
 			if (winU->freezeChunkUpdate == false) {
-				args->chunkManager.update(args->camPos);
-				if (args->chunkManager.toDelete.size() > 0) {  // auto lock
-					args->deleteLocker.ask = true;
-					continue;
+				args->chunkManager.update(args->camPos, args->threadID);
+			    { std::lock_guard<std::mutex>	guard(s.mutexToDelete);
+					if (args->chunkManager.toDelete.size() > 0) {  // auto lock
+						args->deleteLocker.ask = true;
+						continue;
+					}
 				}
 			}
 		}
@@ -64,7 +66,14 @@ TextRender &textRender, ChunkManager &chunkManager) {
 	int							lastFps = 0;
 	tWinUser					*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
 	bool						firstLoop = true;
-	ThreadupdateArgs			*threadUpdateArgs = new ThreadupdateArgs(0, window, chunkManager, winU->cam->pos);
+
+	/* threading */
+	std::array<ThreadupdateArgs *, NB_UPDATE_THREADS>	threadUpdateArgs;
+	std::array<pthread_t, NB_UPDATE_THREADS>			threadUpdate;
+
+	for (uint8_t i = 0; i < NB_UPDATE_THREADS; i++) {
+		threadUpdateArgs[i] = new ThreadupdateArgs(i, window, chunkManager, winU->cam->pos);
+	}
 
 	// projection matrix
 	float angle = cam.zoom;
@@ -82,12 +91,12 @@ TextRender &textRender, ChunkManager &chunkManager) {
 	skybox.getShader().use();
 	skybox.getShader().setMat4("projection", projection);
 
-	pthread_t threadUpdate;
-	int rc = pthread_create(&threadUpdate, NULL, threadUpdateFunction, reinterpret_cast<void*>(threadUpdateArgs));
-	if (rc) {
-		std::cout << "Error: unable to create thread," << rc << std::endl;
-		delete threadUpdateArgs;
-		return;
+	for (uint8_t i = 0; i < NB_UPDATE_THREADS; i++) {
+		int rc = pthread_create(&(threadUpdate[i]), NULL, threadUpdateFunction, reinterpret_cast<void*>(threadUpdateArgs[i]));
+		if (rc) {
+			std::cout << "Error: unable to create thread," << rc << std::endl;
+			return;
+		}
 	}
 
 	glClearColor(0.11373f, 0.17647f, 0.27059f, 1.0f);
@@ -122,17 +131,33 @@ TextRender &textRender, ChunkManager &chunkManager) {
 		checkError();
 
 		// delete chunks if needed
-		if (chunkManager.toDelete.size() > 0)
-			threadUpdateArgs->deleteLocker.ask = true;  // ask update thread to lock
-
-		if (threadUpdateArgs->deleteLocker.isLocked) {  // when the other thread is locked
-			// delete all old chunks
-			for (auto it = chunkManager.toDelete.begin(); it != chunkManager.toDelete.end(); it++) {
-				delete chunkManager.getChunkMap()[*it];
-				chunkManager.getChunkMap().erase(*it);
+	    { std::lock_guard<std::mutex>	guard(s.mutexToDelete);
+			if (chunkManager.toDelete.size() > 0) {
+				for (uint8_t i = 0; i < NB_UPDATE_THREADS; i++) {
+					threadUpdateArgs[i]->deleteLocker.ask = true;  // ask update thread to lock
+				}
 			}
-			chunkManager.toDelete.clear();
-			threadUpdateArgs->deleteLocker.ask = false;
+		}
+
+		bool	allLocked = true;
+		for (uint8_t i = 0; i < NB_UPDATE_THREADS; i++) {
+			if (threadUpdateArgs[i]->deleteLocker.isLocked == false) {
+				allLocked = false;
+				break;
+			}
+		}
+		if (allLocked) {  // when the other thread is locked
+			// delete all old chunks
+		    { std::lock_guard<std::mutex>	guard(s.mutexToDelete);
+				for (auto it = chunkManager.toDelete.begin(); it != chunkManager.toDelete.end(); it++) {
+					delete chunkManager.getChunkMap()[*it];
+					chunkManager.getChunkMap().erase(*it);
+				}
+				chunkManager.toDelete.clear();
+			}
+			for (uint8_t i = 0; i < NB_UPDATE_THREADS; i++) {
+				threadUpdateArgs[i]->deleteLocker.ask = false;
+			}
 		}
 
 		// fps
@@ -154,9 +179,15 @@ TextRender &textRender, ChunkManager &chunkManager) {
 		firstLoop = false;
 	}
 
-	threadUpdateArgs->quit = true;
-	pthread_join(threadUpdate, NULL);
-	delete threadUpdateArgs;
+	for (uint8_t i = 0; i < NB_UPDATE_THREADS; i++) {
+		threadUpdateArgs[i]->quit = true;
+	}
+	for (uint8_t i = 0; i < NB_UPDATE_THREADS; i++) {
+		pthread_join(threadUpdate[i], NULL);
+	}
+	for (uint8_t i = 0; i < NB_UPDATE_THREADS; i++) {
+		delete threadUpdateArgs[i];
+	}
 
 	#if DEBUG_SHOW_FPS
 		std::cout << "ENDFPS" << std::endl;

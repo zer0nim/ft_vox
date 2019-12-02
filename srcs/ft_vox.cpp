@@ -347,10 +347,13 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 
 	// actual chunk
 	textY -= lineSz;
-	std::string sPosChunk = std::string("Chunk: ") + std::to_string(chunkManager.getChunkActPos().x) + " "
-		+ std::to_string(chunkManager.getChunkActPos().y) + " " +std::to_string(chunkManager.getChunkActPos().z)
-		+ " (" + std::to_string(chunkManager.getNbChunkRendered()) + " chunks rendered on "
-		+ std::to_string(chunkManager.getNbChunkLoaded()) + " loaded)";
+	std::string sPosChunk;
+    { std::lock_guard<std::mutex>	guard(s.mutexOthers);
+		sPosChunk = std::string("Chunk: ") + std::to_string(chunkManager.getChunkActPos().x) + " "
+			+ std::to_string(chunkManager.getChunkActPos().y) + " " +std::to_string(chunkManager.getChunkActPos().z)
+			+ " (" + std::to_string(chunkManager.getNbChunkRendered()) + " chunks rendered on "
+			+ std::to_string(chunkManager.getNbChunkLoaded()) + " loaded)";
+	}
 	textRender.write("normal", sPosChunk, textX, textY);
 
 	if (winU->freezeChunkUpdate) {
