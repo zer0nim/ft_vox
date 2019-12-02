@@ -28,7 +28,8 @@ class GreedyChunk3 : public AChunk {
 			Shader		*greedyShader;
 
 			ShaderData() {
-				greedyShader = new Shader("shaders/greedyChunk3_vs.glsl", "shaders/naive_fs.glsl");
+				greedyShader = new Shader("shaders/greedyChunk3_vs.glsl", \
+				"shaders/naive_fs.glsl", "shaders/greedyChunk3_gs.glsl");
 			}
 			~ShaderData() {
 				delete greedyShader;
