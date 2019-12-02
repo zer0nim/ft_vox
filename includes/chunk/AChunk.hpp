@@ -20,10 +20,9 @@ class AChunk {
 
 		AChunk &operator=(AChunk const &rhs);
 
-		virtual void	draw(glm::mat4 &view) const;
+		virtual void	draw(glm::mat4 &view);
 		virtual void	update() = 0;
 		void			createChunk(wordIVec3 const &chunkPos);
-		void			createChunk(std::string const &chunkPos);
 		void			updateBlock(chunkVec3 pos, uint8_t value);
 		void			save();
 
@@ -31,11 +30,11 @@ class AChunk {
 		TextureManager const	&getTextureManager() const;
 		bool					isModifiedFromBegining() const;
 
-		mutable bool	isDrawing;  // true if the chunk is actually in drawing process
-		mutable bool	isUpdating;  // true if the chunk is actually in updating process
+		bool	isDrawing;  // true if the chunk is actually in drawing process
+		bool	isUpdating;  // true if the chunk is actually in updating process
 
 	protected:
-		virtual void	_draw(glm::mat4 &view) const = 0;
+		virtual void	_draw(glm::mat4 &view) = 0;
 		bool			_createChunkFromFile();
 		virtual void	_createChunk();
 

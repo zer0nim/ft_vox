@@ -21,7 +21,7 @@ class GreedyChunk : public AChunk {
 		virtual void	update();
 
 	protected:
-		virtual void	_draw(glm::mat4 &view) const;
+		virtual void	_draw(glm::mat4 &view);
 
 	private:
 		void	sendCubeData();
@@ -54,7 +54,6 @@ class GreedyChunk : public AChunk {
 
 		static const float	_cubeData[];
 		static std::unique_ptr<ShaderData>	_shaderData;
-		// static bool	_processedVox[CHUNK_SZ_X][CHUNK_SZ_Y][CHUNK_SZ_Z];
 		static std::array< std::array< std::array<bool, CHUNK_SZ_Z>, CHUNK_SZ_Y >, \
 			CHUNK_SZ_X >	_processedVox;
 };
