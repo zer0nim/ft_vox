@@ -78,14 +78,15 @@ struct Locker {
 
 class ChunkManager;
 struct ThreadupdateArgs {
+	uint8_t			threadID;
 	GLFWwindow		*window;
 	ChunkManager	&chunkManager;
 	wordFVec3		&camPos;
 	bool			quit;
 	Locker			deleteLocker;  // lock thread to delete chunks safely
 
-	ThreadupdateArgs(GLFWwindow *window_, ChunkManager &chunkManager_, wordFVec3 &camPos_) :
-	window(window_), chunkManager(chunkManager_), camPos(camPos_), quit(false) {}
+	ThreadupdateArgs(uint8_t id, GLFWwindow *window_, ChunkManager &chunkManager_, wordFVec3 &camPos_) :
+	threadID(id), window(window_), chunkManager(chunkManager_), camPos(camPos_), quit(false) {}
 };
 
 bool	initWindow(GLFWwindow **window, const char *name, tWinUser *winU);

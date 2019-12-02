@@ -19,7 +19,7 @@ void	*threadUpdateFunction(void *args_) {
 	tWinUser					*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(args->window));
 	bool						firstLoop = true;
 
-	while (!glfwWindowShouldClose(args->window)) {
+	while (!args->quit) {
 		time_start = getMs();
 
 		args->deleteLocker.isLocked = args->deleteLocker.ask;
@@ -46,6 +46,10 @@ void	*threadUpdateFunction(void *args_) {
 		else {
 			usleep((loopTime - time_loop.count()) * 1000);
 		}
+		#if DEBUG_SHOW_FPS_ALLTHREAD
+			std::cout << "FPS: |update" << static_cast<int>(args->threadID) << "| " << getMs().count() << " | "
+				<< (getMs() - time_start).count() << std::endl;
+		#endif
 		firstLoop = false;
 	}
 	args->quit = true;
@@ -60,7 +64,7 @@ TextRender &textRender, ChunkManager &chunkManager) {
 	int							lastFps = 0;
 	tWinUser					*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
 	bool						firstLoop = true;
-	ThreadupdateArgs			*threadUpdateArgs = new ThreadupdateArgs(window, chunkManager, winU->cam->pos);
+	ThreadupdateArgs			*threadUpdateArgs = new ThreadupdateArgs(0, window, chunkManager, winU->cam->pos);
 
 	// projection matrix
 	float angle = cam.zoom;
@@ -87,7 +91,7 @@ TextRender &textRender, ChunkManager &chunkManager) {
 
 	glClearColor(0.11373f, 0.17647f, 0.27059f, 1.0f);
 	checkError();
-	while (!threadUpdateArgs->quit) {
+	while (!glfwWindowShouldClose(window)) {
 		time_start = getMs();
 
 		processInput(window);
@@ -143,8 +147,19 @@ TextRender &textRender, ChunkManager &chunkManager) {
 			lastFps = s.g.screen.fps;
 			usleep((loopTime - time_loop.count()) * 1000);
 		}
+		#if DEBUG_SHOW_FPS
+			std::cout << "FPS: |main| " << getMs().count() << " | " << (getMs() - time_start).count() << std::endl;
+		#endif
 		firstLoop = false;
 	}
+
+	threadUpdateArgs->quit = true;
+	pthread_join(threadUpdate, NULL);
+	delete threadUpdateArgs;
+
+	#if DEBUG_SHOW_FPS
+		std::cout << "ENDFPS" << std::endl;
+	#endif
 }
 
 bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
