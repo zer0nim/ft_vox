@@ -26,7 +26,9 @@
 
 class Chunk;
 class GreedyChunk;
-#define CHUNK_OBJECT			GreedyChunk2  // the chunk object used
+class GreedyChunk2;
+class GreedyChunk3;
+#define CHUNK_OBJECT			GreedyChunk3  // the chunk object used
 
 /*
 generation type

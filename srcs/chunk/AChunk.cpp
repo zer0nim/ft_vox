@@ -6,6 +6,7 @@
 #include "Chunk.hpp"
 #include "GreedyChunk.hpp"
 #include "GreedyChunk2.hpp"
+#include "GreedyChunk3.hpp"
 #include "ChunkManager.hpp"
 #include "MapGenerator.hpp"
 
