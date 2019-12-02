@@ -22,7 +22,7 @@
 
 #define ENABLE_MAX_CREATED_CHUNK_UPDATE	true  // enable / disable option
 #define LOAD_ALL_BEFORE_OPEN_WINDOW		false
-#define MAX_CREATED_CHUNK_UPDATE_COUNT	6  // create max # chunks each update call (don't create all at the same update)
+#define MAX_CREATED_CHUNK_UPDATE_COUNT	4  // create max # chunks each update call (don't create all at the same update)
 
 #define NB_UPDATE_THREADS				15
 
@@ -32,7 +32,7 @@ GreedyChunk
 GreedyChunk2
 GreedyChunk3
 */
-#define CHUNK_OBJECT			GreedyChunk2  // the chunk object used
+#define CHUNK_OBJECT			GreedyChunk3  // the chunk object used
 
 /*
 generation type

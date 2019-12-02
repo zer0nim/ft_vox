@@ -70,7 +70,7 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 			startX += (threadID - startID) * CHUNK_SZ_X;
 		}
 		for (int32_t x = startX;
-		x < _chunkActPos.x + CHUNK_SZ_X * s.g.renderDist; x += CHUNK_SZ_X) {
+		x < _chunkActPos.x + CHUNK_SZ_X * s.g.renderDist; x += CHUNK_SZ_X * NB_UPDATE_THREADS) {
 			for (int32_t z = _chunkActPos.z - CHUNK_SZ_Z * (s.g.renderDist - 1);
 			z < _chunkActPos.z + CHUNK_SZ_Z * s.g.renderDist; z += CHUNK_SZ_Z) {
 				for (int32_t y = 0; y < CHUNK_SZ_Y * MAX_Y_CHUNK; y += CHUNK_SZ_Y) {
