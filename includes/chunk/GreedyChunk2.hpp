@@ -73,7 +73,6 @@ class GreedyChunk2 : public AChunk {
 		std::vector<Quad>		_quads;
 		int						_nbVertices;
 
-		static const float	_cubeData[];
 		static std::unique_ptr<ShaderData>	_shaderData;
 };
 

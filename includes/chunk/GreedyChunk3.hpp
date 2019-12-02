@@ -64,8 +64,8 @@ class GreedyChunk3 : public AChunk {
 		void	sendConstUniforms();
 		VoxFace	*getVoxFace(chunkVec3 const pos, Direction const side);
 		void	calcGreedyChunk();
-		void	fillVectLine(std::vector<float> &vertices, int & i, \
-		chunkVec3 const &pos, glm::tvec2<int8_t> textUv, Quad const &q);
+		void	fillFaceLine(std::vector<float> &faces, int & i, \
+		chunkVec3 const &pos, Quad const &q);
 
 		bool					_meshUpdated;
 		bool					_needInitVao;
@@ -74,7 +74,6 @@ class GreedyChunk3 : public AChunk {
 		std::vector<Quad>		_quads;
 		int						_nbVertices;
 
-		static const float	_cubeData[];
 		static std::unique_ptr<ShaderData>	_shaderData;
 };
 

@@ -262,50 +262,43 @@ void	GreedyChunk3::update() {
 	_meshUpdated = true;
 }
 
-void	GreedyChunk3::fillVectLine(std::vector<float> &vertices, int & i, \
-chunkVec3 const &pos, glm::tvec2<int8_t> textUv, Quad const &q) {
+void	GreedyChunk3::fillFaceLine(std::vector<float> &faces, int & i, \
+chunkVec3 const &pos, Quad const &q) {
 	// std::cout << "pos: " << glm::to_string(pos) << std::endl;
 
 	// position
-	vertices[++i] = pos.x;
-	vertices[++i] = pos.y;
-	vertices[++i] = pos.z;
-	// texture coords
-	vertices[++i] = textUv.x * q.width;
-	vertices[++i] = textUv.y * q.height;
+	faces[++i] = pos.x;
+	faces[++i] = pos.y;
+	faces[++i] = pos.z;
+	// size
+	faces[++i] = q.width;
+	faces[++i] = q.height;
 	// faceId
-	vertices[++i] = static_cast<float>(q.voxFace.side);
+	faces[++i] = static_cast<float>(q.voxFace.side);
 	// blockId
-	vertices[++i] = static_cast<float>(q.voxFace.type - 1);
+	faces[++i] = static_cast<float>(q.voxFace.type - 1);
 }
 
 void	GreedyChunk3::sendMeshData() {
 	if (_quads.size() > 0) {
 		int const rowSize = 7;
-		_nbVertices = _quads.size() * 6;
+		_nbVertices = _quads.size();
 		int const size = _nbVertices * rowSize;
-		std::vector<float> vertices(size);
+		std::vector<float> faces(size);
 
-		// fill vertices array
+		// fill faces array
 		int i = -1;
 		for (Quad &q : _quads) {
-			if (q.backFace) {
-				fillVectLine(vertices, i, q.topLeft, glm::tvec2<int8_t>(0, 0), q);
-				fillVectLine(vertices, i, q.bottomLeft, glm::tvec2<int8_t>(0, 1), q);
-				fillVectLine(vertices, i, q.bottomRight, glm::tvec2<int8_t>(1, 1), q);
-
-				fillVectLine(vertices, i, q.bottomRight, glm::tvec2<int8_t>(1, 1), q);
-				fillVectLine(vertices, i, q.topRight, glm::tvec2<int8_t>(1, 0), q);
-				fillVectLine(vertices, i, q.topLeft, glm::tvec2<int8_t>(0, 0), q);
-			}
-			else {
-				fillVectLine(vertices, i, q.topLeft, glm::tvec2<int8_t>(0, 0), q);
-				fillVectLine(vertices, i, q.topRight, glm::tvec2<int8_t>(1, 0), q);
-				fillVectLine(vertices, i, q.bottomRight, glm::tvec2<int8_t>(1, 1), q);
-
-				fillVectLine(vertices, i, q.bottomRight, glm::tvec2<int8_t>(1, 1), q);
-				fillVectLine(vertices, i, q.bottomLeft, glm::tvec2<int8_t>(0, 1), q);
-				fillVectLine(vertices, i, q.topLeft, glm::tvec2<int8_t>(0, 0), q);
+			switch (q.voxFace.side) {
+				case Direction::FRONT: case Direction::RIGHT:
+					fillFaceLine(faces, i, q.bottomRight, q);
+					break;
+				case Direction::BACK: case Direction::LEFT: case Direction::BOTTOM:
+					fillFaceLine(faces, i, q.bottomLeft, q);
+					break;
+				case Direction::TOP:
+					fillFaceLine(faces, i, q.topLeft, q);
+					break;
 			}
 		}
 
@@ -320,16 +313,16 @@ void	GreedyChunk3::sendMeshData() {
 			}
 
 			glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-			glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, faces.size() * sizeof(float), &faces[0], GL_STATIC_DRAW);
 
 			glBindVertexArray(_vao);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), reinterpret_cast<void*>(0));
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, rowSize * sizeof(float), reinterpret_cast<void*>(0));
 			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, rowSize * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
 			glEnableVertexAttribArray(1);
-			glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 7 * sizeof(float), reinterpret_cast<void*>(5 * sizeof(float)));
+			glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, rowSize * sizeof(float), reinterpret_cast<void*>(5 * sizeof(float)));
 			glEnableVertexAttribArray(2);
-			glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 7 * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
+			glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, rowSize * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
 			glEnableVertexAttribArray(3);
 		}
 	}
@@ -352,7 +345,7 @@ void	GreedyChunk3::_draw(glm::mat4 &view) {
 		_shaderData->greedyShader->setMat4("model", model);
 
 		glBindVertexArray(_vao);
-		glDrawArrays(GL_TRIANGLES, 0, _nbVertices);
+		glDrawArrays(GL_POINTS, 0, _nbVertices);
 	}
 }
 

@@ -4,13 +4,13 @@
 #define NB_BLOCK_TYPES 8
 
 layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec2 aTexCoords;
+layout (location = 1) in vec2 aSize;
 layout (location = 2) in float aFaceId;
 layout (location = 3) in float blockId;
 
-out VS_OUT {
-	vec2 TexCoords;
-	vec3 FragPos;
+out GS_IN {
+	flat int FaceId;
+	vec2 FSize;
 	vec3 Normal;
 	flat int TextureId;
 } vs_out;
@@ -38,10 +38,8 @@ const vec3 normals[6] = vec3[6](
 );
 
 void main() {
-	vec4 pos = vec4(aPos, 1.0);
-
-	// vs_out.FragPos = vec3(aPos);
-	vs_out.FragPos = vec3(model * vec4(aPos, 1.0));
+	vs_out.FaceId = int(aFaceId);
+	vs_out.FSize = aSize;
 	vs_out.Normal = mat3(transpose(inverse(model))) * normals[int(aFaceId)];
 
 	BlockTexture bt = blockTexturesInfo[int(blockId)];
@@ -55,7 +53,5 @@ void main() {
 		vs_out.TextureId = bt.textureSide;
 	}
 
-	vs_out.TexCoords = aTexCoords;
-
-	gl_Position = projection * view * model * pos;
+	gl_Position = vec4(aPos, 1.0);
 }
