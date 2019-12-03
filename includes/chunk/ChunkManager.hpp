@@ -29,7 +29,7 @@ class ChunkManager {
 		uint32_t								getNbChunkLoaded() const;
 		uint32_t								getNbChunkRendered() const;
 
-		std::vector<wordFVec3>				toDelete;  // list of chunks to delete
+		std::deque<wordFVec3>				toDelete;  // list of chunks to delete
 
 	private:
 		ChunkManager();

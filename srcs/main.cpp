@@ -29,7 +29,7 @@ void	*threadUpdateFunction(void *args_) {
 			if (winU->freezeChunkUpdate == false) {
 				args->chunkManager.update(args->camPos, args->threadID);
 			    { std::lock_guard<std::mutex>	guard(s.mutexToDelete);
-					if (args->chunkManager.toDelete.size() > 0) {  // auto lock
+					if (args->chunkManager.toDelete.empty() == false) {  // auto lock
 						args->deleteLocker.ask = true;
 						continue;
 					}
@@ -131,7 +131,7 @@ TextRender &textRender, ChunkManager &chunkManager) {
 
 		// delete chunks if needed
 	    { std::lock_guard<std::mutex>	guard(s.mutexToDelete);
-			if (chunkManager.toDelete.size() > 0) {
+			if (chunkManager.toDelete.empty() == false) {
 				for (uint8_t i = 0; i < NB_UPDATE_THREADS; i++) {
 					threadUpdateArgs[i]->deleteLocker.ask = true;  // ask update thread to lock
 				}
@@ -148,11 +148,11 @@ TextRender &textRender, ChunkManager &chunkManager) {
 		if (allLocked) {  // when the other thread is locked
 			// delete all old chunks
 		    { std::lock_guard<std::mutex>	guard(s.mutexToDelete);
-				for (auto it = chunkManager.toDelete.begin(); it != chunkManager.toDelete.end(); it++) {
-					delete chunkManager.getChunkMap()[*it];
-					chunkManager.getChunkMap().erase(*it);
+				while (chunkManager.toDelete.empty() == false) {
+					delete chunkManager.getChunkMap()[chunkManager.toDelete.front()];
+					chunkManager.getChunkMap().erase(chunkManager.toDelete.front());
+					chunkManager.toDelete.pop_front();
 				}
-				chunkManager.toDelete.clear();
 			}
 			for (uint8_t i = 0; i < NB_UPDATE_THREADS; i++) {
 				threadUpdateArgs[i]->deleteLocker.ask = false;

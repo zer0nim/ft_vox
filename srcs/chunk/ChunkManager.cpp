@@ -18,16 +18,14 @@ _textureManager(src.getTextureManager()) {
 }
 
 ChunkManager::~ChunkManager() {
-	std::vector<wordIVec3> toDelete;
-
 	// update all chunks
 	for (auto it = _chunkMap.begin(); it != _chunkMap.end(); it++) {
 		toDelete.push_back(it->first);
 	}
-	// delete all old chunks
-	for (auto it = toDelete.begin(); it != toDelete.end(); it++) {
-		delete _chunkMap[*it];  // this line auto save chunk
-		_chunkMap.erase(*it);
+	while (toDelete.empty() == false) {
+		delete _chunkMap[toDelete.front()];
+		_chunkMap.erase(toDelete.front());
+		toDelete.pop_front();
 	}
 }
 
@@ -186,11 +184,11 @@ void ChunkManager::saveAndQuit() {
 		if (s.g.files.saveAllChunks || it->second->isModifiedFromBegining())  // save (if needed)
 			it->second->save();
 	}
-	for (auto it = toDelete.begin(); it != toDelete.end(); it++) {
-		delete _chunkMap[*it];
-		_chunkMap.erase(*it);
+	while (toDelete.empty() == false) {
+		delete _chunkMap[toDelete.front()];
+		_chunkMap.erase(toDelete.front());
+		toDelete.pop_front();
 	}
-	toDelete.clear();
 }
 
 void ChunkManager::_updateChunkPos(wordFVec3 const &pos) {
