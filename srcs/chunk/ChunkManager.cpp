@@ -180,8 +180,7 @@ void ChunkManager::draw(glm::mat4 view, Camera *cam) {
 }
 
 void ChunkManager::saveAndQuit() {
-	std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
-	std::lock_guard<std::mutex>	guard2(s.mutexToDelete);
+	std::lock_guard<std::mutex>	guard(s.mutexChunkMap), guard2(s.mutexToDelete);
 	for (auto it = _chunkMap.begin(); it != _chunkMap.end(); it++) {
 		toDelete.push_back(it->first);
 		if (s.g.files.saveAllChunks || it->second->isModifiedFromBegining())  // save (if needed)
