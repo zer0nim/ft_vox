@@ -1,6 +1,8 @@
 #ifndef ACHUNK_HPP_
 #define ACHUNK_HPP_
 
+#include <memory>
+
 #include "commonInclude.hpp"
 #include "ft_vox.hpp"
 #include "TextureManager.hpp"
@@ -14,7 +16,7 @@ class AChunk {
 			ChunkData() : isModified(true) {}
 		};
 
-		explicit AChunk(TextureManager const &textureManager, glm::mat4 &projection);
+		explicit AChunk(TextureManager const &textureManager);
 		AChunk(AChunk const &src);
 		virtual ~AChunk();
 
@@ -34,6 +36,25 @@ class AChunk {
 		bool	isUpdating;  // true if the chunk is actually in updating process
 
 	protected:
+		struct ShaderData {
+			Shader		*shader;
+			u_int32_t	vbo;
+			u_int32_t	vao;
+
+			ShaderData(std::string const vs, std::string const fs, std::string const gs = "") {
+				if (gs.empty()) {
+					shader = new Shader(vs, fs);
+				}
+				else {
+					shader = new Shader(vs, fs, gs);
+				}
+			}
+			~ShaderData() {
+				delete shader;
+			}
+		};
+		static std::unique_ptr<ShaderData>	_shaderData;
+
 		virtual void	_draw(glm::mat4 &view) = 0;
 		bool			_createChunkFromFile();
 		virtual void	_createChunk();
@@ -45,6 +66,6 @@ class AChunk {
 		TextureManager const &_textureManager;
 };
 
-AChunk * instanciateNewChunk(TextureManager const &textureManager, glm::mat4 &projection);
+AChunk * instanciateNewChunk(TextureManager const &textureManager);
 
 #endif  // ACHUNK_HPP_

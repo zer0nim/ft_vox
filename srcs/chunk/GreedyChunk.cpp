@@ -57,19 +57,11 @@ const float	GreedyChunk::_cubeData[] = {
 	0.0f, 0.0f, 0.0f,		0.0f, -1.0f, 0.0f,		0.0f, 1.0f,		5.0f   // 5r
 };
 
-std::unique_ptr<GreedyChunk::ShaderData>	GreedyChunk::_shaderData = std::unique_ptr<GreedyChunk::ShaderData>();
 std::array< std::array< std::array<bool, CHUNK_SZ_Z>, CHUNK_SZ_Y >, CHUNK_SZ_X >	\
 	GreedyChunk::_processedVox = {{{{{0}}}}};
 
-GreedyChunk::GreedyChunk(TextureManager const &textureManager, glm::mat4 &projection)
-: AChunk(textureManager, projection) {
-	if (!_shaderData) {
-		_shaderData = std::unique_ptr<ShaderData>(new ShaderData());
-		_shaderData->naiveShader->use();
-		_shaderData->naiveShader->setMat4("projection", projection);
-		sendCubeData();
-	}
-}
+GreedyChunk::GreedyChunk(TextureManager const &textureManager)
+: AChunk(textureManager) {}
 
 GreedyChunk::GreedyChunk(GreedyChunk const &src) : AChunk(src) {
 	*this = src;
@@ -82,6 +74,16 @@ GreedyChunk &GreedyChunk::operator=(GreedyChunk const &rhs) {
 	(void)rhs;
 	// if (this != &rhs) {}
 	return *this;
+}
+
+void	GreedyChunk::initShader(glm::mat4 &projection, TextureManager const &textureManager) {
+	if (!_shaderData) {
+		_shaderData = std::unique_ptr<ShaderData>(new AChunk::ShaderData(
+			"./shaders/greedyChunk_vs.glsl", "./shaders/naive_fs.glsl"));
+		_shaderData->shader->use();
+		_shaderData->shader->setMat4("projection", projection);
+		sendCubeData(textureManager);
+	}
 }
 
 /*
@@ -176,31 +178,31 @@ void	GreedyChunk::update() {
 void	GreedyChunk::_draw(glm::mat4 &view) {
 	_textureManager.activateTextures();
 
-	_shaderData->naiveShader->use();
-	_shaderData->naiveShader->setMat4("view", view);
-	glBindVertexArray(_shaderData->cubeVao);
+	_shaderData->shader->use();
+	_shaderData->shader->setMat4("view", view);
+	glBindVertexArray(_shaderData->vao);
 
 	glm::mat4 baseModel = glm::translate(glm::mat4(1.0), glm::vec3(_chunkPos));
 	for (MeshData const &md : _meshDatas) {
-		_shaderData->naiveShader->setInt("blockId", md.blockId - 1);
-		_shaderData->naiveShader->setVec3("size", glm::vec3(md.size));
+		_shaderData->shader->setInt("blockId", md.blockId - 1);
+		_shaderData->shader->setVec3("size", glm::vec3(md.size));
 
 		glm::mat4 model = glm::translate(baseModel, glm::vec3(md.pos));
 		model = glm::scale(model, glm::vec3(md.size));
-		_shaderData->naiveShader->setMat4("model", model);
+		_shaderData->shader->setMat4("model", model);
 
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 	}
 }
 
-void	GreedyChunk::sendCubeData() {
-    glGenVertexArrays(1, &_shaderData->cubeVao);
-    glGenBuffers(1, &(_shaderData->cubeVbo));
+void	GreedyChunk::sendCubeData(TextureManager const &textureManager) {
+    glGenVertexArrays(1, &_shaderData->vao);
+    glGenBuffers(1, &(_shaderData->vbo));
 
-    glBindBuffer(GL_ARRAY_BUFFER, _shaderData->cubeVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, _shaderData->vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(GreedyChunk::_cubeData), GreedyChunk::_cubeData, GL_STATIC_DRAW);
 
-    glBindVertexArray(_shaderData->cubeVao);
+    glBindVertexArray(_shaderData->vao);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
@@ -210,19 +212,19 @@ void	GreedyChunk::sendCubeData() {
     glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 9 * sizeof(float), reinterpret_cast<void*>(8 * sizeof(float)));
     glEnableVertexAttribArray(3);
 
-	_shaderData->naiveShader->use();
+	_shaderData->shader->use();
 	// set cube material
 	Material material;
-	_shaderData->naiveShader->use();
-	_shaderData->naiveShader->setBool("material.specular.isTexture", false);
-	_shaderData->naiveShader->setVec3("material.specular.color", material.specular);
-	_shaderData->naiveShader->setFloat("material.shininess", material.shininess);
+	_shaderData->shader->use();
+	_shaderData->shader->setBool("material.specular.isTexture", false);
+	_shaderData->shader->setVec3("material.specular.color", material.specular);
+	_shaderData->shader->setFloat("material.shininess", material.shininess);
 
 	// set direction light
-	_shaderData->naiveShader->setVec3("dirLight.direction", -0.2f, -0.8f, -0.6f);
-	_shaderData->naiveShader->setVec3("dirLight.ambient", 0.4f, 0.4f, 0.4f);
-	_shaderData->naiveShader->setVec3("dirLight.diffuse", 1.5f, 1.5f, 1.5f);
-	_shaderData->naiveShader->setVec3("dirLight.specular", 1, 1, 1);
+	_shaderData->shader->setVec3("dirLight.direction", -0.2f, -0.8f, -0.6f);
+	_shaderData->shader->setVec3("dirLight.ambient", 0.4f, 0.4f, 0.4f);
+	_shaderData->shader->setVec3("dirLight.diffuse", 1.5f, 1.5f, 1.5f);
+	_shaderData->shader->setVec3("dirLight.specular", 1, 1, 1);
 
-	_textureManager.setUniform(*_shaderData->naiveShader);
+	textureManager.setUniform(*_shaderData->shader);
 }

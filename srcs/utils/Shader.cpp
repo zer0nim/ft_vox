@@ -3,7 +3,7 @@
 /*
 	load shader source code to string
 */
-void	fillShaderStr(const char *vsPath, const char *fsPath, const char *gsPath,
+void	fillShaderStr(std::string const vsPath, std::string const fsPath, std::string const gsPath,
 std::string *vsCode, std::string *fsCode, std::string *gsCode
 ) {
 	std::ifstream		vsFile;
@@ -27,7 +27,7 @@ std::string *vsCode, std::string *fsCode, std::string *gsCode
 		*fsCode = sStream.str();
 		fsFile.close();
 
-		if (gsPath != nullptr) {
+		if (!gsPath.empty()) {
 			sStream.clear();
 			sStream.str(std::string());
 			gsFile.open(gsPath);
@@ -42,7 +42,7 @@ std::string *vsCode, std::string *fsCode, std::string *gsCode
 	}
 }
 
-Shader::Shader(const char *vsPath, const char *fsPath, const char *gsPath) {
+Shader::Shader(std::string const vsPath, std::string const fsPath, std::string const gsPath) {
 	std::string	vsCode;
 	std::string	fsCode;
 	std::string	gsCode;
@@ -70,7 +70,7 @@ Shader::Shader(const char *vsPath, const char *fsPath, const char *gsPath) {
 	checkCompileErrors(fragment, "FRAGMENT");
 
 	// geometry shader
-	if (gsPath != nullptr) {
+	if (!gsPath.empty()) {
 		gsData = gsCode.c_str();
 		geometry = glCreateShader(GL_GEOMETRY_SHADER);
 		glShaderSource(geometry, 1, &gsData, NULL);
@@ -82,7 +82,7 @@ Shader::Shader(const char *vsPath, const char *fsPath, const char *gsPath) {
 	id = glCreateProgram();
 	glAttachShader(id, vertex);
 	glAttachShader(id, fragment);
-	if (gsPath != nullptr)
+	if (!gsPath.empty())
 		glAttachShader(id, geometry);
 	glLinkProgram(id);
 	checkCompileErrors(id, "PROGRAM");
@@ -90,7 +90,7 @@ Shader::Shader(const char *vsPath, const char *fsPath, const char *gsPath) {
 	// delete the shaders as they're linked into our program now and no longer necessery
 	glDeleteShader(vertex);
 	glDeleteShader(fragment);
-	if (gsPath != nullptr)
+	if (!gsPath.empty())
 		glDeleteShader(geometry);
 }
 

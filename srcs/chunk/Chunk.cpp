@@ -57,16 +57,7 @@ const float	Chunk::_cubeData[] = {
 	-0.5f, -0.5f, -0.5f,	0.0f, -1.0f, 0.0f,		0.0f, 1.0f,		5.0f   // 5r
 };
 
-std::unique_ptr<Chunk::ShaderData>	Chunk::_shaderData = std::unique_ptr<Chunk::ShaderData>();
-
-Chunk::Chunk(TextureManager const &textureManager, glm::mat4 &projection) : AChunk(textureManager, projection) {
-	if (!_shaderData) {
-		_shaderData = std::unique_ptr<ShaderData>(new ShaderData());
-		_shaderData->naiveShader->use();
-		_shaderData->naiveShader->setMat4("projection", projection);
-		sendCubeData();
-	}
-}
+Chunk::Chunk(TextureManager const &textureManager): AChunk(textureManager) {}
 
 Chunk::Chunk(Chunk const &src) : AChunk(src) {
 	*this = src;
@@ -81,6 +72,16 @@ Chunk &Chunk::operator=(Chunk const &rhs) {
 	return *this;
 }
 
+void	Chunk::initShader(glm::mat4 &projection, TextureManager const &textureManager) {
+	if (!_shaderData) {
+		_shaderData = std::unique_ptr<ShaderData>(new AChunk::ShaderData(
+			"./shaders/naive_vs.glsl", "./shaders/naive_fs.glsl"));
+		_shaderData->shader->use();
+		_shaderData->shader->setMat4("projection", projection);
+		sendCubeData(textureManager);
+	}
+}
+
 void	Chunk::update() {
 	if (_data.isModified == false)
 		return;  // chunk not modified -> don't update it
@@ -90,9 +91,9 @@ void	Chunk::update() {
 void	Chunk::_draw(glm::mat4 &view) {
 	_textureManager.activateTextures();
 
-	_shaderData->naiveShader->use();
-	_shaderData->naiveShader->setMat4("view", view);
-	glBindVertexArray(_shaderData->cubeVao);
+	_shaderData->shader->use();
+	_shaderData->shader->setMat4("view", view);
+	glBindVertexArray(_shaderData->vao);
 
 	// loop throught chunk cubes and draw them
 	glm::mat4 baseModel = glm::translate(glm::mat4(1.0), glm::vec3(_chunkPos));
@@ -100,10 +101,10 @@ void	Chunk::_draw(glm::mat4 &view) {
 		for (uint8_t y = 0; y < CHUNK_SZ_Y; ++y) {
 			for (uint8_t z = 0; z < CHUNK_SZ_Z; ++z) {
 				if (_data.data[x][y][z] > 0) {
-					_shaderData->naiveShader->setInt("cubeId", _data.data[x][y][z] - 1);
+					_shaderData->shader->setInt("cubeId", _data.data[x][y][z] - 1);
 
 					glm::mat4 model = glm::translate(baseModel, glm::vec3(x, y, z));
-					_shaderData->naiveShader->setMat4("model", model);
+					_shaderData->shader->setMat4("model", model);
 
 					glDrawArrays(GL_TRIANGLES, 0, 36);
 				}
@@ -112,14 +113,14 @@ void	Chunk::_draw(glm::mat4 &view) {
 	}
 }
 
-void	Chunk::sendCubeData() {
-    glGenVertexArrays(1, &_shaderData->cubeVao);
-    glGenBuffers(1, &(_shaderData->cubeVbo));
+void	Chunk::sendCubeData(TextureManager const &textureManager) {
+    glGenVertexArrays(1, &_shaderData->vao);
+    glGenBuffers(1, &(_shaderData->vbo));
 
-    glBindBuffer(GL_ARRAY_BUFFER, _shaderData->cubeVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, _shaderData->vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(Chunk::_cubeData), Chunk::_cubeData, GL_STATIC_DRAW);
 
-    glBindVertexArray(_shaderData->cubeVao);
+    glBindVertexArray(_shaderData->vao);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
@@ -129,17 +130,17 @@ void	Chunk::sendCubeData() {
     glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 9 * sizeof(float), reinterpret_cast<void*>(8 * sizeof(float)));
     glEnableVertexAttribArray(3);
 
-	_shaderData->naiveShader->use();
+	_shaderData->shader->use();
 	// set cube material
 	Material material;
-	_shaderData->naiveShader->setVec3("material.specular", material.specular);
-	_shaderData->naiveShader->setFloat("material.shininess", material.shininess);
+	_shaderData->shader->setVec3("material.specular", material.specular);
+	_shaderData->shader->setFloat("material.shininess", material.shininess);
 
 	// set direction light
-	_shaderData->naiveShader->setVec3("dirLight.direction", -0.2f, -0.8f, -0.6f);
-	_shaderData->naiveShader->setVec3("dirLight.ambient", 0.4f, 0.4f, 0.4f);
-	_shaderData->naiveShader->setVec3("dirLight.diffuse", 1.5f, 1.5f, 1.5f);
-	_shaderData->naiveShader->setVec3("dirLight.specular", 1, 1, 1);
+	_shaderData->shader->setVec3("dirLight.direction", -0.2f, -0.8f, -0.6f);
+	_shaderData->shader->setVec3("dirLight.ambient", 0.4f, 0.4f, 0.4f);
+	_shaderData->shader->setVec3("dirLight.diffuse", 1.5f, 1.5f, 1.5f);
+	_shaderData->shader->setVec3("dirLight.specular", 1, 1, 1);
 
-	_textureManager.setUniform(*_shaderData->naiveShader);
+	textureManager.setUniform(*_shaderData->shader);
 }

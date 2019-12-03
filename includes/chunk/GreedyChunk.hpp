@@ -12,48 +12,31 @@
 
 class GreedyChunk : public AChunk {
 	public:
-		explicit GreedyChunk(TextureManager const &textureManager, glm::mat4 &projection);
+		explicit GreedyChunk(TextureManager const &textureManager);
 		GreedyChunk(GreedyChunk const &src);
 		virtual ~GreedyChunk();
 
 		GreedyChunk &operator=(GreedyChunk const &rhs);
 
+		static void	initShader(glm::mat4 &projection, TextureManager const &textureManager);
 		virtual void	update();
 
 	protected:
 		virtual void	_draw(glm::mat4 &view);
 
 	private:
-		void	sendCubeData();
-
-		struct ShaderData {
-			Shader		*naiveShader;
-			u_int32_t	cubeVbo;
-			u_int32_t	cubeVao;
-
-			ShaderData() {
-				naiveShader = new Shader("shaders/greedyChunk_vs.glsl", "shaders/naive_fs.glsl");
-				cubeVbo = 0;
-				cubeVao = 0;
-			}
-
-			~ShaderData() {
-				delete naiveShader;
-			}
-		};
-
 		struct MeshData {
 			chunkVec3	pos;
 			chunkVec3	size;
 			uint8_t		blockId;
 		};
 
+		static void	sendCubeData(TextureManager const &textureManager);
 		void	searchQuadMesh(chunkVec3 const &startI);
 
 		std::vector<MeshData>	_meshDatas;
 
 		static const float	_cubeData[];
-		static std::unique_ptr<ShaderData>	_shaderData;
 		static std::array< std::array< std::array<bool, CHUNK_SZ_Z>, CHUNK_SZ_Y >, \
 			CHUNK_SZ_X >	_processedVox;
 };

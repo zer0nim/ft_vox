@@ -1,6 +1,7 @@
 #ifndef SHADER_HPP_
 #define SHADER_HPP_
 
+#include <string>
 #include <fstream>
 #include <sstream>
 
@@ -15,7 +16,7 @@
 */
 class Shader {
 	public:
-		Shader(const char *vsPath, const char *fsPath, const char *gsPath = nullptr);
+		Shader(std::string const vsPath, std::string const fsPath, std::string const gsPath = "");
 		Shader(Shader const &src);
 		virtual ~Shader();
 

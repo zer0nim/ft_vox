@@ -6,6 +6,9 @@
 #include "TextureManager.hpp"
 #include "AChunk.hpp"
 #include "Chunk.hpp"
+#include "GreedyChunk.hpp"
+#include "GreedyChunk2.hpp"
+#include "GreedyChunk3.hpp"
 #include "ChunkManager.hpp"
 #include "MapGenerator.hpp"
 #include "utils/Shader.hpp"
@@ -60,7 +63,7 @@ void	*threadUpdateFunction(void *args_) {
 }
 
 void	gameLoop(GLFWwindow *window, Camera const &cam, Skybox &skybox, \
-TextRender &textRender, ChunkManager &chunkManager) {
+TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textureManager) {
 	float						loopTime = 1000 / s.g.screen.fps;
 	std::chrono::milliseconds	time_start;
 	int							lastFps = 0;
@@ -86,7 +89,8 @@ TextRender &textRender, ChunkManager &chunkManager) {
 
 	winU->cam->frustumCullingInit(angle, ratio, nearD, farD);
 
-	chunkManager.init(winU->cam->pos, projection);
+	CHUNK_OBJECT::initShader(projection, textureManager);  // init shader objects
+	chunkManager.init(winU->cam->pos);
 
 	skybox.getShader().use();
 	skybox.getShader().setMat4("projection", projection);
@@ -269,7 +273,7 @@ int		main(int ac, char const **av) {
 		ChunkManager chunkManager(*textureManager, &winU);
 
 		// run the game
-		gameLoop(window, cam, skybox, textRender, chunkManager);
+		gameLoop(window, cam, skybox, textRender, chunkManager, *textureManager);
 
 		// save and quit all chunks
 		chunkManager.saveAndQuit();

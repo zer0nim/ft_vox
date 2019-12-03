@@ -10,20 +10,21 @@
 #include "ChunkManager.hpp"
 #include "MapGenerator.hpp"
 
-AChunk * instanciateNewChunk(TextureManager const &textureManager, glm::mat4 &projection) {
-	AChunk * newChunk = new CHUNK_OBJECT(textureManager, projection);
+std::unique_ptr<AChunk::ShaderData>	AChunk::_shaderData = \
+	std::unique_ptr<AChunk::ShaderData>();
+
+AChunk * instanciateNewChunk(TextureManager const &textureManager) {
+	AChunk * newChunk = new CHUNK_OBJECT(textureManager);
 	return newChunk;
 }
 
-AChunk::AChunk(TextureManager const &textureManager, glm::mat4 &projection) :
-isDrawing(false),
-isUpdating(false),
-_data(),
-_filename(""),
-_isModifiedFromBegining(false),
-_textureManager(textureManager) {
-	(void)projection;
-}
+AChunk::AChunk(TextureManager const &textureManager)
+: isDrawing(false),
+  isUpdating(false),
+  _data(),
+  _filename(""),
+  _isModifiedFromBegining(false),
+  _textureManager(textureManager) {}
 
 AChunk::AChunk(AChunk const &src)
 : _textureManager(src.getTextureManager()) {

@@ -14,7 +14,7 @@ class ChunkManager {
 
 		ChunkManager &operator=(ChunkManager const &rhs);
 
-		void	init(wordFVec3 camPos, glm::mat4 &projection);  // load the firsts chunks
+		void	init(wordFVec3 camPos);  // load the firsts chunks
 		void	update(wordFVec3 &camPos, uint8_t threadID, bool createAll = false);  // global update (call each frame)
 		void	draw(glm::mat4 view, Camera *cam);  // draw all chunks
 		void	saveAndQuit();  // save all chunks (if needed) and destroy them
@@ -49,7 +49,6 @@ class ChunkManager {
 		wordIVec3						_chunkActPos;  // actual chunk position
 		std::array<wordIVec3, NB_UPDATE_THREADS>	_lastChunkPos;
 		TextureManager const			&_textureManager;
-		glm::mat4						_projection;
 		std::array<std::deque<wordIVec3>, NB_UPDATE_THREADS>	_toCreate;  // list of chunks to create
 		std::array<uint32_t, NB_UPDATE_THREADS>					_nbChunkLoaded;  // number of chunks loaded in memory
 		uint32_t						_nbChunkRendered;  // number of chunks rendered on screen

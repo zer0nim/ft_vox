@@ -4,21 +4,13 @@
 #include "GreedyChunk2.hpp"
 #include "utils/Material.hpp"
 
-std::unique_ptr<GreedyChunk2::ShaderData>	GreedyChunk2::_shaderData = std::unique_ptr<GreedyChunk2::ShaderData>();
-
-GreedyChunk2::GreedyChunk2(TextureManager const &textureManager, glm::mat4 &projection)
-: AChunk(textureManager, projection) {
+GreedyChunk2::GreedyChunk2(TextureManager const &textureManager)
+: AChunk(textureManager) {
 	_nbVertices = 0;
 	_needInitVao = true;
 	_meshUpdated = false;
 	_vao = 0;
 	_vbo = 0;
-	if (!_shaderData) {
-		_shaderData = std::unique_ptr<ShaderData>(new ShaderData());
-		_shaderData->greedyShader->use();
-		_shaderData->greedyShader->setMat4("projection", projection);
-		sendConstUniforms();
-	}
 }
 
 GreedyChunk2::GreedyChunk2(GreedyChunk2 const &src) : AChunk(src) {
@@ -33,6 +25,17 @@ GreedyChunk2 &GreedyChunk2::operator=(GreedyChunk2 const &rhs) {
 	(void)rhs;
 	// if (this != &rhs) {}
 	return *this;
+}
+
+void	GreedyChunk2::initShader(glm::mat4 &projection, TextureManager const &textureManager) {
+	if (!_shaderData) {
+		_shaderData = std::unique_ptr<ShaderData>(new AChunk::ShaderData(
+			"./shaders/greedyChunk3_vs.glsl", "./shaders/naive_fs.glsl", \
+			"./shaders/greedyChunk3_gs.glsl"));
+		_shaderData->shader->use();
+		_shaderData->shader->setMat4("projection", projection);
+		sendConstUniforms(textureManager);
+	}
 }
 
 /*
@@ -310,7 +313,7 @@ void	GreedyChunk2::sendMeshData() {
 		}
 
 		if (_nbVertices > 0) {
-			_shaderData->greedyShader->use();
+			_shaderData->shader->use();
 
 			// generate vao vbo only on first call
 			if (_needInitVao) {
@@ -345,31 +348,31 @@ void	GreedyChunk2::_draw(glm::mat4 &view) {
 	if (_nbVertices > 0) {
 		_textureManager.activateTextures();
 
-		_shaderData->greedyShader->use();
-		_shaderData->greedyShader->setMat4("view", view);
+		_shaderData->shader->use();
+		_shaderData->shader->setMat4("view", view);
 
 		glm::mat4 model = glm::translate(glm::mat4(1.0), glm::vec3(_chunkPos));
-		_shaderData->greedyShader->setMat4("model", model);
+		_shaderData->shader->setMat4("model", model);
 
 		glBindVertexArray(_vao);
 		glDrawArrays(GL_TRIANGLES, 0, _nbVertices);
 	}
 }
 
-void	GreedyChunk2::sendConstUniforms() {
-	_shaderData->greedyShader->use();
+void	GreedyChunk2::sendConstUniforms(TextureManager const &textureManager) {
+	_shaderData->shader->use();
 
 	// set cube material
 	Material material;
-	_shaderData->greedyShader->setVec3("material.specular", material.specular);
-	_shaderData->greedyShader->setFloat("material.shininess", material.shininess);
+	_shaderData->shader->setVec3("material.specular", material.specular);
+	_shaderData->shader->setFloat("material.shininess", material.shininess);
 
 	// set direction light
-	_shaderData->greedyShader->setVec3("dirLight.direction", -0.2f, -0.8f, -0.6f);
-	_shaderData->greedyShader->setVec3("dirLight.ambient", 0.4f, 0.4f, 0.4f);
-	_shaderData->greedyShader->setVec3("dirLight.diffuse", 1.5f, 1.5f, 1.5f);
-	_shaderData->greedyShader->setVec3("dirLight.specular", 1, 1, 1);
+	_shaderData->shader->setVec3("dirLight.direction", -0.2f, -0.8f, -0.6f);
+	_shaderData->shader->setVec3("dirLight.ambient", 0.4f, 0.4f, 0.4f);
+	_shaderData->shader->setVec3("dirLight.diffuse", 1.5f, 1.5f, 1.5f);
+	_shaderData->shader->setVec3("dirLight.specular", 1, 1, 1);
 
 	// send textures
-	_textureManager.setUniform(*_shaderData->greedyShader);
+	textureManager.setUniform(*_shaderData->shader);
 }

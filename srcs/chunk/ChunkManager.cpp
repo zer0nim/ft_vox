@@ -8,7 +8,6 @@ _winU(winU),
 _chunkMap(),
 _chunkActPos(-1, -1, -1),
 _textureManager(textureManager),
-_projection(),
 _toCreate(),
 _nbChunkLoaded{0} {}
 
@@ -35,13 +34,11 @@ ChunkManager &ChunkManager::operator=(ChunkManager const &rhs) {
 	if (this != &rhs) {
 		_winU = rhs.getWinU();
 		_chunkMap = rhs.getChunkMap();
-		_projection = rhs.getProjection();
 	}
 	return *this;
 }
 
-void ChunkManager::init(wordFVec3 camPos, glm::mat4 &projection) {
-	_projection = projection;
+void ChunkManager::init(wordFVec3 camPos) {
 	for (uint8_t i = 0; i < NB_UPDATE_THREADS; i++) {
 		_lastChunkPos[i].x = -1;
 		_lastChunkPos[i].y = -1;
@@ -109,7 +106,8 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 			exist = _isChunkExist(chunkPos);
 		}
 		if (exist == false) {  // if the chunk doesnt exist (for now)
-			newChunk = instanciateNewChunk(_textureManager, _projection);  // create a chunk with the rihgt type
+			// create a chunk with the rihgt type
+			newChunk = instanciateNewChunk(_textureManager);
 			newChunk->createChunk(chunkPos);  // init the chunk with the right values
 			newChunk->update();
 		    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
@@ -230,7 +228,6 @@ std::map<wordIVec3, AChunk*>			&ChunkManager::getChunkMap() { return _chunkMap; 
 std::map<wordIVec3, AChunk*> const	&ChunkManager::getChunkMap() const { return _chunkMap; }
 wordIVec3 const							&ChunkManager::getChunkActPos() const { return _chunkActPos; }
 TextureManager const					&ChunkManager::getTextureManager() const { return _textureManager; };
-glm::mat4 const							&ChunkManager::getProjection() const { return _projection; };
 uint32_t								ChunkManager::getNbChunkLoaded() const {
 	uint32_t ret = 0;
 	for (uint8_t i = 0; i < NB_UPDATE_THREADS; i++) {

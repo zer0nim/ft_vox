@@ -12,29 +12,19 @@
 
 class GreedyChunk2 : public AChunk {
 	public:
-		explicit GreedyChunk2(TextureManager const &textureManager, glm::mat4 &projection);
+		explicit GreedyChunk2(TextureManager const &textureManager);
 		GreedyChunk2(GreedyChunk2 const &src);
 		virtual ~GreedyChunk2();
 
 		GreedyChunk2 &operator=(GreedyChunk2 const &rhs);
 
+		static void	initShader(glm::mat4 &projection, TextureManager const &textureManager);
 		virtual void	update();
 
 	protected:
 		virtual void	_draw(glm::mat4 &view);
 
 	private:
-		struct ShaderData {
-			Shader		*greedyShader;
-
-			ShaderData() {
-				greedyShader = new Shader("shaders/greedyChunk2_vs.glsl", "shaders/naive_fs.glsl");
-			}
-			~ShaderData() {
-				delete greedyShader;
-			}
-		};
-
 		struct VoxFace {
 			uint8_t		type;
 			bool		transparent;  // for face culling
@@ -60,7 +50,7 @@ class GreedyChunk2 : public AChunk {
 		};
 
 		void	sendMeshData();
-		void	sendConstUniforms();
+		static void	sendConstUniforms(TextureManager const &textureManager);
 		VoxFace	*getVoxFace(chunkVec3 const pos, Direction const side);
 		void	calcGreedyChunk();
 		void	fillVectLine(std::vector<float> &vertices, int & i, \
@@ -72,8 +62,6 @@ class GreedyChunk2 : public AChunk {
 		u_int32_t				_vao;
 		std::vector<Quad>		_quads;
 		int						_nbVertices;
-
-		static std::unique_ptr<ShaderData>	_shaderData;
 };
 
 #endif  // GREEDYCHUNK2_HPP_
