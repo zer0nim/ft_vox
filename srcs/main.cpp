@@ -4,8 +4,6 @@
 
 #include "ft_vox.hpp"
 #include "TextureManager.hpp"
-#include "AChunk.hpp"
-#include "Chunk.hpp"
 #include "ChunkManager.hpp"
 #include "MapGenerator.hpp"
 #include "utils/Shader.hpp"
@@ -215,8 +213,10 @@ int		main(int ac, char const **av) {
 	catch (Settings::SettingsError &e) {
 		return 1;
 	}
-	if (s.m.seed == 0)
-		s.m.seed = time(nullptr);
+	if (s.m.seed == 0) {
+		uint32_t seedRand = time(nullptr);
+		s.m.seed = rand_r(&seedRand);
+	}
 
 	if (argparse(ac - 1, av + 1) == false) {
 		return 0;
