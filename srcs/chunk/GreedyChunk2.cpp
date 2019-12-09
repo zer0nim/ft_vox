@@ -30,8 +30,7 @@ GreedyChunk2 &GreedyChunk2::operator=(GreedyChunk2 const &rhs) {
 void	GreedyChunk2::initShader(glm::mat4 &projection, TextureManager const &textureManager) {
 	if (!_shaderData) {
 		_shaderData = std::unique_ptr<ShaderData>(new AChunk::ShaderData(
-			"./shaders/greedyChunk3_vs.glsl", "./shaders/naive_fs.glsl", \
-			"./shaders/greedyChunk3_gs.glsl"));
+			"./shaders/greedyChunk2_vs.glsl", "./shaders/naive_fs.glsl"));
 		_shaderData->shader->use();
 		_shaderData->shader->setMat4("projection", projection);
 		sendConstUniforms(textureManager);
@@ -152,6 +151,8 @@ void	GreedyChunk2::calcGreedyChunk() {
 						// fill the mask
 						if (a != nullptr && b != nullptr && *a == *b) {
 							mask[n] = nullptr;
+							delete a;
+							delete b;
 						}
 						else if (backFace) {
 							mask[n] = b;
@@ -267,8 +268,6 @@ void	GreedyChunk2::update() {
 
 void	GreedyChunk2::fillVectLine(std::vector<float> &vertices, int & i, \
 chunkVec3 const &pos, glm::tvec2<int8_t> textUv, Quad const &q) {
-	// std::cout << "pos: " << glm::to_string(pos) << std::endl;
-
 	// position
 	vertices[++i] = pos.x;
 	vertices[++i] = pos.y;
@@ -326,13 +325,13 @@ void	GreedyChunk2::sendMeshData() {
 			glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
 
 			glBindVertexArray(_vao);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), reinterpret_cast<void*>(0));
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, rowSize * sizeof(float), reinterpret_cast<void*>(0));
 			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, rowSize * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
 			glEnableVertexAttribArray(1);
-			glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 7 * sizeof(float), reinterpret_cast<void*>(5 * sizeof(float)));
+			glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, rowSize * sizeof(float), reinterpret_cast<void*>(5 * sizeof(float)));
 			glEnableVertexAttribArray(2);
-			glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 7 * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
+			glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, rowSize * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
 			glEnableVertexAttribArray(3);
 		}
 	}
@@ -346,9 +345,8 @@ void	GreedyChunk2::_draw(glm::mat4 &view) {
 	}
 
 	if (_nbVertices > 0) {
-		_textureManager.activateTextures();
-
 		_shaderData->shader->use();
+		_textureManager.activateTextures();
 		_shaderData->shader->setMat4("view", view);
 
 		glm::mat4 model = glm::translate(glm::mat4(1.0), glm::vec3(_chunkPos));

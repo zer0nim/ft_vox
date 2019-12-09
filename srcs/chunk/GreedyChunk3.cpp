@@ -269,8 +269,6 @@ void	GreedyChunk3::update() {
 
 void	GreedyChunk3::fillFaceLine(std::vector<float> &faces, int & i, \
 chunkVec3 const &pos, Quad const &q) {
-	// std::cout << "pos: " << glm::to_string(pos) << std::endl;
-
 	// position
 	faces[++i] = pos.x;
 	faces[++i] = pos.y;
@@ -341,9 +339,8 @@ void	GreedyChunk3::_draw(glm::mat4 &view) {
 	}
 
 	if (_nbVertices > 0) {
-		_textureManager.activateTextures();
-
 		_shaderData->shader->use();
+		_textureManager.activateTextures();
 		_shaderData->shader->setMat4("view", view);
 
 		glm::mat4 model = glm::translate(glm::mat4(1.0), glm::vec3(_chunkPos));

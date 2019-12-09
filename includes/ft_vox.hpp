@@ -32,7 +32,7 @@ GreedyChunk
 GreedyChunk2
 GreedyChunk3
 */
-#define CHUNK_OBJECT			Chunk  // the chunk object used
+#define CHUNK_OBJECT			GreedyChunk2  // the chunk object used
 
 /*
 generation type
