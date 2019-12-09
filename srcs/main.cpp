@@ -64,6 +64,8 @@ TextRender &textRender, ChunkManager &chunkManager) {
 	int							lastFps = 0;
 	tWinUser					*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
 	bool						firstLoop = true;
+	float						cursorX = s.g.screen.width / 2 - s.g.screen.text["courrier_new"].size / 2;
+	float						cursorY = s.g.screen.height / 2 - s.g.screen.text["courrier_new"].size / 2;
 
 	/* threading */
 	std::array<ThreadupdateArgs *, NB_UPDATE_THREADS>	threadUpdateArgs;
@@ -122,6 +124,9 @@ TextRender &textRender, ChunkManager &chunkManager) {
 
 		// draw text
 		drawText(window, textRender, lastFps, chunkManager);
+
+		// drawCursor
+		textRender.write("courrier_new", "+", cursorX, cursorY, 1, glm::vec3(127, 127, 127));
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -260,6 +265,7 @@ int		main(int ac, char const **av) {
 		TextRender textRender(textShader, s.g.screen.width, s.g.screen.height);
 		textRender.loadFont("title", s.g.screen.text["title"].path, s.g.screen.text["title"].size);
 		textRender.loadFont("normal", s.g.screen.text["normal"].path, s.g.screen.text["normal"].size);
+		textRender.loadFont("courrier_new", s.g.screen.text["courrier_new"].path, s.g.screen.text["courrier_new"].size);
 
 		// load skybox
 		Skybox skybox(skyboxShader);

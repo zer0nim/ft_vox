@@ -20,6 +20,10 @@
 				"title": {
 					"path": "assets/fonts/minecraft_title.ttf",
 					"size": 40
+				},
+				"courrier_new": {
+					"path": "assets/fonts/courrier_new.ttf",
+					"size": 40
 				}
 			}
 		}

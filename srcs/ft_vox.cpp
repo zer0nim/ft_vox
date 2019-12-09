@@ -25,6 +25,8 @@ void	setDefaultSettings() {
 		"normal", {"assets/fonts/minecraft_normal.ttf", 20}));
 	s.g.screen.text.insert(std::pair<std::string, Settings::Global::Screen::Text>(
 		"title", {"assets/fonts/minecraft_title.ttf", 24}));
+	s.g.screen.text.insert(std::pair<std::string, Settings::Global::Screen::Text>(
+		"courrier_new", {"assets/fonts/courrier_new.ttf", 40}));
 	uint32_t seedRand = time(nullptr);
 	s.m.seed = rand_r(&seedRand);
 	s.m.generationType = GENERATION_NORMAL;
