@@ -149,6 +149,8 @@ void	GreedyChunk3::calcGreedyChunk() {
 						// fill the mask
 						if (a != nullptr && b != nullptr && *a == *b) {
 							mask[n] = nullptr;
+							delete a;
+							delete b;
 						}
 						else if (backFace) {
 							mask[n] = b;
