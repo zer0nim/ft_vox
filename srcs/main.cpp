@@ -32,7 +32,7 @@ void	*threadUpdateFunction(void *args_) {
 			if (winU->freezeChunkUpdate == false) {
 				args->chunkManager.update(args->camPos, args->threadID);
 			    { std::lock_guard<std::mutex>	guard(s.mutexToDelete);
-					if (args->chunkManager.toDelete.size() > 0) {  // auto lock
+					if (args->chunkManager.toDelete.empty() == false) {  // auto lock
 						args->deleteLocker.ask = true;
 						continue;
 					}
@@ -82,9 +82,8 @@ TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textur
 	float angle = cam.zoom;
 	float ratio = static_cast<float>(s.g.screen.width) / s.g.screen.height;
 	float nearD = 0.1f;
-	float farD = std::max(
-		static_cast<int>(std::sqrt(std::pow(CHUNK_SZ_X * s.g.renderDist, 2) + std::pow(CHUNK_SZ_Z * s.g.renderDist, 2))),
-		200);
+	float farD = 200 + static_cast<int>(std::sqrt(std::pow(CHUNK_SZ_X * s.g.renderDist, 2)
+		+ std::pow(CHUNK_SZ_Z * s.g.renderDist, 2)));
 	glm::mat4	projection = glm::perspective(glm::radians(angle), ratio, nearD, farD);
 
 	winU->cam->frustumCullingInit(angle, ratio, nearD, farD);
@@ -136,7 +135,7 @@ TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textur
 
 		// delete chunks if needed
 	    { std::lock_guard<std::mutex>	guard(s.mutexToDelete);
-			if (chunkManager.toDelete.size() > 0) {
+			if (chunkManager.toDelete.empty() == false) {
 				for (uint8_t i = 0; i < NB_UPDATE_THREADS; i++) {
 					threadUpdateArgs[i]->deleteLocker.ask = true;  // ask update thread to lock
 				}
@@ -153,11 +152,11 @@ TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textur
 		if (allLocked) {  // when the other thread is locked
 			// delete all old chunks
 		    { std::lock_guard<std::mutex>	guard(s.mutexToDelete);
-				for (auto it = chunkManager.toDelete.begin(); it != chunkManager.toDelete.end(); it++) {
-					delete chunkManager.getChunkMap()[*it];
-					chunkManager.getChunkMap().erase(*it);
+				while (chunkManager.toDelete.empty() == false) {
+					delete chunkManager.getChunkMap()[chunkManager.toDelete.front()];
+					chunkManager.getChunkMap().erase(chunkManager.toDelete.front());
+					chunkManager.toDelete.pop_front();
 				}
-				chunkManager.toDelete.clear();
 			}
 			for (uint8_t i = 0; i < NB_UPDATE_THREADS; i++) {
 				threadUpdateArgs[i]->deleteLocker.ask = false;
@@ -220,8 +219,10 @@ int		main(int ac, char const **av) {
 	catch (Settings::SettingsError &e) {
 		return 1;
 	}
-	if (s.m.seed == 0)
-		s.m.seed = time(nullptr);
+	if (s.m.seed == 0) {
+		uint32_t seedRand = time(nullptr);
+		s.m.seed = rand_r(&seedRand);
+	}
 
 	if (argparse(ac - 1, av + 1) == false) {
 		return 0;
