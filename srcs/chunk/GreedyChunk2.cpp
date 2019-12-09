@@ -108,7 +108,7 @@ void	GreedyChunk2::calcGreedyChunk() {
 		The inner loop 3 times, totally 6 iterations, one for each voxel face.
 	*/
 	bool backFace = true;
-	for (uint8_t i = 0; i < 2; ++i, backFace = !backFace) {
+	for (uint8_t flipFlop = 0; flipFlop < 2; ++flipFlop, backFace = !backFace) {
 		// loop over 3-axes
 		for (uint8_t d = 0; d < 3; ++d) {
 			uint8_t u = (d + 1) % 3;  // d+1, if d == 0(x)  =>  u == 1(y)
