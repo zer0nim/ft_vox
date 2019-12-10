@@ -19,6 +19,7 @@ class ChunkManager {
 		void	draw(glm::mat4 view, Camera *cam);  // draw all chunks
 		void	saveAndQuit();  // save all chunks (if needed) and destroy them
 		void	destroyBlock();  // destroy block using raycasting
+		void	putBlock(uint8_t type);  // put block using raycasting
 		void	updateBlock(wordIVec3 pos, uint8_t value) const;
 		void	updateBlock(wordFVec3 pos, uint8_t value) const;
 		void	updateRaycast();  // update raycast
@@ -41,7 +42,10 @@ class ChunkManager {
 			wordIVec3	selectedBlock;
 			uint8_t		blockType;
 
-			Raycast() : isBlockSelected(false), blockType(0) {}
+			bool		isBeforeBlock;
+			wordIVec3	beforeSelectedBlock;
+
+			Raycast() : isBlockSelected(false), blockType(0), isBeforeBlock(false) {}
 		};
 		Raycast			raycast;
 

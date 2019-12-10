@@ -124,6 +124,9 @@ void	mouseClick(GLFWwindow *window, int button, int action, int mods) {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		winU->chunkManager->destroyBlock();
 	}
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+		winU->chunkManager->putBlock(2);
+	}
 }
 
 void	mouseCb(GLFWwindow *window, double xPos, double yPos) {

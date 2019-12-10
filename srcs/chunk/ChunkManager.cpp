@@ -274,8 +274,21 @@ void ChunkManager::destroyBlock() {
 	}
 }
 
+void ChunkManager::putBlock(uint8_t type) {
+    { std::lock_guard<std::mutex>	guard(s.mutexOthers), guard2(s.mutexChunkMap);
+		if (raycast.isBeforeBlock) {
+			updateBlock(raycast.beforeSelectedBlock, type);
+			raycast.isBlockSelected = false;
+			raycast.isBeforeBlock = false;
+			raycast.blockType = 0;
+		}
+	}
+}
+
 void ChunkManager::updateRaycast() {
-	glm::vec3	point;
+	wordIVec3	point;
+	wordIVec3	pointLastBlock;
+	bool		isBeforeBlock = false;
 	glm::mat4	view;
 	float		start = 0.6;
 	float		end = 0.99;
@@ -291,14 +304,24 @@ void ChunkManager::updateRaycast() {
 			stepDivVal = 2;  // to enter in this condition only once
 			step /= 2;
 		}
-		point = glm::unProject(glm::vec3(s.g.screen.width / 2, s.g.screen.height / 2, dist),
+		glm::vec3 tmpPoint = glm::unProject(glm::vec3(s.g.screen.width / 2, s.g.screen.height / 2, dist),
 							   view,
 							   _projection,
 							   glm::vec4(0, 0, s.g.screen.width, s.g.screen.height));
-		if (point.x < 0) point.x -= 1;
-		if (point.y < 0) point.y -= 1;
-		if (point.z < 0) point.z -= 1;
+		if (tmpPoint.x < 0) tmpPoint.x -= 1;
+		if (tmpPoint.y < 0) tmpPoint.y -= 1;
+		if (tmpPoint.z < 0) tmpPoint.z -= 1;
+		point = wordIVec3(tmpPoint);
 		block = getBlock(point);
+		if (dist > start) {
+			if (pointLastBlock != point && block == 0) {
+				pointLastBlock = point;
+				isBeforeBlock = true;
+			}
+		}
+		else {
+			pointLastBlock = point;
+		}
 		if (block > 0)
 			break;
 	}
@@ -306,11 +329,14 @@ void ChunkManager::updateRaycast() {
     { std::lock_guard<std::mutex>	guard(s.mutexOthers);
 		if (block > 0) {
 			raycast.isBlockSelected = true;
-			raycast.selectedBlock = wordIVec3(point);
+			raycast.selectedBlock = point;
 			raycast.blockType = block;
+			raycast.isBeforeBlock = true;
+			raycast.beforeSelectedBlock = pointLastBlock;
 		}
 		else {
 			raycast.isBlockSelected = false;
+			raycast.isBeforeBlock = false;
 			raycast.blockType = 0;
 		}
 	}
