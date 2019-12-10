@@ -14,6 +14,7 @@
 #include "utils/Shader.hpp"
 #include "utils/Skybox.hpp"
 #include "utils/TextRender.hpp"
+#include "utils/Stats.hpp"
 
 void	*threadUpdateFunction(void *args_) {
 	float						loopTime = 1000 / s.g.screen.fps;
@@ -275,6 +276,7 @@ int		main(int ac, char const **av) {
 
 		// run the game
 		gameLoop(window, cam, skybox, textRender, chunkManager, *textureManager);
+		Stats::printStats();
 
 		// save and quit all chunks
 		chunkManager.saveAndQuit();
