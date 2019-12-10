@@ -128,6 +128,13 @@ void	mouseClick(GLFWwindow *window, int button, int action, int mods) {
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
 		winU->chunkManager->putBlock(s.m.handBlockID);
 	}
+    if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS) {
+	    { std::lock_guard<std::mutex>	guard(s.mutexOthers);
+			if (winU->chunkManager->raycast.isBlockSelected) {
+				s.m.handBlockID = winU->chunkManager->raycast.blockType;
+			}
+		}
+	}
 }
 
 void scrolling(GLFWwindow* window, double xoffset, double yoffset) {
