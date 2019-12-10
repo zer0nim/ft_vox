@@ -150,9 +150,7 @@ void	loadSettings(std::string settingFile) {
 		}
 	}
 	catch (const nlohmann::json::parse_error& e) {
-		std::cerr << "message: " << e.what() << std::endl;
-		std::cerr << "exception id: " << e.id << std::endl;
-		std::cerr << "byte position of error: " << e.byte << std::endl;
+		std::cerr << "error in json loading" << std::endl;
 		throw Settings::JsonParseException();
 	}
 	catch (std::exception &e) {

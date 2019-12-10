@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <vector>
+#include <cmath>
 #include "ChunkManager.hpp"
 
 ChunkManager::ChunkManager(TextureManager const &textureManager, tWinUser *winU) :
@@ -10,7 +11,8 @@ _chunkActPos(-1, -1, -1),
 _textureManager(textureManager),
 _projection(),
 _toCreate(),
-_nbChunkLoaded{0} {}
+_nbChunkLoaded{0},
+_raycast() {}
 
 ChunkManager::ChunkManager(ChunkManager const &src) :
 _textureManager(src.getTextureManager()) {
@@ -51,7 +53,7 @@ void ChunkManager::init(wordFVec3 camPos, glm::mat4 &projection) {
 void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 	AChunk *	newChunk;
 	if (threadID == 0) {
-		std::lock_guard<std::mutex>	guard(s.mutexOthers);
+		std::lock_guard<std::mutex>	guard(s.mutexOthers), guard2(s.mutexCamera);
 		_updateChunkPos(camPos);  // update once only
 	}
 
@@ -125,12 +127,9 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 			if (_getID(it->first) == threadID) {
 				chunkLoaded++;
 				if (_isInChunkLoaded(it->first)) {
-					while (it->second->isDrawing) {
-						usleep(10);
+				    { std::lock_guard<std::mutex>	guard(it->second->mutexChunk);
+						it->second->update();
 					}
-					it->second->isUpdating = true;
-					it->second->update();
-					it->second->isUpdating = false;
 				}
 				else {  // we need to remove the chunk
 				    { std::lock_guard<std::mutex>	guard(s.mutexToDelete);
@@ -163,7 +162,11 @@ void ChunkManager::draw(glm::mat4 view, Camera *cam) {
 				}
 				if (exist) {  // if the chunk exist
 					// if inside the camera
-					if (FRCL_IS_INSIDE(cam->frustumCullingCheckCube(chunkPos, chunkSize))) {
+					bool	frclInside;
+				    { std::lock_guard<std::mutex>	guard(s.mutexCamera);
+						frclInside = FRCL_IS_INSIDE(cam->frustumCullingCheckCube(chunkPos, chunkSize));
+					}
+					if (frclInside) {
 						++chunkRendered;
 						std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
 						_chunkMap[chunkPos]->draw(view);
@@ -191,13 +194,67 @@ void ChunkManager::saveAndQuit() {
 	}
 }
 
+void ChunkManager::destroyBlock() {
+    { std::lock_guard<std::mutex>	guard(s.mutexOthers), guard2(s.mutexChunkMap);
+		if (_raycast.isBlockSelected) {
+			updateBlock(_raycast.selectedBlock, 0);
+			_raycast.isBlockSelected = false;
+			_raycast.blockType = 0;
+		}
+	}
+}
+
+void ChunkManager::updateRaycast() {
+    { std::lock_guard<std::mutex>	guard(s.mutexOthers);
+		if (_raycast.isBlockSelected) {
+		    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
+				if (getBlock(_raycast.selectedBlock) != 0)
+					updateBlock(_raycast.selectedBlock, _raycast.blockType);
+			}
+		}
+	}
+
+	glm::vec3	point;
+	float		start = 0.6;
+	float		end = 0.99;
+	float		step = 0.001;
+	uint8_t		block = 0;
+
+	for (float dist = start; dist <= end; dist += step) {
+		point = glm::unProject(glm::vec3(s.g.screen.width / 2, s.g.screen.height / 2, dist),
+							   _winU->cam->getViewMatrix(),
+							   _projection,
+							   glm::vec4(0, 0, s.g.screen.width, s.g.screen.height));
+		block = getBlock(point);
+		if (block > 0)
+			break;
+	}
+
+    { std::lock_guard<std::mutex>	guard(s.mutexOthers);
+		if (block > 0) {
+			_raycast.isBlockSelected = true;
+			_raycast.selectedBlock = wordIVec3(point);
+			_raycast.blockType = block;
+	////////////////////////////////////////
+		    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
+				updateBlock(_raycast.selectedBlock, TextureManager::blocksNames["bedrock"]);
+			}
+	////////////////////////////////////////
+		}
+		else {
+			_raycast.isBlockSelected = false;
+			_raycast.blockType = 0;
+		}
+	}
+}
+
 void ChunkManager::_updateChunkPos(wordFVec3 const &pos) {
 	_updateChunkPos(wordIVec3(pos));
 }
 void ChunkManager::_updateChunkPos(wordIVec3 const &pos) {
-	_chunkActPos.x = pos.x - pos.x % CHUNK_SZ_X + ((pos.x < 0) ? -CHUNK_SZ_X : 0);
-	_chunkActPos.y = pos.y - pos.y % CHUNK_SZ_Y + ((pos.y < 0) ? -CHUNK_SZ_Y : 0);
-	_chunkActPos.z = pos.z - pos.z % CHUNK_SZ_Z + ((pos.z < 0) ? -CHUNK_SZ_Z : 0);
+	_chunkActPos.x = pos.x - pos.x % CHUNK_SZ_X + ((pos.x < 0 && pos.x % CHUNK_SZ_X != 0) ? -CHUNK_SZ_X : 0);
+	_chunkActPos.y = pos.y - pos.y % CHUNK_SZ_Y + ((pos.y < 0 && pos.y % CHUNK_SZ_Y != 0) ? -CHUNK_SZ_Y : 0);
+	_chunkActPos.z = pos.z - pos.z % CHUNK_SZ_Z + ((pos.z < 0 && pos.z % CHUNK_SZ_Z != 0) ? -CHUNK_SZ_Z : 0);
 }
 
 bool	ChunkManager::_isInChunkLoaded(wordIVec3 const &chunkPos) const {
@@ -224,7 +281,7 @@ uint8_t	ChunkManager::_getID(int32_t const x) const {
 tWinUser								*ChunkManager::getWinU() { return _winU; }
 tWinUser								*ChunkManager::getWinU() const { return _winU; }
 std::map<wordIVec3, AChunk*>			&ChunkManager::getChunkMap() { return _chunkMap; }
-std::map<wordIVec3, AChunk*> const	&ChunkManager::getChunkMap() const { return _chunkMap; }
+std::map<wordIVec3, AChunk*> const		&ChunkManager::getChunkMap() const { return _chunkMap; }
 wordIVec3 const							&ChunkManager::getChunkActPos() const { return _chunkActPos; }
 TextureManager const					&ChunkManager::getTextureManager() const { return _textureManager; };
 glm::mat4 const							&ChunkManager::getProjection() const { return _projection; };
@@ -235,4 +292,43 @@ uint32_t								ChunkManager::getNbChunkLoaded() const {
 	}
 	return ret;
 }
-uint32_t								ChunkManager::getNbChunkRendered() const { return _nbChunkRendered; }
+uint32_t	ChunkManager::getNbChunkRendered() const { return _nbChunkRendered; }
+uint8_t		ChunkManager::getBlock(wordFVec3 pos) const {
+	return getBlock(static_cast<wordIVec3>(pos));
+}
+uint8_t		ChunkManager::getBlock(wordIVec3 pos) const {
+	uint8_t		ret = 0;
+	wordIVec3	chunkPos;
+	chunkPos.x = pos.x - pos.x % CHUNK_SZ_X + ((pos.x < 0 && pos.x % CHUNK_SZ_X != 0) ? -CHUNK_SZ_X : 0);
+	chunkPos.y = pos.y - pos.y % CHUNK_SZ_Y + ((pos.y < 0 && pos.y % CHUNK_SZ_Y != 0) ? -CHUNK_SZ_Y : 0);
+	chunkPos.z = pos.z - pos.z % CHUNK_SZ_Z + ((pos.z < 0 && pos.z % CHUNK_SZ_Z != 0) ? -CHUNK_SZ_Z : 0);
+
+	if (_isChunkExist(chunkPos)) {
+		AChunk * chunk = _chunkMap.at(chunkPos);
+	    { std::lock_guard<std::mutex>	guard(chunk->mutexChunk);
+			ret = chunk->getData().data[std::abs(pos.x - chunkPos.x)]
+									[std::abs(pos.y - chunkPos.y)]
+									[std::abs(pos.z - chunkPos.z)];
+		}
+	}
+	return ret;
+}
+void	ChunkManager::updateBlock(wordFVec3 pos, uint8_t value) const {
+	updateBlock(static_cast<wordIVec3>(pos), value);
+}
+void	ChunkManager::updateBlock(wordIVec3 pos, uint8_t value) const {
+	wordIVec3	chunkPos;
+	chunkPos.x = pos.x - pos.x % CHUNK_SZ_X + ((pos.x < 0 && pos.x % CHUNK_SZ_X != 0) ? -CHUNK_SZ_X : 0);
+	chunkPos.y = pos.y - pos.y % CHUNK_SZ_Y + ((pos.y < 0 && pos.y % CHUNK_SZ_Y != 0) ? -CHUNK_SZ_Y : 0);
+	chunkPos.z = pos.z - pos.z % CHUNK_SZ_Z + ((pos.z < 0 && pos.z % CHUNK_SZ_Z != 0) ? -CHUNK_SZ_Z : 0);
+
+	if (_isChunkExist(chunkPos)) {
+		AChunk * chunk = _chunkMap.at(chunkPos);
+		chunkVec3	blockPos = chunkVec3(std::abs(pos.x - chunkPos.x),
+										 std::abs(pos.y - chunkPos.y),
+										 std::abs(pos.z - chunkPos.z));
+	    { std::lock_guard<std::mutex>	guard(chunk->mutexChunk);
+			chunk->updateBlock(blockPos, value);
+		}
+	}
+}

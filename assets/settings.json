@@ -1,6 +1,6 @@
 {
 	"global": {
-		"renderDist": 16,
+		"renderDist": 3,
 		"files": {
 			"mapsPath": "/tmp/ft_vox/maps/",
 			"chunkPath": "chunks/",
@@ -9,8 +9,8 @@
 		},
 		"screen": {
 			"fullscreen": false,
-			"width": 1200,
-			"height": 800,
+			"width": 800,
+			"height": 600,
 			"fps": 120,
 			"text": {
 				"normal": {
@@ -30,27 +30,17 @@
 	},
 	"map": {
 		"seed": 0,
-		"generationType": 2,
+		"generationType": 1,
 		"cameraStartPos": {
 			"pos": {
 				"x": 0,
-				"y": 64,
+				"y": 6,
 				"z": 0
 			},
 			"yaw": -90,
 			"pitch": 0
 		},
 		"flatMap": [
-			{
-				"fromY": 0,
-				"toY": 0,
-				"blockName": "bedrock"
-			},
-			{
-				"fromY": 1,
-				"toY": 2,
-				"blockName": "stone"
-			},
 			{
 				"fromY": 3,
 				"toY": 3,

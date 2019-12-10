@@ -1,6 +1,7 @@
 #include <chrono>
 
 #include "ft_vox.hpp"
+#include "ChunkManager.hpp"
 
 static u_int8_t	firstTwoCall = 2;
 
@@ -116,6 +117,15 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 	}
 }
 
+void	mouseClick(GLFWwindow *window, int button, int action, int mods) {
+	tWinUser	*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
+	(void)action;
+	(void)mods;
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+		winU->chunkManager->destroyBlock();
+	}
+}
+
 void	mouseCb(GLFWwindow *window, double xPos, double yPos) {
 	tWinUser		*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
 	static float	lastX = s.g.screen.width / 2.0;
@@ -192,6 +202,7 @@ bool	initWindow(GLFWwindow **window, const char *name, tWinUser *winU) {
 
 	glfwSetFramebufferSizeCallback(*window, frambuffResizeCb);
 	glfwSetCursorPosCallback(*window, mouseCb);
+	glfwSetMouseButtonCallback(*window, mouseClick);
 	glfwSetKeyCallback(*window, keyCb);
 
 	glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);

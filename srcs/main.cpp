@@ -83,7 +83,9 @@ TextRender &textRender, ChunkManager &chunkManager) {
 		+ std::pow(CHUNK_SZ_Z * s.g.renderDist, 2)));
 	glm::mat4	projection = glm::perspective(glm::radians(angle), ratio, nearD, farD);
 
-	winU->cam->frustumCullingInit(angle, ratio, nearD, farD);
+    { std::lock_guard<std::mutex>	guard(s.mutexCamera);
+		winU->cam->frustumCullingInit(angle, ratio, nearD, farD);
+	}
 
 	chunkManager.init(winU->cam->pos, projection);
 
@@ -107,7 +109,13 @@ TextRender &textRender, ChunkManager &chunkManager) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// view matrix
-		glm::mat4	view = cam.getViewMatrix();
+		glm::mat4	view;
+	    { std::lock_guard<std::mutex>	guard(s.mutexCamera);
+			view = cam.getViewMatrix();
+		}
+
+		// update raycast
+		chunkManager.updateRaycast();
 
 		glm::mat4	skyView = view;
 		skyView[3][0] = 0;  // remove translation for the skybox
@@ -198,6 +206,7 @@ TextRender &textRender, ChunkManager &chunkManager) {
 
 bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
 	winU->cam = cam;
+	winU->chunkManager = nullptr;
 	winU->dtTime = 0.0f;
 	winU->lastFrame = 0.0f;
 	winU->showInfo = true;
@@ -272,6 +281,7 @@ int		main(int ac, char const **av) {
 
 		// create chunkManager
 		ChunkManager chunkManager(*textureManager, &winU);
+		winU.chunkManager = &chunkManager;
 
 		// run the game
 		gameLoop(window, cam, skybox, textRender, chunkManager);

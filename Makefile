@@ -79,12 +79,8 @@ PRE_COMMIT_FILE = .git/hooks/pre-commit
 define PRE_COMMIT
 #!/bin/zsh
 
-git stash -q --keep-index
-
 make check -j8
 lol=$$?
-
-git stash pop -q
 
 exit $${lol}
 endef

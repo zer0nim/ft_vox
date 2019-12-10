@@ -18,6 +18,10 @@ class ChunkManager {
 		void	update(wordFVec3 &camPos, uint8_t threadID, bool createAll = false);  // global update (call each frame)
 		void	draw(glm::mat4 view, Camera *cam);  // draw all chunks
 		void	saveAndQuit();  // save all chunks (if needed) and destroy them
+		void	destroyBlock();  // destroy block using raycasting
+		void	updateBlock(wordIVec3 pos, uint8_t value) const;
+		void	updateBlock(wordFVec3 pos, uint8_t value) const;
+		void	updateRaycast();  // update raycast
 
 		tWinUser								*getWinU();
 		tWinUser								*getWinU() const;
@@ -28,6 +32,8 @@ class ChunkManager {
 		glm::mat4 const							&getProjection() const;
 		uint32_t								getNbChunkLoaded() const;
 		uint32_t								getNbChunkRendered() const;
+		uint8_t									getBlock(wordIVec3 pos) const;
+		uint8_t									getBlock(wordFVec3 pos) const;
 
 		std::deque<wordFVec3>				toDelete;  // list of chunks to delete
 
@@ -53,4 +59,12 @@ class ChunkManager {
 		std::array<std::deque<wordIVec3>, NB_UPDATE_THREADS>	_toCreate;  // list of chunks to create
 		std::array<uint32_t, NB_UPDATE_THREADS>					_nbChunkLoaded;  // number of chunks loaded in memory
 		uint32_t						_nbChunkRendered;  // number of chunks rendered on screen
+		struct Raycast {
+			bool		isBlockSelected;
+			wordIVec3	selectedBlock;
+			uint8_t		blockType;
+
+			Raycast() : isBlockSelected(false), blockType(0) {}
+		};
+		Raycast			_raycast;
 };

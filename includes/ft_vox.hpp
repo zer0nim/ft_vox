@@ -32,7 +32,8 @@ GreedyChunk
 GreedyChunk2
 GreedyChunk3
 */
-#define CHUNK_OBJECT			GreedyChunk3  // the chunk object used
+#define CHUNK_OBJECT	Chunk  // the chunk object used
+
 
 /*
 generation type
@@ -59,16 +60,18 @@ enum class Direction {
 	BOTTOM
 };
 
-typedef struct	sWinUser {
-	Camera		*cam;
-	float		dtTime;
-	float		lastFrame;
+class ChunkManager;
+typedef struct		sWinUser {
+	Camera			*cam;
+	ChunkManager	*chunkManager;
+	float			dtTime;
+	float			lastFrame;
 
-	bool		showInfo;  // show info module (F3)
-	bool		showHelp;  // show help module (F3 + H)
-	bool		freezeChunkUpdate;  // freeze chunk update (F3 + F)
-	int8_t		polygonRenderMode;  // toggle polygon render mode (F3 + P)
-}				tWinUser;
+	bool			showInfo;  // show info module (F3)
+	bool			showHelp;  // show help module (F3 + H)
+	bool			freezeChunkUpdate;  // freeze chunk update (F3 + F)
+	int8_t			polygonRenderMode;  // toggle polygon render mode (F3 + P)
+}					tWinUser;
 
 struct Locker {
 	bool	ask;
@@ -194,6 +197,7 @@ struct Settings {
 	std::mutex	mutexChunkMap;
 	std::mutex	mutexToCreate;
 	std::mutex	mutexToDelete;
+	std::mutex	mutexCamera;
 	std::mutex	mutexOthers;
 };
 
