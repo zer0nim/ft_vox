@@ -205,17 +205,6 @@ void ChunkManager::destroyBlock() {
 }
 
 void ChunkManager::updateRaycast() {
-	////////////////////////////////////////
-    { std::lock_guard<std::mutex>	guard(s.mutexOthers);
-		if (raycast.isBlockSelected) {
-		    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
-				if (getBlock(raycast.selectedBlock) != 0)
-					updateBlock(raycast.selectedBlock, raycast.blockType);
-			}
-		}
-	}
-	////////////////////////////////////////
-
 	glm::vec3	point;
 	float		start = 0.6;
 	float		end = 0.99;
@@ -245,11 +234,6 @@ void ChunkManager::updateRaycast() {
 			raycast.isBlockSelected = true;
 			raycast.selectedBlock = wordIVec3(point);
 			raycast.blockType = block;
-	////////////////////////////////////////
-		    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
-				updateBlock(raycast.selectedBlock, TextureManager::blocksNames["bedrock"]);
-			}
-	////////////////////////////////////////
 		}
 		else {
 			raycast.isBlockSelected = false;

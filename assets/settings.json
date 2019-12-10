@@ -1,6 +1,6 @@
 {
 	"global": {
-		"renderDist": 3,
+		"renderDist": 16,
 		"files": {
 			"mapsPath": "/tmp/ft_vox/maps/",
 			"chunkPath": "chunks/",
@@ -30,17 +30,27 @@
 	},
 	"map": {
 		"seed": 0,
-		"generationType": 1,
+		"generationType": 2,
 		"cameraStartPos": {
 			"pos": {
 				"x": 0,
-				"y": 6,
+				"y": 64,
 				"z": 0
 			},
 			"yaw": -90,
 			"pitch": 0
 		},
 		"flatMap": [
+			{
+				"fromY": 0,
+				"toY": 0,
+				"blockName": "bedrock"
+			},
+			{
+				"fromY": 1,
+				"toY": 2,
+				"blockName": "stone"
+			},
 			{
 				"fromY": 3,
 				"toY": 3,
