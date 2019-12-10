@@ -67,4 +67,9 @@ class ChunkManager {
 		std::array<std::deque<wordIVec3>, NB_UPDATE_THREADS>	_toCreate;  // list of chunks to create
 		std::array<uint32_t, NB_UPDATE_THREADS>					_nbChunkLoaded;  // number of chunks loaded in memory
 		uint32_t						_nbChunkRendered;  // number of chunks rendered on screen
+
+		Shader							*_borderShader;
+		uint32_t						_borderShaderVAO;
+		uint32_t						_borderShaderVBO;
+		static const float				_borderVertices[];
 };

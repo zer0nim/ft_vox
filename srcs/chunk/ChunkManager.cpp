@@ -3,6 +3,44 @@
 #include <cmath>
 #include "ChunkManager.hpp"
 
+const float	ChunkManager::_borderVertices[] = {
+	0, 0, 0,
+	0, 0, 1,
+
+	1, 0, 0,
+	1, 0, 1,
+
+	0, 0, 0,
+	1, 0, 0,
+
+	0, 0, 1,
+	1, 0, 1,
+
+	0, 1, 0,
+	0, 1, 1,
+
+	1, 1, 0,
+	1, 1, 1,
+
+	0, 1, 0,
+	1, 1, 0,
+
+	0, 1, 1,
+	1, 1, 1,
+
+	0, 0, 0,
+	0, 1, 0,
+
+	0, 0, 1,
+	0, 1, 1,
+
+	1, 0, 0,
+	1, 1, 0,
+
+	1, 0, 1,
+	1, 1, 1,
+};
+
 ChunkManager::ChunkManager(TextureManager const &textureManager, tWinUser *winU) :
 toDelete(),
 raycast(),
@@ -12,7 +50,9 @@ _chunkActPos(-1, -1, -1),
 _textureManager(textureManager),
 _projection(),
 _toCreate(),
-_nbChunkLoaded{0} {}
+_nbChunkLoaded{0},
+_borderShader(nullptr) {
+}
 
 ChunkManager::ChunkManager(ChunkManager const &src) :
 _textureManager(src.getTextureManager()) {
@@ -29,6 +69,8 @@ ChunkManager::~ChunkManager() {
 		_chunkMap.erase(toDelete.front());
 		toDelete.pop_front();
 	}
+
+	delete _borderShader;
 }
 
 ChunkManager &ChunkManager::operator=(ChunkManager const &rhs) {
@@ -42,6 +84,19 @@ ChunkManager &ChunkManager::operator=(ChunkManager const &rhs) {
 
 void ChunkManager::init(wordFVec3 camPos, glm::mat4 &projection) {
 	_projection = projection;
+	_borderShader = new Shader("shaders/blockBorder_vs.glsl", "shaders/blockBorder_fs.glsl");
+	_borderShader->use();
+	_borderShader->setMat4("projection", _projection);
+    glGenVertexArrays(1, &_borderShaderVAO);
+    glGenBuffers(1, &_borderShaderVBO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, _borderShaderVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(ChunkManager::_borderVertices), ChunkManager::_borderVertices, GL_STATIC_DRAW);
+
+    glBindVertexArray(_borderShaderVAO);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), reinterpret_cast<void*>(0));
+    glEnableVertexAttribArray(0);
 	for (uint8_t i = 0; i < NB_UPDATE_THREADS; i++) {
 		_lastChunkPos[i].x = -1;
 		_lastChunkPos[i].y = -1;
@@ -175,6 +230,21 @@ void ChunkManager::draw(glm::mat4 view, Camera *cam) {
 			}
 		}
 	}
+	bool blockSelected;
+    { std::lock_guard<std::mutex>	guard(s.mutexOthers);
+		blockSelected = raycast.isBlockSelected;
+	}
+	if (blockSelected) {
+		glm::mat4 model;
+	    { std::lock_guard<std::mutex>	guard(s.mutexOthers);
+			model = glm::translate(glm::mat4(1.0f), glm::vec3(raycast.selectedBlock));
+		}
+		_borderShader->use();
+		_borderShader->setMat4("view", view);
+		_borderShader->setMat4("model", model);
+		glBindVertexArray(_borderShaderVAO);
+		glDrawArrays(GL_LINES, 0, 24);
+	}
     { std::lock_guard<std::mutex>	guard(s.mutexOthers);
 		_nbChunkRendered = chunkRendered;
 	}
@@ -206,19 +276,23 @@ void ChunkManager::destroyBlock() {
 
 void ChunkManager::updateRaycast() {
 	glm::vec3	point;
+	glm::mat4	view;
 	float		start = 0.6;
 	float		end = 0.99;
 	float		stepDivVal = 0.97;
 	float		step = 0.001;
 	uint8_t		block = 0;
 
+    { std::lock_guard<std::mutex>	guard(s.mutexCamera);
+		view = _winU->cam->getViewMatrix();
+	}
 	for (float dist = start; dist <= end; dist += step) {
 		if (dist >= stepDivVal) {
 			stepDivVal = 2;  // to enter in this condition only once
 			step /= 2;
 		}
 		point = glm::unProject(glm::vec3(s.g.screen.width / 2, s.g.screen.height / 2, dist),
-							   _winU->cam->getViewMatrix(),
+							   view,
 							   _projection,
 							   glm::vec4(0, 0, s.g.screen.width, s.g.screen.height));
 		if (point.x < 0) point.x -= 1;
