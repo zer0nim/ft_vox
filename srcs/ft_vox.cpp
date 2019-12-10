@@ -39,6 +39,7 @@ void	setDefaultSettings() {
 	s.m.flatMap.push_back({0, 0, "bedrock"});
 	s.m.flatMap.push_back({1, 2, "stone"});
 	s.m.flatMap.push_back({3, 3, "grass"});
+	s.m.handBlockID = 2;
 }
 
 static void	loadSettingElementFont(nlohmann::json &element, std::string &key) {
@@ -114,6 +115,8 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		s.m.seed = element.get<uint32_t>();
 	else if (element.is_array() && key == ".map.flatMap")
 		loadFlatMap(element);
+	else if (element.is_number() && key == ".map.handBlockID")
+		s.m.handBlockID = element.get<uint32_t>();
 	else
 		std::cout << "[WARN]: invalid argument or argument type in settings: " << key << ": " << element << std::endl;
 }
@@ -286,7 +289,8 @@ bool	saveMap(Camera &cam) {
 			    {"yaw", cam.yaw},
 			    {"pitch", cam.pitch}
 			}},
-			{"flatMap", flatMapElem}
+			{"flatMap", flatMapElem},
+			{"handBlockID", s.m.handBlockID},
 		}
 	}};
 	try {

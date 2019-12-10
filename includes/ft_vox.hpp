@@ -164,6 +164,7 @@ struct Settings {
 			std::string	blockName;
 		};
 		std::vector<FlatMap>	flatMap;
+		uint8_t					handBlockID;
 	};
 	Map m;  // map
 

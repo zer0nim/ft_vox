@@ -2,6 +2,7 @@
 
 #include "ft_vox.hpp"
 #include "ChunkManager.hpp"
+#include "TextureManager.hpp"
 
 static u_int8_t	firstTwoCall = 2;
 
@@ -125,7 +126,24 @@ void	mouseClick(GLFWwindow *window, int button, int action, int mods) {
 		winU->chunkManager->destroyBlock();
 	}
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
-		winU->chunkManager->putBlock(2);
+		winU->chunkManager->putBlock(s.m.handBlockID);
+	}
+}
+
+void scrolling(GLFWwindow* window, double xoffset, double yoffset) {
+	(void)window;
+	(void)xoffset;
+	if (yoffset > 0) {
+		s.m.handBlockID++;
+		if (s.m.handBlockID > NB_TYPE_BLOCKS) {
+			s.m.handBlockID = 1;
+		}
+	}
+	else if (yoffset < 0) {
+		s.m.handBlockID--;
+		if (s.m.handBlockID <= 0) {
+			s.m.handBlockID = NB_TYPE_BLOCKS;
+		}
 	}
 }
 
@@ -206,6 +224,7 @@ bool	initWindow(GLFWwindow **window, const char *name, tWinUser *winU) {
 	glfwSetFramebufferSizeCallback(*window, frambuffResizeCb);
 	glfwSetCursorPosCallback(*window, mouseCb);
 	glfwSetMouseButtonCallback(*window, mouseClick);
+	glfwSetScrollCallback(*window, scrolling);
 	glfwSetKeyCallback(*window, keyCb);
 
 	glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
