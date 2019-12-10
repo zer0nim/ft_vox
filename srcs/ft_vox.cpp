@@ -357,6 +357,18 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 	}
 	textRender.write("normal", sPosChunk, textX, textY);
 
+	// looking at
+    { std::lock_guard<std::mutex>	guard(s.mutexOthers);
+		if (chunkManager.raycast.isBlockSelected) {
+			std::string sLookAt;
+			textY -= lineSz;
+			sLookAt = std::string("Looking at: ") + std::to_string(chunkManager.raycast.selectedBlock.x) + " "
+				+ std::to_string(chunkManager.raycast.selectedBlock.y) + " "
+				+ std::to_string(chunkManager.raycast.selectedBlock.z);
+			textRender.write("normal", sLookAt, textX, textY);
+		}
+	}
+
 	if (winU->freezeChunkUpdate) {
 		// freeze chunk update
 		textY -= lineSz;

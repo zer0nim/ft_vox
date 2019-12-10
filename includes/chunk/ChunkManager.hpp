@@ -36,6 +36,14 @@ class ChunkManager {
 		uint8_t									getBlock(wordFVec3 pos) const;
 
 		std::deque<wordFVec3>				toDelete;  // list of chunks to delete
+		struct Raycast {
+			bool		isBlockSelected;
+			wordIVec3	selectedBlock;
+			uint8_t		blockType;
+
+			Raycast() : isBlockSelected(false), blockType(0) {}
+		};
+		Raycast			raycast;
 
 	private:
 		ChunkManager();
@@ -59,12 +67,4 @@ class ChunkManager {
 		std::array<std::deque<wordIVec3>, NB_UPDATE_THREADS>	_toCreate;  // list of chunks to create
 		std::array<uint32_t, NB_UPDATE_THREADS>					_nbChunkLoaded;  // number of chunks loaded in memory
 		uint32_t						_nbChunkRendered;  // number of chunks rendered on screen
-		struct Raycast {
-			bool		isBlockSelected;
-			wordIVec3	selectedBlock;
-			uint8_t		blockType;
-
-			Raycast() : isBlockSelected(false), blockType(0) {}
-		};
-		Raycast			_raycast;
 };

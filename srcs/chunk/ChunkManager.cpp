@@ -5,14 +5,14 @@
 
 ChunkManager::ChunkManager(TextureManager const &textureManager, tWinUser *winU) :
 toDelete(),
+raycast(),
 _winU(winU),
 _chunkMap(),
 _chunkActPos(-1, -1, -1),
 _textureManager(textureManager),
 _projection(),
 _toCreate(),
-_nbChunkLoaded{0},
-_raycast() {}
+_nbChunkLoaded{0} {}
 
 ChunkManager::ChunkManager(ChunkManager const &src) :
 _textureManager(src.getTextureManager()) {
@@ -196,35 +196,45 @@ void ChunkManager::saveAndQuit() {
 
 void ChunkManager::destroyBlock() {
     { std::lock_guard<std::mutex>	guard(s.mutexOthers), guard2(s.mutexChunkMap);
-		if (_raycast.isBlockSelected) {
-			updateBlock(_raycast.selectedBlock, 0);
-			_raycast.isBlockSelected = false;
-			_raycast.blockType = 0;
+		if (raycast.isBlockSelected) {
+			updateBlock(raycast.selectedBlock, 0);
+			raycast.isBlockSelected = false;
+			raycast.blockType = 0;
 		}
 	}
 }
 
 void ChunkManager::updateRaycast() {
+	////////////////////////////////////////
     { std::lock_guard<std::mutex>	guard(s.mutexOthers);
-		if (_raycast.isBlockSelected) {
+		if (raycast.isBlockSelected) {
 		    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
-				if (getBlock(_raycast.selectedBlock) != 0)
-					updateBlock(_raycast.selectedBlock, _raycast.blockType);
+				if (getBlock(raycast.selectedBlock) != 0)
+					updateBlock(raycast.selectedBlock, raycast.blockType);
 			}
 		}
 	}
+	////////////////////////////////////////
 
 	glm::vec3	point;
 	float		start = 0.6;
 	float		end = 0.99;
+	float		stepDivVal = 0.97;
 	float		step = 0.001;
 	uint8_t		block = 0;
 
 	for (float dist = start; dist <= end; dist += step) {
+		if (dist >= stepDivVal) {
+			stepDivVal = 2;  // to enter in this condition only once
+			step /= 2;
+		}
 		point = glm::unProject(glm::vec3(s.g.screen.width / 2, s.g.screen.height / 2, dist),
 							   _winU->cam->getViewMatrix(),
 							   _projection,
 							   glm::vec4(0, 0, s.g.screen.width, s.g.screen.height));
+		if (point.x < 0) point.x -= 1;
+		if (point.y < 0) point.y -= 1;
+		if (point.z < 0) point.z -= 1;
 		block = getBlock(point);
 		if (block > 0)
 			break;
@@ -232,18 +242,18 @@ void ChunkManager::updateRaycast() {
 
     { std::lock_guard<std::mutex>	guard(s.mutexOthers);
 		if (block > 0) {
-			_raycast.isBlockSelected = true;
-			_raycast.selectedBlock = wordIVec3(point);
-			_raycast.blockType = block;
+			raycast.isBlockSelected = true;
+			raycast.selectedBlock = wordIVec3(point);
+			raycast.blockType = block;
 	////////////////////////////////////////
 		    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
-				updateBlock(_raycast.selectedBlock, TextureManager::blocksNames["bedrock"]);
+				updateBlock(raycast.selectedBlock, TextureManager::blocksNames["bedrock"]);
 			}
 	////////////////////////////////////////
 		}
 		else {
-			_raycast.isBlockSelected = false;
-			_raycast.blockType = 0;
+			raycast.isBlockSelected = false;
+			raycast.blockType = 0;
 		}
 	}
 }

@@ -64,8 +64,8 @@ TextRender &textRender, ChunkManager &chunkManager) {
 	int							lastFps = 0;
 	tWinUser					*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
 	bool						firstLoop = true;
-	float						cursorX = s.g.screen.width / 2 - s.g.screen.text["courrier_new"].size / 2;
-	float						cursorY = s.g.screen.height / 2 - s.g.screen.text["courrier_new"].size / 2;
+	float						cursorX = s.g.screen.width / 2 - textRender.font["courrier_new"]['+'].size.x / 2;
+	float						cursorY = s.g.screen.height / 2 - textRender.font["courrier_new"]['+'].size.y / 2;
 
 	/* threading */
 	std::array<ThreadupdateArgs *, NB_UPDATE_THREADS>	threadUpdateArgs;
