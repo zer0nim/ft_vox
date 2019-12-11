@@ -219,6 +219,7 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
 	winU->lastFrame = 0.0f;
 	winU->showInfo = true;
 	winU->showHelp = false;
+	winU->freezeChunkUpdate = false;
 	winU->putBlock = false;
 	winU->destroyBlock = false;
 	winU->polygonRenderMode = 0;
