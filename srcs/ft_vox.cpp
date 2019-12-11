@@ -373,6 +373,16 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 		}
 	}
 
+	// object in hand
+	textY -= lineSz;
+	std::string sInHand = "In hand: ";
+	for (auto it = TextureManager::blocksNames.begin(); it != TextureManager::blocksNames.end(); it++) {
+		if (it->second == s.m.handBlockID) {
+			sInHand += it->first;
+		}
+	}
+	textRender.write("normal", sInHand, textX, textY);
+
 	if (winU->freezeChunkUpdate) {
 		// freeze chunk update
 		textY -= lineSz;

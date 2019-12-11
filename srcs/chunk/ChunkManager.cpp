@@ -150,18 +150,39 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 	wordIVec3	chunkPos;
 	while (i < MAX_CREATED_CHUNK_UPDATE_COUNT) {
 	    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap), guard2(s.mutexToCreate);
-			// skip old chunks
-			while (_toCreate[threadID].empty() == false && _isInChunkLoaded(_toCreate[threadID].front()) == false) {
+			#if SMART_LOAD_ORDER
+				if (_toCreate[threadID].size() == 0)
+					break;
+				uint32_t	minDist = 100000;
+				uint32_t	idMinDist = 0;
+				// get the closest chunk
+				for (uint32_t j = 0; j < _toCreate[threadID].size(); j++) {
+					uint32_t dist = std::abs(_toCreate[threadID][j].x - _chunkActPos.x)
+									+ std::abs(_toCreate[threadID][j].z - _chunkActPos.z);
+					if (dist < minDist) {
+						minDist = dist;
+						idMinDist = j;
+					}
+				}
+				chunkPos = _toCreate[threadID][idMinDist];
+				_toCreate[threadID].erase(_toCreate[threadID].begin() + idMinDist);
+			#else
+				// skip old chunks
+				while (_toCreate[threadID].empty() == false && _isInChunkLoaded(_toCreate[threadID].front()) == false) {
+					_toCreate[threadID].pop_front();
+				}
+				if (_toCreate[threadID].empty())
+					break;
+				chunkPos = _toCreate[threadID].front();
 				_toCreate[threadID].pop_front();
-			}
-			if (_toCreate[threadID].empty())
-				break;
-			chunkPos = _toCreate[threadID].front();
-			_toCreate[threadID].pop_front();
+			#endif
 		}
 		bool exist;
 	    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
 			exist = _isChunkExist(chunkPos);
+			if (_isInChunkLoaded(chunkPos) == false) {
+				exist = true;
+			}
 		}
 		if (exist == false) {  // if the chunk doesnt exist (for now)
 			newChunk = instanciateNewChunk(_textureManager, _projection);  // create a chunk with the rihgt type
@@ -293,7 +314,7 @@ void ChunkManager::updateRaycast() {
 	float		start = 0.6;
 	float		end = 0.99;
 	float		stepDivVal = 0.97;
-	float		step = 0.001;
+	float		step = 0.0005;
 	uint8_t		block = 0;
 
     { std::lock_guard<std::mutex>	guard(s.mutexCamera);
@@ -302,7 +323,7 @@ void ChunkManager::updateRaycast() {
 	for (float dist = start; dist <= end; dist += step) {
 		if (dist >= stepDivVal) {
 			stepDivVal = 2;  // to enter in this condition only once
-			step /= 2;
+			step /= 5;
 		}
 		glm::vec3 tmpPoint = glm::unProject(glm::vec3(s.g.screen.width / 2, s.g.screen.height / 2, dist),
 							   view,
