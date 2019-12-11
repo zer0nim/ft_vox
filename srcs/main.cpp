@@ -114,6 +114,14 @@ TextRender &textRender, ChunkManager &chunkManager) {
 			view = cam.getViewMatrix();
 		}
 
+		// put / destroy block
+		if (winU->putBlock) {
+			chunkManager.putBlock(s.m.handBlockID);
+		}
+		if (winU->destroyBlock) {
+			chunkManager.destroyBlock();
+		}
+
 		// update raycast
 		chunkManager.updateRaycast();
 
@@ -210,8 +218,9 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
 	winU->dtTime = 0.0f;
 	winU->lastFrame = 0.0f;
 	winU->showInfo = true;
-	winU->showHelp = true;
-	winU->freezeChunkUpdate = false;
+	winU->showHelp = false;
+	winU->putBlock = false;
+	winU->destroyBlock = false;
 	winU->polygonRenderMode = 0;
 
 	if (!initWindow(window, name, winU))

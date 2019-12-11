@@ -27,6 +27,8 @@ void	setDefaultSettings() {
 		"title", {"assets/fonts/minecraft_title.ttf", 24}));
 	s.g.screen.text.insert(std::pair<std::string, Settings::Global::Screen::Text>(
 		"courrier_new", {"assets/fonts/courrier_new.ttf", 40}));
+	s.g.delayPutMs = 100;
+	s.g.delayDestroyMs = 100;
 	uint32_t seedRand = time(nullptr);
 	s.m.seed = rand_r(&seedRand);
 	s.m.generationType = GENERATION_NORMAL;
@@ -99,6 +101,10 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		s.g.screen.fps = element.get<uint32_t>();
 	else if (boost::starts_with(key, ".global.screen.text."))
 		loadSettingElementFont(element, key);
+	else if (element.is_number() && key == ".global.delayPutMs")
+		s.g.delayPutMs = element.get<uint32_t>();
+	else if (element.is_number() && key == ".global.delayDestroyMs")
+		s.g.delayDestroyMs = element.get<uint32_t>();
 	else if (element.is_number() && key == ".map.generationType")
 		s.m.generationType = element.get<uint32_t>();
 	else if (element.is_number() && key == ".map.cameraStartPos.pos.x")
@@ -361,6 +367,17 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 	}
 	textRender.write("normal", sPosChunk, textX, textY);
 
+
+	// object in hand
+	textY -= lineSz;
+	std::string sInHand = "In hand: ";
+	for (auto it = TextureManager::blocksNames.begin(); it != TextureManager::blocksNames.end(); it++) {
+		if (it->second == s.m.handBlockID) {
+			sInHand += it->first;
+		}
+	}
+	textRender.write("normal", sInHand, textX, textY);
+
 	// looking at
     { std::lock_guard<std::mutex>	guard(s.mutexOthers);
 		if (chunkManager.raycast.isBlockSelected) {
@@ -372,16 +389,6 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 			textRender.write("normal", sLookAt, textX, textY);
 		}
 	}
-
-	// object in hand
-	textY -= lineSz;
-	std::string sInHand = "In hand: ";
-	for (auto it = TextureManager::blocksNames.begin(); it != TextureManager::blocksNames.end(); it++) {
-		if (it->second == s.m.handBlockID) {
-			sInHand += it->first;
-		}
-	}
-	textRender.write("normal", sInHand, textX, textY);
 
 	if (winU->freezeChunkUpdate) {
 		// freeze chunk update

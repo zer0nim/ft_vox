@@ -22,7 +22,7 @@
 
 #define ENABLE_MAX_CREATED_CHUNK_UPDATE	true  // enable / disable option
 #define LOAD_ALL_BEFORE_OPEN_WINDOW		false
-#define MAX_CREATED_CHUNK_UPDATE_COUNT	4  // create max # chunks each update call (don't create all at the same update)
+#define MAX_CREATED_CHUNK_UPDATE_COUNT	2  // create max # chunks each update call (don't create all at the same update)
 
 #define NB_UPDATE_THREADS				4
 
@@ -72,6 +72,8 @@ typedef struct		sWinUser {
 	bool			showInfo;  // show info module (F3)
 	bool			showHelp;  // show help module (F3 + H)
 	bool			freezeChunkUpdate;  // freeze chunk update (F3 + F)
+	bool			putBlock;  // mouse left clicked
+	bool			destroyBlock;  // mouse right clicked
 	int8_t			polygonRenderMode;  // toggle polygon render mode (F3 + P)
 }					tWinUser;
 
@@ -145,7 +147,9 @@ struct Settings {
 			};
 			std::map<std::string, Text> text;
 		};
-		Screen	screen;
+		Screen		screen;
+		uint32_t	delayPutMs;  // delay between put 2 blocks
+		uint32_t	delayDestroyMs;  // delay between destroy 2 blocks
 	};
 	Global	g;  // global
 	struct Map {

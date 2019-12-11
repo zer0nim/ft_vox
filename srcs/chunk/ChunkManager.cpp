@@ -52,6 +52,8 @@ _projection(),
 _toCreate(),
 _nbChunkLoaded{0},
 _borderShader(nullptr) {
+	_lastDestroyed = getMs();
+	_lastPut = getMs();
 }
 
 ChunkManager::ChunkManager(ChunkManager const &src) :
@@ -286,22 +288,42 @@ void ChunkManager::saveAndQuit() {
 }
 
 void ChunkManager::destroyBlock() {
-    { std::lock_guard<std::mutex>	guard(s.mutexOthers), guard2(s.mutexChunkMap);
-		if (raycast.isBlockSelected) {
-			updateBlock(raycast.selectedBlock, 0);
-			raycast.isBlockSelected = false;
-			raycast.blockType = 0;
+	std::chrono::milliseconds	time = getMs();
+	bool						canChangeBlock = false;
+    { std::lock_guard<std::mutex>	guard(s.mutexOthers);
+		if ((time - _lastDestroyed).count() > s.g.delayDestroyMs) {
+			_lastDestroyed = time;
+			canChangeBlock = true;
+		}
+	}
+	if (canChangeBlock) {
+	    { std::lock_guard<std::mutex>	guard(s.mutexOthers), guard2(s.mutexChunkMap);
+			if (raycast.isBlockSelected) {
+				updateBlock(raycast.selectedBlock, 0);
+				raycast.isBlockSelected = false;
+				raycast.blockType = 0;
+			}
 		}
 	}
 }
 
 void ChunkManager::putBlock(uint8_t type) {
-    { std::lock_guard<std::mutex>	guard(s.mutexOthers), guard2(s.mutexChunkMap);
-		if (raycast.isBeforeBlock) {
-			updateBlock(raycast.beforeSelectedBlock, type);
-			raycast.isBlockSelected = false;
-			raycast.isBeforeBlock = false;
-			raycast.blockType = 0;
+	std::chrono::milliseconds	time = getMs();
+	bool						canChangeBlock = false;
+    { std::lock_guard<std::mutex>	guard(s.mutexOthers);
+		if ((time - _lastPut).count() > s.g.delayPutMs) {
+			_lastPut = time;
+			canChangeBlock = true;
+		}
+	}
+	if (canChangeBlock) {
+	    { std::lock_guard<std::mutex>	guard(s.mutexOthers), guard2(s.mutexChunkMap);
+			if (raycast.isBeforeBlock) {
+				updateBlock(raycast.beforeSelectedBlock, type);
+				raycast.isBlockSelected = false;
+				raycast.isBeforeBlock = false;
+				raycast.blockType = 0;
+			}
 		}
 	}
 }

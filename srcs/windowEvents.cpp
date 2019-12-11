@@ -123,10 +123,16 @@ void	mouseClick(GLFWwindow *window, int button, int action, int mods) {
 	(void)action;
 	(void)mods;
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-		winU->chunkManager->destroyBlock();
+		winU->destroyBlock = true;
+	}
+    else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+		winU->destroyBlock = false;
 	}
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
-		winU->chunkManager->putBlock(s.m.handBlockID);
+		winU->putBlock = true;
+	}
+    else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
+		winU->putBlock = false;
 	}
     if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS) {
 	    { std::lock_guard<std::mutex>	guard(s.mutexOthers);
