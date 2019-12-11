@@ -64,6 +64,8 @@ GreedyChunk3::VoxFace	*GreedyChunk3::getVoxFace(chunkVec3 const pos, Direction c
 void	GreedyChunk3::calcGreedyChunk() {
 	chunkVec3 chunkSz = {CHUNK_SZ_X, CHUNK_SZ_Y, CHUNK_SZ_Z};
 
+	_quads.clear();
+
 	std::array<VoxFace *, CHUNK_SZ_Y * CHUNK_SZ_X>	mask = { nullptr };
 	/*
 		the greedy chunk algorithm work with a mask.

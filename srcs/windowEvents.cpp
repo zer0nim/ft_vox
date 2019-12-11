@@ -1,6 +1,8 @@
 #include <chrono>
 
 #include "ft_vox.hpp"
+#include "ChunkManager.hpp"
+#include "TextureManager.hpp"
 
 static u_int8_t	firstTwoCall = 2;
 
@@ -116,6 +118,48 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 	}
 }
 
+void	mouseClick(GLFWwindow *window, int button, int action, int mods) {
+	tWinUser	*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
+	(void)action;
+	(void)mods;
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+		winU->destroyBlock = true;
+	}
+    else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+		winU->destroyBlock = false;
+	}
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+		winU->putBlock = true;
+	}
+    else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
+		winU->putBlock = false;
+	}
+    if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS) {
+	    { std::lock_guard<std::mutex>	guard(s.mutexOthers);
+			if (winU->chunkManager->raycast.isBlockSelected) {
+				s.m.handBlockID = winU->chunkManager->raycast.blockType;
+			}
+		}
+	}
+}
+
+void scrolling(GLFWwindow* window, double xoffset, double yoffset) {
+	(void)window;
+	(void)xoffset;
+	if (yoffset > 0) {
+		s.m.handBlockID++;
+		if (s.m.handBlockID > NB_TYPE_BLOCKS) {
+			s.m.handBlockID = 1;
+		}
+	}
+	else if (yoffset < 0) {
+		s.m.handBlockID--;
+		if (s.m.handBlockID <= 0) {
+			s.m.handBlockID = NB_TYPE_BLOCKS;
+		}
+	}
+}
+
 void	mouseCb(GLFWwindow *window, double xPos, double yPos) {
 	tWinUser		*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
 	static float	lastX = s.g.screen.width / 2.0;
@@ -192,6 +236,8 @@ bool	initWindow(GLFWwindow **window, const char *name, tWinUser *winU) {
 
 	glfwSetFramebufferSizeCallback(*window, frambuffResizeCb);
 	glfwSetCursorPosCallback(*window, mouseCb);
+	glfwSetMouseButtonCallback(*window, mouseClick);
+	glfwSetScrollCallback(*window, scrolling);
 	glfwSetKeyCallback(*window, keyCb);
 
 	glfwSetInputMode(*window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);

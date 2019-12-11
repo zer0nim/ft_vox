@@ -25,6 +25,10 @@ void	setDefaultSettings() {
 		"normal", {"assets/fonts/minecraft_normal.ttf", 20}));
 	s.g.screen.text.insert(std::pair<std::string, Settings::Global::Screen::Text>(
 		"title", {"assets/fonts/minecraft_title.ttf", 24}));
+	s.g.screen.text.insert(std::pair<std::string, Settings::Global::Screen::Text>(
+		"courrier_new", {"assets/fonts/courrier_new.ttf", 40}));
+	s.g.delayPutMs = 100;
+	s.g.delayDestroyMs = 100;
 	uint32_t seedRand = time(nullptr);
 	s.m.seed = rand_r(&seedRand);
 	s.m.generationType = GENERATION_NORMAL;
@@ -37,6 +41,7 @@ void	setDefaultSettings() {
 	s.m.flatMap.push_back({0, 0, "bedrock"});
 	s.m.flatMap.push_back({1, 2, "stone"});
 	s.m.flatMap.push_back({3, 3, "grass"});
+	s.m.handBlockID = 2;
 }
 
 static void	loadSettingElementFont(nlohmann::json &element, std::string &key) {
@@ -96,6 +101,10 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		s.g.screen.fps = element.get<uint32_t>();
 	else if (boost::starts_with(key, ".global.screen.text."))
 		loadSettingElementFont(element, key);
+	else if (element.is_number() && key == ".global.delayPutMs")
+		s.g.delayPutMs = element.get<uint32_t>();
+	else if (element.is_number() && key == ".global.delayDestroyMs")
+		s.g.delayDestroyMs = element.get<uint32_t>();
 	else if (element.is_number() && key == ".map.generationType")
 		s.m.generationType = element.get<uint32_t>();
 	else if (element.is_number() && key == ".map.cameraStartPos.pos.x")
@@ -112,6 +121,8 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		s.m.seed = element.get<uint32_t>();
 	else if (element.is_array() && key == ".map.flatMap")
 		loadFlatMap(element);
+	else if (element.is_number() && key == ".map.handBlockID")
+		s.m.handBlockID = element.get<uint32_t>();
 	else
 		std::cout << "[WARN]: invalid argument or argument type in settings: " << key << ": " << element << std::endl;
 }
@@ -148,9 +159,7 @@ void	loadSettings(std::string settingFile) {
 		}
 	}
 	catch (const nlohmann::json::parse_error& e) {
-		std::cerr << "message: " << e.what() << std::endl;
-		std::cerr << "exception id: " << e.id << std::endl;
-		std::cerr << "byte position of error: " << e.byte << std::endl;
+		std::cerr << "error in json loading" << std::endl;
 		throw Settings::JsonParseException();
 	}
 	catch (std::exception &e) {
@@ -286,7 +295,8 @@ bool	saveMap(Camera &cam) {
 			    {"yaw", cam.yaw},
 			    {"pitch", cam.pitch}
 			}},
-			{"flatMap", flatMapElem}
+			{"flatMap", flatMapElem},
+			{"handBlockID", s.m.handBlockID},
 		}
 	}};
 	try {
@@ -356,6 +366,29 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 			+ std::to_string(chunkManager.getNbChunkLoaded()) + " loaded)";
 	}
 	textRender.write("normal", sPosChunk, textX, textY);
+
+
+	// object in hand
+	textY -= lineSz;
+	std::string sInHand = "In hand: ";
+	for (auto it = TextureManager::blocksNames.begin(); it != TextureManager::blocksNames.end(); it++) {
+		if (it->second == s.m.handBlockID) {
+			sInHand += it->first;
+		}
+	}
+	textRender.write("normal", sInHand, textX, textY);
+
+	// looking at
+    { std::lock_guard<std::mutex>	guard(s.mutexOthers);
+		if (chunkManager.raycast.isBlockSelected) {
+			std::string sLookAt;
+			textY -= lineSz;
+			sLookAt = std::string("Looking at: ") + std::to_string(chunkManager.raycast.selectedBlock.x) + " "
+				+ std::to_string(chunkManager.raycast.selectedBlock.y) + " "
+				+ std::to_string(chunkManager.raycast.selectedBlock.z);
+			textRender.write("normal", sLookAt, textX, textY);
+		}
+	}
 
 	if (winU->freezeChunkUpdate) {
 		// freeze chunk update

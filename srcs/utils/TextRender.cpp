@@ -33,7 +33,7 @@ void TextRender::loadFont(std::string name, std::string const &filename, uint32_
 	}
 	FT_Set_Pixel_Sizes(face, 0, size);  // set size
 
-	_font.insert(std::pair<std::string, std::map<GLchar, Character> >(name, std::map<GLchar, Character>()));
+	font.insert(std::pair<std::string, std::map<GLchar, Character> >(name, std::map<GLchar, Character>()));
 
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -61,7 +61,7 @@ void TextRender::loadFont(std::string name, std::string const &filename, uint32_
 			glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
 			face->glyph->advance.x
 		};
-		_font[name].insert(std::pair<GLchar, Character>(c, character));
+		font[name].insert(std::pair<GLchar, Character>(c, character));
 	}
     glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -95,7 +95,7 @@ GLfloat scale, glm::vec3 color) {
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(_vao);
 	for (auto c = text.begin(); c != text.end(); c++) {  // foreach chars
-        Character ch = _font[fontName][*c];
+        Character ch = font[fontName][*c];
         GLfloat xpos = x + ch.bearing.x * scale;
         GLfloat ypos = y - (ch.size.y - ch.bearing.y) * scale;
         GLfloat w = ch.size.x * scale;

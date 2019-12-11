@@ -22,9 +22,11 @@
 
 #define ENABLE_MAX_CREATED_CHUNK_UPDATE	true  // enable / disable option
 #define LOAD_ALL_BEFORE_OPEN_WINDOW		false
-#define MAX_CREATED_CHUNK_UPDATE_COUNT	4  // create max # chunks each update call (don't create all at the same update)
+#define MAX_CREATED_CHUNK_UPDATE_COUNT	2  // create max # chunks each update call (don't create all at the same update)
 
-#define NB_UPDATE_THREADS				15
+#define NB_UPDATE_THREADS				8
+
+#define SMART_LOAD_ORDER				true  // load chunks next to the player first
 
 /*
 Chunk
@@ -32,7 +34,8 @@ GreedyChunk
 GreedyChunk2
 GreedyChunk3
 */
-#define CHUNK_OBJECT			GreedyChunk3  // the chunk object used
+#define CHUNK_OBJECT	GreedyChunk3  // the chunk object used
+
 
 /*
 generation type
@@ -59,16 +62,20 @@ enum class Direction {
 	BOTTOM
 };
 
-typedef struct	sWinUser {
-	Camera		*cam;
-	float		dtTime;
-	float		lastFrame;
+class ChunkManager;
+typedef struct		sWinUser {
+	Camera			*cam;
+	ChunkManager	*chunkManager;
+	float			dtTime;
+	float			lastFrame;
 
-	bool		showInfo;  // show info module (F3)
-	bool		showHelp;  // show help module (F3 + H)
-	bool		freezeChunkUpdate;  // freeze chunk update (F3 + F)
-	int8_t		polygonRenderMode;  // toggle polygon render mode (F3 + P)
-}				tWinUser;
+	bool			showInfo;  // show info module (F3)
+	bool			showHelp;  // show help module (F3 + H)
+	bool			freezeChunkUpdate;  // freeze chunk update (F3 + F)
+	bool			putBlock;  // mouse left clicked
+	bool			destroyBlock;  // mouse right clicked
+	int8_t			polygonRenderMode;  // toggle polygon render mode (F3 + P)
+}					tWinUser;
 
 struct Locker {
 	bool	ask;
@@ -140,7 +147,9 @@ struct Settings {
 			};
 			std::map<std::string, Text> text;
 		};
-		Screen	screen;
+		Screen		screen;
+		uint32_t	delayPutMs;  // delay between put 2 blocks
+		uint32_t	delayDestroyMs;  // delay between destroy 2 blocks
 	};
 	Global	g;  // global
 	struct Map {
@@ -161,6 +170,7 @@ struct Settings {
 			std::string	blockName;
 		};
 		std::vector<FlatMap>	flatMap;
+		uint8_t					handBlockID;
 	};
 	Map m;  // map
 
@@ -194,6 +204,7 @@ struct Settings {
 	std::mutex	mutexChunkMap;
 	std::mutex	mutexToCreate;
 	std::mutex	mutexToDelete;
+	std::mutex	mutexCamera;
 	std::mutex	mutexOthers;
 };
 

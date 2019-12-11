@@ -34,16 +34,16 @@ class TextRender {
 					return ("Fail to load text");
 				}
 		};
-
-	private:
-		TextRender();
 		struct Character {
 			GLuint		textureID;
 			glm::ivec2	size;
 			glm::ivec2	bearing;
 			int64_t		advance;
 		};
-		std::map<std::string, std::map<GLchar, Character> > _font;
+		std::map<std::string, std::map<GLchar, Character> > font;
+
+	private:
+		TextRender();
 
 		Shader		&_shader;
 		glm::mat4	_projection;

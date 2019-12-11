@@ -20,9 +20,15 @@
 				"title": {
 					"path": "assets/fonts/minecraft_title.ttf",
 					"size": 40
+				},
+				"courrier_new": {
+					"path": "assets/fonts/courrier_new.ttf",
+					"size": 40
 				}
 			}
-		}
+		},
+		"delayPutMs": 100,
+		"delayDestroyMs": 100
 	},
 	"map": {
 		"seed": 0,
@@ -52,6 +58,7 @@
 				"toY": 3,
 				"blockName": "grass"
 			}
-		]
+		],
+		"handBlockID": 2
 	}
 }

@@ -70,6 +70,8 @@ TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textur
 	int							lastFps = 0;
 	tWinUser					*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
 	bool						firstLoop = true;
+	float						cursorX = s.g.screen.width / 2 - textRender.font["courrier_new"]['+'].size.x / 2;
+	float						cursorY = s.g.screen.height / 2 - textRender.font["courrier_new"]['+'].size.y / 2;
 
 	/* threading */
 	std::array<ThreadupdateArgs *, NB_UPDATE_THREADS>	threadUpdateArgs;
@@ -87,10 +89,12 @@ TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textur
 		+ std::pow(CHUNK_SZ_Z * s.g.renderDist, 2)));
 	glm::mat4	projection = glm::perspective(glm::radians(angle), ratio, nearD, farD);
 
-	winU->cam->frustumCullingInit(angle, ratio, nearD, farD);
+    { std::lock_guard<std::mutex>	guard(s.mutexCamera);
+		winU->cam->frustumCullingInit(angle, ratio, nearD, farD);
+	}
 
 	CHUNK_OBJECT::initShader(projection, textureManager);  // init shader objects
-	chunkManager.init(winU->cam->pos);
+	chunkManager.init(winU->cam->pos, projection);
 
 	skybox.getShader().use();
 	skybox.getShader().setMat4("projection", projection);
@@ -112,7 +116,21 @@ TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textur
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// view matrix
-		glm::mat4	view = cam.getViewMatrix();
+		glm::mat4	view;
+	    { std::lock_guard<std::mutex>	guard(s.mutexCamera);
+			view = cam.getViewMatrix();
+		}
+
+		// put / destroy block
+		if (winU->putBlock) {
+			chunkManager.putBlock(s.m.handBlockID);
+		}
+		if (winU->destroyBlock) {
+			chunkManager.destroyBlock();
+		}
+
+		// update raycast
+		chunkManager.updateRaycast();
 
 		glm::mat4	skyView = view;
 		skyView[3][0] = 0;  // remove translation for the skybox
@@ -129,6 +147,9 @@ TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textur
 
 		// draw text
 		drawText(window, textRender, lastFps, chunkManager);
+
+		// drawCursor
+		textRender.write("courrier_new", "+", cursorX, cursorY, 1, glm::vec3(127, 127, 127));
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -200,11 +221,14 @@ TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textur
 
 bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
 	winU->cam = cam;
+	winU->chunkManager = nullptr;
 	winU->dtTime = 0.0f;
 	winU->lastFrame = 0.0f;
 	winU->showInfo = true;
-	winU->showHelp = true;
+	winU->showHelp = false;
 	winU->freezeChunkUpdate = false;
+	winU->putBlock = false;
+	winU->destroyBlock = false;
 	winU->polygonRenderMode = 0;
 
 	if (!initWindow(window, name, winU))
@@ -267,12 +291,14 @@ int		main(int ac, char const **av) {
 		TextRender textRender(textShader, s.g.screen.width, s.g.screen.height);
 		textRender.loadFont("title", s.g.screen.text["title"].path, s.g.screen.text["title"].size);
 		textRender.loadFont("normal", s.g.screen.text["normal"].path, s.g.screen.text["normal"].size);
+		textRender.loadFont("courrier_new", s.g.screen.text["courrier_new"].path, s.g.screen.text["courrier_new"].size);
 
 		// load skybox
 		Skybox skybox(skyboxShader);
 
 		// create chunkManager
 		ChunkManager chunkManager(*textureManager, &winU);
+		winU.chunkManager = &chunkManager;
 
 		// run the game
 		gameLoop(window, cam, skybox, textRender, chunkManager, *textureManager);
