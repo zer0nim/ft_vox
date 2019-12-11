@@ -1,6 +1,6 @@
 {
 	"global": {
-		"renderDist": 16,
+		"renderDist": 8,
 		"files": {
 			"mapsPath": "/tmp/ft_vox/maps/",
 			"chunkPath": "chunks/",
@@ -27,8 +27,8 @@
 				}
 			}
 		},
-		"delayPutMs": 100,
-		"delayDestroyMs": 100
+		"delayPutMs": 200,
+		"delayDestroyMs": 200
 	},
 	"map": {
 		"seed": 0,

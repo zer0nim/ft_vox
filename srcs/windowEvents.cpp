@@ -48,9 +48,9 @@ void	processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ||
 	glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
         winU->cam->processKeyboard(CamMovement::Right, winU->dtTime, isRun);
-    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
         winU->cam->processKeyboard(CamMovement::Up, winU->dtTime, isRun);
-    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
         winU->cam->processKeyboard(CamMovement::Down, winU->dtTime, isRun);
 }
 
@@ -70,7 +70,7 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 		glfwSetWindowShouldClose(window, true);
 
 	// toggle cursor visibility key
-	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+	if (key == GLFW_KEY_C && action == GLFW_PRESS)
 		toggleCursor(window);
 
 	// reset key
