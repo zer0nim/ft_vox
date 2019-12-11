@@ -78,13 +78,21 @@ endif
 PRE_COMMIT_FILE = .git/hooks/pre-commit
 define PRE_COMMIT
 #!/bin/zsh
+exit 0
+endef
+export PRE_COMMIT
+
+# pre-push rules
+PRE_PUSH_FILE = .git/hooks/pre-push
+define PRE_PUSH
+#!/bin/zsh
 
 make check -j8
 lol=$$?
 
 exit $${lol}
 endef
-export PRE_COMMIT
+export PRE_PUSH
 
 HEADS		= $(addprefix $(INC_DIR)/, $(HEAD))
 OBJS		= $(addprefix $(OBJS_DIR)/, $(SRC:.cpp=.o))
@@ -117,6 +125,9 @@ init:
 	@printf $(CYAN)"create pre-commit\n"$(NORMAL)
 	@echo "$$PRE_COMMIT" > $(PRE_COMMIT_FILE)
 	@chmod 755 $(PRE_COMMIT_FILE)
+	@printf $(CYAN)"create pre-push\n"$(NORMAL)
+	@echo "$$PRE_PUSH" > $(PRE_PUSH_FILE)
+	@chmod 755 $(PRE_PUSH_FILE)
 	$(END)
 
 $(NAME): $(OBJS_DIR) $(OBJS)
@@ -175,7 +186,6 @@ lint:
 	@printf $(BLUE)$(BOLD)"--------------------\n"$(NORMAL)
 
 check:
-	@make fclean
 	@make lint
 	@make
 
