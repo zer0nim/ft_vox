@@ -86,9 +86,9 @@ define PRE_COMMIT
 #!/bin/zsh
 
 make lint
-lol=$$?
+res=$$?
 
-exit $${lol}
+exit $${res}
 endef
 export PRE_COMMIT
 
@@ -98,9 +98,9 @@ define PRE_PUSH
 #!/bin/zsh
 
 make check -j8
-lol=$$?
+res=$$?
 
-exit $${lol}
+exit $${res}
 endef
 export PRE_PUSH
 
