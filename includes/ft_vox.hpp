@@ -24,7 +24,7 @@
 #define LOAD_ALL_BEFORE_OPEN_WINDOW		false
 #define MAX_CREATED_CHUNK_UPDATE_COUNT	2  // create max # chunks each update call (don't create all at the same update)
 
-#define NB_UPDATE_THREADS				8
+#define NB_UPDATE_THREADS				4
 
 #define SMART_LOAD_ORDER				true  // load chunks next to the player first
 

@@ -3,12 +3,12 @@
 #include "Camera.hpp"
 #include "ft_vox.hpp"
 
-#define SURV_GRAVITY		10.0f
-#define SURV_JUMP_HEIGHT	1.2f
+#define SURV_GRAVITY		15.0f
+#define SURV_JUMP_HEIGHT	1.4f
 #define SURV_HEIGHT			1.8f
 #define SURV_RADIUS			0.4f
-#define SURV_JUMP_SPEED		10.0f
-#define SURV_MOVEMENT_SPEED 12.0f
+#define SURV_JUMP_SPEED		7.0f
+#define SURV_MOVEMENT_SPEED 8.0f
 #define SURV_RUN_FACTOR		1.5f
 
 class CameraSurvival : public Camera {
@@ -40,7 +40,7 @@ class CameraSurvival : public Camera {
 
 		CameraSurvival();
 		void _move(glm::vec3 dest);
-		Constraints _getConstraints();
+		Constraints _getConstraints(glm::vec3 dest);
 
 		tWinUser *	_winU;
 		float		_height;
@@ -49,5 +49,5 @@ class CameraSurvival : public Camera {
 		float		_jumpHeight;
 		float		_jumpSpeed;
 
-		float		_curJumping;  // current jumping height -> -1 == no jump
+		float		_curJumping;  // current jumping height -> if _curJumping < 0: no jump
 };
