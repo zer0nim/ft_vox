@@ -38,6 +38,11 @@ Camera &Camera::operator=(Camera const &rhs) {
 	return *this;
 }
 
+void Camera::run(float dtTime) {
+	// process for each frame (gravity)
+	(void)dtTime;
+}
+
 glm::mat4 Camera::getViewMatrix() const {
 	return glm::lookAt(pos, pos + front, up);
 }

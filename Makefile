@@ -25,6 +25,8 @@ SRC =	main.cpp \
 		utils/Shader.cpp \
 		utils/Skybox.cpp \
 		utils/Camera.cpp \
+		utils/CameraCreative.cpp \
+		utils/CameraSurvival.cpp \
 		utils/debug.cpp \
 		utils/TextRender.cpp \
 		utils/Material.cpp \
@@ -46,6 +48,8 @@ HEAD =	commonInclude.hpp \
 		utils/Shader.hpp \
 		utils/Skybox.hpp \
 		utils/Camera.hpp \
+		utils/CameraCreative.hpp \
+		utils/CameraSurvival.hpp \
 		utils/debug.hpp \
 		utils/TextRender.hpp \
 		utils/Material.hpp \

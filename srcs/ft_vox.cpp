@@ -42,6 +42,7 @@ void	setDefaultSettings() {
 	s.m.flatMap.push_back({1, 2, "stone"});
 	s.m.flatMap.push_back({3, 3, "grass"});
 	s.m.handBlockID = 2;
+	s.m.gamemode = GAMEMODE_CREATIVE;
 }
 
 static void	loadSettingElementFont(nlohmann::json &element, std::string &key) {
@@ -123,6 +124,8 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		loadFlatMap(element);
 	else if (element.is_number() && key == ".map.handBlockID")
 		s.m.handBlockID = element.get<uint32_t>();
+	else if (element.is_number() && key == ".map.gamemode" && element.get<uint8_t>() <= 1)
+		s.m.gamemode = element.get<uint8_t>();
 	else
 		std::cout << "[WARN]: invalid argument or argument type in settings: " << key << ": " << element << std::endl;
 }
@@ -266,7 +269,7 @@ bool	createMapFiles() {
 	return true;
 }
 
-bool	saveMap(Camera &cam) {
+bool	saveMap(Camera *cam) {
 	std::string		settingsFilename = s.m.fullMapName + "/" + s.g.files.mapSettingsPath;
 	nlohmann::json	lastSettings;
 	try {
@@ -288,15 +291,16 @@ bool	saveMap(Camera &cam) {
 			{"generationType", s.m.generationType},
 			{"cameraStartPos", {
 				{"pos", {
-					{"x", cam.pos.x},
-					{"y", cam.pos.y},
-					{"z", cam.pos.z}
+					{"x", cam->pos.x},
+					{"y", cam->pos.y},
+					{"z", cam->pos.z}
 				}},
-			    {"yaw", cam.yaw},
-			    {"pitch", cam.pitch}
+			    {"yaw", cam->yaw},
+			    {"pitch", cam->pitch}
 			}},
 			{"flatMap", flatMapElem},
 			{"handBlockID", s.m.handBlockID},
+			{"gamemode", s.m.gamemode},
 		}
 	}};
 	try {
@@ -367,6 +371,16 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 	}
 	textRender.write("normal", sPosChunk, textX, textY);
 
+	// gamemode information
+	textY -= lineSz;
+	std::string sGamemode = "gamemode: ";
+	if (s.m.gamemode == GAMEMODE_SURVIVAL)
+		sGamemode += "survival";
+	else if (s.m.gamemode == GAMEMODE_CREATIVE)
+		sGamemode += "creative";
+	else
+		sGamemode += "unknown";
+	textRender.write("normal", sGamemode, textX, textY);
 
 	// object in hand
 	textY -= lineSz;

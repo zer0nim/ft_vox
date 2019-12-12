@@ -39,12 +39,12 @@ class Camera {
 
 		Camera &operator=(Camera const &rhs);
 
+		virtual void run(float dtTime);  // call this function each frame
 		glm::mat4 getViewMatrix() const;
-		void processKeyboard(CamMovement direction, float dtTime, bool isRun = false);
-		void processMouseMovement(float xOffset, float yOffset, bool \
-		constrainPitch = true);
-		void processMouseScroll(float yOffset);
-		void resetPosition();
+		virtual void processKeyboard(CamMovement direction, float dtTime, bool isRun = false);
+		virtual void processMouseMovement(float xOffset, float yOffset, bool constrainPitch = true);
+		virtual void processMouseScroll(float yOffset);
+		virtual void resetPosition();
 
 		/*
 		check if objects are inside or outside of the camera

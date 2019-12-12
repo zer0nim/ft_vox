@@ -116,6 +116,26 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 		}
 	}
+
+	// gamemode key
+	if (key == GLFW_KEY_G && action == GLFW_PRESS) {
+	    { std::lock_guard<std::mutex>	guard(s.mutexCamera);
+			Camera * tmp = winU->cam;
+			if (s.m.gamemode == GAMEMODE_CREATIVE) {
+				s.m.gamemode = GAMEMODE_SURVIVAL;
+				winU->cam = winU->camSurv;
+			}
+			else {
+				s.m.gamemode = GAMEMODE_CREATIVE;
+				winU->cam = winU->camCrea;
+			}
+			winU->cam->pos = tmp->pos;
+			winU->cam->front = tmp->front;
+			winU->cam->up = tmp->up;
+			winU->cam->yaw = tmp->yaw;
+			winU->cam->pitch = tmp->pitch;
+		}
+	}
 }
 
 void	mouseClick(GLFWwindow *window, int button, int action, int mods) {

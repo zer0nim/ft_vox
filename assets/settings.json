@@ -59,6 +59,7 @@
 				"blockName": "grass"
 			}
 		],
-		"handBlockID": 2
+		"handBlockID": 2,
+		"gamemode": 1
 	}
 }

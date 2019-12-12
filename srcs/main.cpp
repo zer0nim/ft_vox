@@ -15,6 +15,8 @@
 #include "utils/Skybox.hpp"
 #include "utils/TextRender.hpp"
 #include "utils/Stats.hpp"
+#include "utils/CameraCreative.hpp"
+#include "utils/CameraSurvival.hpp"
 
 void	*threadUpdateFunction(void *args_) {
 	float						loopTime = 1000 / s.g.screen.fps;
@@ -31,7 +33,7 @@ void	*threadUpdateFunction(void *args_) {
 		if (args->deleteLocker.isLocked == false) {  // thread is unlocked
 			// update
 			if (winU->freezeChunkUpdate == false) {
-				args->chunkManager.update(args->camPos, args->threadID);
+				args->chunkManager.update(winU->cam->pos, args->threadID);
 			    { std::lock_guard<std::mutex>	guard(s.mutexToDelete);
 					if (args->chunkManager.toDelete.empty() == false) {  // auto lock
 						args->deleteLocker.ask = true;
@@ -63,7 +65,7 @@ void	*threadUpdateFunction(void *args_) {
 	return nullptr;
 }
 
-void	gameLoop(GLFWwindow *window, Camera const &cam, Skybox &skybox, \
+void	gameLoop(GLFWwindow *window, Skybox &skybox, \
 TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textureManager) {
 	float						loopTime = 1000 / s.g.screen.fps;
 	std::chrono::milliseconds	time_start;
@@ -78,11 +80,11 @@ TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textur
 	std::array<pthread_t, NB_UPDATE_THREADS>			threadUpdate;
 
 	for (uint8_t i = 0; i < NB_UPDATE_THREADS; i++) {
-		threadUpdateArgs[i] = new ThreadupdateArgs(i, window, chunkManager, winU->cam->pos);
+		threadUpdateArgs[i] = new ThreadupdateArgs(i, window, chunkManager);
 	}
 
 	// projection matrix
-	float angle = cam.zoom;
+	float angle = winU->cam->zoom;
 	float ratio = static_cast<float>(s.g.screen.width) / s.g.screen.height;
 	float nearD = 0.1f;
 	float farD = 200 + static_cast<int>(std::sqrt(std::pow(CHUNK_SZ_X * s.g.renderDist, 2)
@@ -90,7 +92,8 @@ TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textur
 	glm::mat4	projection = glm::perspective(glm::radians(angle), ratio, nearD, farD);
 
     { std::lock_guard<std::mutex>	guard(s.mutexCamera);
-		winU->cam->frustumCullingInit(angle, ratio, nearD, farD);
+		winU->camCrea->frustumCullingInit(angle, ratio, nearD, farD);
+		winU->camSurv->frustumCullingInit(angle, ratio, nearD, farD);
 	}
 
 	CHUNK_OBJECT::initShader(projection, textureManager);  // init shader objects
@@ -113,12 +116,15 @@ TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textur
 		time_start = getMs();
 
 		processInput(window);
+		// update camera
+		winU->cam->run(winU->dtTime);
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// view matrix
 		glm::mat4	view;
 	    { std::lock_guard<std::mutex>	guard(s.mutexCamera);
-			view = cam.getViewMatrix();
+			view = winU->cam->getViewMatrix();
 		}
 
 		// put / destroy block
@@ -219,8 +225,13 @@ TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textur
 	#endif
 }
 
-bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *cam) {
-	winU->cam = cam;
+bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *camCrea, Camera *camSurv) {
+	winU->camSurv = camSurv;
+	winU->camCrea = camCrea;
+	if (s.m.gamemode == GAMEMODE_CREATIVE)
+		winU->cam = winU->camCrea;
+	else
+		winU->cam = winU->camSurv;
 	winU->chunkManager = nullptr;
 	winU->dtTime = 0.0f;
 	winU->lastFrame = 0.0f;
@@ -266,7 +277,10 @@ int		main(int ac, char const **av) {
 
 	GLFWwindow		*window;
 	tWinUser		winU;
-	Camera			cam(s.m.cameraStartPos.pos, glm::vec3(0, 1, 0), s.m.cameraStartPos.yaw, s.m.cameraStartPos.pitch);
+	Camera			*camCrea = new CameraCreative(s.m.cameraStartPos.pos, glm::vec3(0, 1, 0),
+		s.m.cameraStartPos.yaw, s.m.cameraStartPos.pitch);
+	Camera			*camSurv = new CameraSurvival(s.m.cameraStartPos.pos, glm::vec3(0, 1, 0),
+		s.m.cameraStartPos.yaw, s.m.cameraStartPos.pitch);
 	TextureManager	*textureManager = nullptr;
 
 	std::cout << "[INFO]: starting at " << s.m.cameraStartPos.pos.x << " "
@@ -275,7 +289,7 @@ int		main(int ac, char const **av) {
 	std::cout << "[INFO]: chunk size " << CHUNK_SZ_X << " " << CHUNK_SZ_Y << " " << CHUNK_SZ_Z << std::endl;
 	std::cout << "[INFO]: render distance " << s.g.renderDist << " chunks" << std::endl;
 
-	if (!init(&window, "ft_vox", &winU, &cam))
+	if (!init(&window, "ft_vox", &winU, camCrea, camSurv))
 		return (1);
 	std::cout << "[INFO]: window size " << s.g.screen.width << " * " << s.g.screen.height << std::endl;
 
@@ -301,7 +315,7 @@ int		main(int ac, char const **av) {
 		winU.chunkManager = &chunkManager;
 
 		// run the game
-		gameLoop(window, cam, skybox, textRender, chunkManager, *textureManager);
+		gameLoop(window, skybox, textRender, chunkManager, *textureManager);
 		Stats::printStats();
 
 		// save and quit all chunks
@@ -329,13 +343,15 @@ int		main(int ac, char const **av) {
 
 	if (s.m.mapName != "") {  // if we have a map
 		std::cout << "[INFO]: saving..." << std::endl;
-		if (saveMap(cam))
+		if (saveMap(winU.cam))
 			std::cout << "[INFO]: settings saved" << std::endl;
 		else
 			std::cout << "[WARN]: unable to save settings" << std::endl;
 	}
 
 	delete textureManager;
+	delete winU.camCrea;
+	delete winU.camSurv;
 
 	return 0;
 }

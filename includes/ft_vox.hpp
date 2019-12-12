@@ -45,6 +45,12 @@ generation type
 #define GENERATION_NORMAL			2
 
 /*
+gamemode
+*/
+#define GAMEMODE_SURVIVAL			0
+#define GAMEMODE_CREATIVE			1
+
+/*
 filesystem
 */
 #define CHUNK_EXTENSION ".chunk"
@@ -65,6 +71,8 @@ enum class Direction {
 class ChunkManager;
 typedef struct		sWinUser {
 	Camera			*cam;
+	Camera			*camCrea;
+	Camera			*camSurv;
 	ChunkManager	*chunkManager;
 	float			dtTime;
 	float			lastFrame;
@@ -103,12 +111,11 @@ struct ThreadupdateArgs {
 	uint8_t			threadID;
 	GLFWwindow		*window;
 	ChunkManager	&chunkManager;
-	wordFVec3		&camPos;
 	bool			quit;
 	Locker			deleteLocker;  // lock thread to delete chunks safely
 
-	ThreadupdateArgs(uint8_t id, GLFWwindow *window_, ChunkManager &chunkManager_, wordFVec3 &camPos_) :
-	threadID(id), window(window_), chunkManager(chunkManager_), camPos(camPos_), quit(false) {}
+	ThreadupdateArgs(uint8_t id, GLFWwindow *window_, ChunkManager &chunkManager_) :
+	threadID(id), window(window_), chunkManager(chunkManager_), quit(false) {}
 };
 
 bool	initWindow(GLFWwindow **window, const char *name, tWinUser *winU);
@@ -124,7 +131,7 @@ bool	createDir(char const *dirNames);
 bool	createMapFiles();
 void	setDefaultSettings();
 void	loadSettings(std::string settingFile);
-bool	saveMap(Camera &cam);
+bool	saveMap(Camera *cam);
 
 struct Settings {
 	struct Global {
@@ -171,6 +178,7 @@ struct Settings {
 		};
 		std::vector<FlatMap>	flatMap;
 		uint8_t					handBlockID;
+		uint8_t					gamemode;
 	};
 	Map m;  // map
 
