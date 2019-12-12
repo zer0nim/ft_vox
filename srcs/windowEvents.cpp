@@ -48,9 +48,11 @@ void	processInput(GLFWwindow *window) {
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS ||
 	glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
         winU->cam->processKeyboard(CamMovement::Right, winU->dtTime, isRun);
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS ||
+	glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
         winU->cam->processKeyboard(CamMovement::Up, winU->dtTime, isRun);
-    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS ||
+	glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
         winU->cam->processKeyboard(CamMovement::Down, winU->dtTime, isRun);
 }
 

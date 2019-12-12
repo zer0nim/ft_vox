@@ -4,7 +4,7 @@
 #include "ft_vox.hpp"
 
 #define SURV_GRAVITY		15.0f
-#define SURV_JUMP_HEIGHT	1.4f
+#define SURV_JUMP_HEIGHT	1.2f
 #define SURV_HEIGHT			1.8f
 #define SURV_RADIUS			0.4f
 #define SURV_JUMP_SPEED		7.0f
