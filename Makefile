@@ -196,6 +196,7 @@ lint:
 	@printf $(BLUE)$(BOLD)"--------------------\n"$(NORMAL)
 
 check:
+	@make fclean
 	@make lint
 	@make
 

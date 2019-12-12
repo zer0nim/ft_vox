@@ -11,7 +11,7 @@ class CameraCreative : public Camera {
 		virtual ~CameraCreative();
 
 		CameraCreative &operator=(CameraCreative const &rhs);
-	protected:
+
 	private:
 		CameraCreative();
 };
