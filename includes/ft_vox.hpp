@@ -163,6 +163,7 @@ struct Settings {
 				float	jumpHeight;
 				float	jumpSpeed;
 				float	height;
+				float	eyeHeight;
 				float	radius;
 			};
 			Survival	survival;

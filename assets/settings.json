@@ -35,6 +35,7 @@
 				"jumpHeight": 1.4,
 				"jumpSpeed": 7.0,
 				"height": 1.8,
+				"eyeHeight": 1.7,
 				"radius": 0.4
 			},
 			"creative": {

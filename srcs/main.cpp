@@ -289,6 +289,7 @@ int		main(int ac, char const **av) {
 	dynamic_cast<CameraSurvival *>(camSurv)->jumpHeight = s.g.player.survival.jumpHeight;
 	dynamic_cast<CameraSurvival *>(camSurv)->jumpSpeed = s.g.player.survival.jumpSpeed;
 	dynamic_cast<CameraSurvival *>(camSurv)->height = s.g.player.survival.height;
+	dynamic_cast<CameraSurvival *>(camSurv)->eyeHeight = s.g.player.survival.eyeHeight;
 	dynamic_cast<CameraSurvival *>(camSurv)->radius = s.g.player.survival.radius;
 	TextureManager	*textureManager = nullptr;
 

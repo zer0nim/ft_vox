@@ -33,6 +33,7 @@ void	setDefaultSettings() {
 	s.g.player.survival.jumpHeight = 1.4f;
 	s.g.player.survival.jumpSpeed = 7.0f;
 	s.g.player.survival.height = 1.8f;
+	s.g.player.survival.eyeHeight = 1.7f;
 	s.g.player.survival.radius = 0.4f;
 	s.g.player.creative.movementSpeed = 15.0f;
 	s.g.player.creative.runFactor = 3.0f;
@@ -57,11 +58,6 @@ void	setDefaultSettings() {
 
 static bool	checkFloat(nlohmann::json &element, float min, float max) {
 	float val = element.get<float>();
-	return val >= min && val <= max;
-}
-
-static bool	checkInt32(nlohmann::json &element, int32_t min, int32_t max) {
-	int32_t val = element.get<int32_t>();
 	return val >= min && val <= max;
 }
 
@@ -153,6 +149,8 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		s.g.player.survival.jumpSpeed = element.get<float>();
 	else if (element.is_number() && key == ".global.player.survival.height" && checkFloat(element, 0.5, 10.0))
 		s.g.player.survival.height = element.get<float>();
+	else if (element.is_number() && key == ".global.player.survival.eyeHeight" && checkFloat(element, 0.0, 10.0))
+		s.g.player.survival.eyeHeight = element.get<float>();
 	else if (element.is_number() && key == ".global.player.survival.radius" && checkFloat(element, 0.01, 0.5))
 		s.g.player.survival.radius = element.get<float>();
 	//// creative

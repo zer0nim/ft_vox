@@ -26,10 +26,13 @@ class CameraSurvival : public Camera {
 		virtual void processKeyboard(CamMovement direction, float dtTime, bool isRun = false);
 		virtual void resetPosition();  // this function does nothing
 
+		bool isOnBlock(wordIVec3 blockPos) const;
+
 		float		gravity;
 		float		jumpHeight;
 		float		jumpSpeed;
 		float		height;
+		float		eyeHeight;
 		float		radius;
 
 	private:

@@ -86,6 +86,25 @@ void CameraSurvival::processKeyboard(CamMovement direction, float dtTime, bool i
 
 void CameraSurvival::resetPosition() {}
 
+bool CameraSurvival::isOnBlock(wordIVec3 blockPos) const {
+	glm::vec3 posBottom = pos + (worldUp * -eyeHeight);
+	glm::vec3 posUp = pos + (worldUp * (height - eyeHeight));
+
+	// check out of X
+	if (blockPos.x + 1 < posBottom.x - radius || blockPos.x > posBottom.x + radius)
+		return false;
+
+	// check out of Y
+	if (blockPos.y + 1 < posBottom.y || blockPos.y > posUp.y)
+		return false;
+
+	// check out of Z
+	if (blockPos.z + 1 < posBottom.z - radius || blockPos.z > posBottom.z + radius)
+		return false;
+
+	return true;
+}
+
 void CameraSurvival::_move(glm::vec3 dest) {
 	Constraints tmpCons = _getConstraints(dest);
 
@@ -110,8 +129,8 @@ void CameraSurvival::_move(glm::vec3 dest) {
 
 CameraSurvival::Constraints CameraSurvival::_getConstraints(glm::vec3 dest) {
 	Constraints constraints = Constraints();
-	glm::vec3 posBottom = dest + (-worldUp * height);
-	glm::vec3 posUp = dest;
+	glm::vec3 posBottom = dest + (worldUp * -eyeHeight);
+	glm::vec3 posUp = dest + (worldUp * (height - eyeHeight));
 	glm::vec3 tmpPos;
 
 	// Y constraints

@@ -2,6 +2,7 @@
 #include <vector>
 #include <cmath>
 #include "ChunkManager.hpp"
+#include "CameraSurvival.hpp"
 
 const float	ChunkManager::_borderVertices[] = {
 	0, 0, 0,
@@ -290,10 +291,8 @@ void ChunkManager::destroyBlock() {
 	std::chrono::milliseconds	time = getMs();
 	bool						canChangeBlock = false;
     { std::lock_guard<std::mutex>	guard(s.mutexOthers);
-		if ((time - _lastDestroyed).count() > s.g.player.delayDestroyMs) {
-			_lastDestroyed = time;
+		if ((time - _lastDestroyed).count() > s.g.player.delayDestroyMs)
 			canChangeBlock = true;
-		}
 	}
 	if (canChangeBlock) {
 	    { std::lock_guard<std::mutex>	guard(s.mutexOthers), guard2(s.mutexChunkMap);
@@ -301,6 +300,7 @@ void ChunkManager::destroyBlock() {
 				updateBlock(raycast.selectedBlock, 0);
 				raycast.isBlockSelected = false;
 				raycast.blockType = 0;
+				_lastDestroyed = time;
 			}
 		}
 	}
@@ -310,18 +310,20 @@ void ChunkManager::putBlock(uint8_t type) {
 	std::chrono::milliseconds	time = getMs();
 	bool						canChangeBlock = false;
     { std::lock_guard<std::mutex>	guard(s.mutexOthers);
-		if ((time - _lastPut).count() > s.g.player.delayPutMs) {
-			_lastPut = time;
+		if ((time - _lastPut).count() > s.g.player.delayPutMs)
 			canChangeBlock = true;
-		}
 	}
 	if (canChangeBlock) {
 	    { std::lock_guard<std::mutex>	guard(s.mutexOthers), guard2(s.mutexChunkMap);
 			if (raycast.isBeforeBlock) {
+				if (s.m.gamemode == GAMEMODE_SURVIVAL
+				&& dynamic_cast<CameraSurvival *>(_winU->cam)->isOnBlock(raycast.beforeSelectedBlock))
+					return;  // if try to put a block on the player
 				updateBlock(raycast.beforeSelectedBlock, type);
 				raycast.isBlockSelected = false;
 				raycast.isBeforeBlock = false;
 				raycast.blockType = 0;
+				_lastPut = time;
 			}
 		}
 	}
