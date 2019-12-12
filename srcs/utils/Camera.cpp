@@ -78,10 +78,10 @@ void Camera::processKeyboard(CamMovement direction, float dtTime, bool isRun) {
 		pos = pos + right * velocity;
 	}
 	if (direction == CamMovement::Up) {
-		pos = pos + glm::vec3(0, 1, 0) * velocity;
+		pos = pos + worldUp * velocity;
 	}
 	if (direction == CamMovement::Down) {
-		pos = pos - glm::vec3(0, 1, 0) * velocity;
+		pos = pos - worldUp * velocity;
 	}
 }
 

@@ -279,7 +279,7 @@ int		main(int ac, char const **av) {
 	tWinUser		winU;
 	Camera			*camCrea = new CameraCreative(s.m.cameraStartPos.pos, glm::vec3(0, 1, 0),
 		s.m.cameraStartPos.yaw, s.m.cameraStartPos.pitch);
-	Camera			*camSurv = new CameraSurvival(s.m.cameraStartPos.pos, glm::vec3(0, 1, 0),
+	Camera			*camSurv = new CameraSurvival(&winU, s.m.cameraStartPos.pos, glm::vec3(0, 1, 0),
 		s.m.cameraStartPos.yaw, s.m.cameraStartPos.pitch);
 	TextureManager	*textureManager = nullptr;
 
