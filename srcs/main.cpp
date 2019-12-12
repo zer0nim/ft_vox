@@ -279,8 +279,17 @@ int		main(int ac, char const **av) {
 	tWinUser		winU;
 	Camera			*camCrea = new CameraCreative(s.m.cameraStartPos.pos, glm::vec3(0, 1, 0),
 		s.m.cameraStartPos.yaw, s.m.cameraStartPos.pitch);
+	camCrea->movementSpeed = s.g.player.creative.movementSpeed;
+	camCrea->runFactor = s.g.player.creative.runFactor;
 	Camera			*camSurv = new CameraSurvival(&winU, s.m.cameraStartPos.pos, glm::vec3(0, 1, 0),
 		s.m.cameraStartPos.yaw, s.m.cameraStartPos.pitch);
+	camSurv->movementSpeed = s.g.player.survival.movementSpeed;
+	camSurv->runFactor = s.g.player.survival.runFactor;
+	dynamic_cast<CameraSurvival *>(camSurv)->gravity = s.g.player.survival.gravity;
+	dynamic_cast<CameraSurvival *>(camSurv)->jumpHeight = s.g.player.survival.jumpHeight;
+	dynamic_cast<CameraSurvival *>(camSurv)->jumpSpeed = s.g.player.survival.jumpSpeed;
+	dynamic_cast<CameraSurvival *>(camSurv)->height = s.g.player.survival.height;
+	dynamic_cast<CameraSurvival *>(camSurv)->radius = s.g.player.survival.radius;
 	TextureManager	*textureManager = nullptr;
 
 	std::cout << "[INFO]: starting at " << s.m.cameraStartPos.pos.x << " "

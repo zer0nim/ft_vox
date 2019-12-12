@@ -27,8 +27,18 @@ void	setDefaultSettings() {
 		"title", {"assets/fonts/minecraft_title.ttf", 24}));
 	s.g.screen.text.insert(std::pair<std::string, Settings::Global::Screen::Text>(
 		"courrier_new", {"assets/fonts/courrier_new.ttf", 40}));
-	s.g.delayPutMs = 100;
-	s.g.delayDestroyMs = 100;
+	s.g.player.survival.movementSpeed = 8.0f;
+	s.g.player.survival.runFactor = 1.5f;
+	s.g.player.survival.gravity = 18.0f;
+	s.g.player.survival.jumpHeight = 1.4f;
+	s.g.player.survival.jumpSpeed = 7.0f;
+	s.g.player.survival.height = 1.8f;
+	s.g.player.survival.radius = 0.4f;
+	s.g.player.creative.movementSpeed = 15.0f;
+	s.g.player.creative.runFactor = 3.0f;
+	s.g.player.mouseSensitivity = 0.1f;
+	s.g.player.delayPutMs = 100;
+	s.g.player.delayDestroyMs = 100;
 	uint32_t seedRand = time(nullptr);
 	s.m.seed = rand_r(&seedRand);
 	s.m.generationType = GENERATION_NORMAL;
@@ -45,6 +55,21 @@ void	setDefaultSettings() {
 	s.m.gamemode = GAMEMODE_CREATIVE;
 }
 
+static bool	checkFloat(nlohmann::json &element, float min, float max) {
+	float val = element.get<float>();
+	return val >= min && val <= max;
+}
+
+static bool	checkInt32(nlohmann::json &element, int32_t min, int32_t max) {
+	int32_t val = element.get<int32_t>();
+	return val >= min && val <= max;
+}
+
+static bool	checkUint32(nlohmann::json &element, uint32_t min, uint32_t max) {
+	uint32_t val = element.get<uint32_t>();
+	return val >= min && val <= max;
+}
+
 static void	loadSettingElementFont(nlohmann::json &element, std::string &key) {
 	static std::string textFont = ".global.screen.text.";
 	if (element.is_string() && boost::ends_with(key, ".path")) {
@@ -54,7 +79,7 @@ static void	loadSettingElementFont(nlohmann::json &element, std::string &key) {
 		else
 			s.g.screen.text[name].path = element.get<std::string>();
 	}
-	else if (element.is_number() && boost::ends_with(key, ".size")) {
+	else if (element.is_number() && boost::ends_with(key, ".size") && checkUint32(element, 1, 128)) {
 		std::string name = key.substr(textFont.size(), key.size() - textFont.size() - std::string(".size").size());
 		if (s.g.screen.text.find(name) == s.g.screen.text.end())
 			std::cout << "[WARN]: invalid font name: " << name << std::endl;
@@ -69,21 +94,32 @@ static void	loadFlatMap(nlohmann::json &element) {
 	for (auto it = element.begin(); it != element.end(); ++it) {
 		try {
 			Settings::Map::FlatMap flatMapElem;
-			flatMapElem.fromY = it->at("fromY").get<uint32_t>();
-			flatMapElem.toY = it->at("toY").get<uint32_t>();
-			flatMapElem.blockName = it->at("blockName").get<std::string>();
-			s.m.flatMap.push_back(flatMapElem);
+			if (checkUint32(it->at("fromY"), 0, 256) && checkUint32(it->at("toY"), 0, 256)
+			&& it->at("fromY").get<uint32_t>() <= it->at("toY").get<uint32_t>()
+			&& TextureManager::blocksNames.find(it->at("blockName").get<std::string>()) != TextureManager::blocksNames.end()) {
+				flatMapElem.fromY = it->at("fromY").get<uint32_t>();
+				flatMapElem.toY = it->at("toY").get<uint32_t>();
+				flatMapElem.blockName = it->at("blockName").get<std::string>();
+				s.m.flatMap.push_back(flatMapElem);
+			}
+			else {
+				std::cerr << "[WARN]: flatMap need fromY (0-256), toY (0-256) and blockName keys" << std::endl;
+				return;
+			}
 		}
 		catch (std::exception & e) {
-			std::cerr << "[WARN]: flatMap need fromY, toY and blockName keys";
+			std::cerr << "[WARN]: flatMap need fromY (0-256), toY (0-256) and blockName keys" << std::endl;
 			return;
 		}
 	}
 }
 
 static void	loadSettingElement(nlohmann::json &element, std::string key) {
-	if (element.is_number() && key == ".global.renderDist")
+	// global
+	/// render distance
+	if (element.is_number() && key == ".global.renderDist" && checkUint32(element, 1, 128))
 		s.g.renderDist = element.get<uint32_t>();
+	/// files
 	else if (element.is_string() && key == ".global.files.mapsPath")
 		s.g.files.mapsPath = element.get<std::string>();
 	else if (element.is_string() && key == ".global.files.chunkPath")
@@ -92,39 +128,70 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		s.g.files.mapSettingsPath = element.get<std::string>();
 	else if (element.is_boolean() && key == ".global.files.saveAllChunks")
 		s.g.files.saveAllChunks = element.get<bool>();
+	/// screen
 	else if (element.is_boolean() && key == ".global.screen.fullscreen")
 		s.g.screen.fullscreen = element.get<bool>();
-	else if (element.is_number() && key == ".global.screen.width")
+	else if (element.is_number() && key == ".global.screen.width" && checkUint32(element, 400, 3000))
 		s.g.screen.width = element.get<uint32_t>();
-	else if (element.is_number() && key == ".global.screen.height")
+	else if (element.is_number() && key == ".global.screen.height" && checkUint32(element, 400, 3000))
 		s.g.screen.height = element.get<uint32_t>();
-	else if (element.is_number() && key == ".global.screen.fps")
+	else if (element.is_number() && key == ".global.screen.fps" && checkUint32(element, 1, 1024))
 		s.g.screen.fps = element.get<uint32_t>();
 	else if (boost::starts_with(key, ".global.screen.text."))
 		loadSettingElementFont(element, key);
-	else if (element.is_number() && key == ".global.delayPutMs")
-		s.g.delayPutMs = element.get<uint32_t>();
-	else if (element.is_number() && key == ".global.delayDestroyMs")
-		s.g.delayDestroyMs = element.get<uint32_t>();
-	else if (element.is_number() && key == ".map.generationType")
+	/// player
+	//// survival
+	else if (element.is_number() && key == ".global.player.survival.movementSpeed" && checkFloat(element, 0.5, 50.0))
+		s.g.player.survival.movementSpeed = element.get<float>();
+	else if (element.is_number() && key == ".global.player.survival.runFactor" && checkFloat(element, 1.0, 10.0))
+		s.g.player.survival.runFactor = element.get<float>();
+	else if (element.is_number() && key == ".global.player.survival.gravity" && checkFloat(element, 0.0, 50.0))
+		s.g.player.survival.gravity = element.get<float>();
+	else if (element.is_number() && key == ".global.player.survival.jumpHeight" && checkFloat(element, 0.0, 256.0))
+		s.g.player.survival.jumpHeight = element.get<float>();
+	else if (element.is_number() && key == ".global.player.survival.jumpSpeed" && checkFloat(element, 0.5, 50.0))
+		s.g.player.survival.jumpSpeed = element.get<float>();
+	else if (element.is_number() && key == ".global.player.survival.height" && checkFloat(element, 0.5, 10.0))
+		s.g.player.survival.height = element.get<float>();
+	else if (element.is_number() && key == ".global.player.survival.radius" && checkFloat(element, 0.01, 0.5))
+		s.g.player.survival.radius = element.get<float>();
+	//// creative
+	else if (element.is_number() && key == ".global.player.creative.movementSpeed" && checkFloat(element, 0.5, 50.0))
+		s.g.player.creative.movementSpeed = element.get<float>();
+	else if (element.is_number() && key == ".global.player.creative.runFactor" && checkFloat(element, 1.0, 10.0))
+		s.g.player.creative.runFactor = element.get<float>();
+	//// others
+	else if (element.is_number() && key == ".global.player.mouseSensitivity" && checkFloat(element, 0.001, 10.0))
+		s.g.player.mouseSensitivity = element.get<float>();
+	else if (element.is_number() && key == ".global.player.delayPutMs" && checkUint32(element, 0, 60000))
+		s.g.player.delayPutMs = element.get<uint32_t>();
+	else if (element.is_number() && key == ".global.player.delayDestroyMs" && checkUint32(element, 0, 60000))
+		s.g.player.delayDestroyMs = element.get<uint32_t>();
+	else if (element.is_number() && key == ".map.generationType" && checkUint32(element, 0, 2))
 		s.m.generationType = element.get<uint32_t>();
-	else if (element.is_number() && key == ".map.cameraStartPos.pos.x")
+	// map
+	/// camera
+	else if (element.is_number() && key == ".map.cameraStartPos.pos.x"
+	&& checkFloat(element, -18446744073709551616.0f, 18446744073709551615.0f))
 		s.m.cameraStartPos.pos.x = element.get<float>();
-	else if (element.is_number() && key == ".map.cameraStartPos.pos.y")
+	else if (element.is_number() && key == ".map.cameraStartPos.pos.y"
+	&& checkFloat(element, -18446744073709551616.0f, 18446744073709551615.0f))
 		s.m.cameraStartPos.pos.y = element.get<float>();
-	else if (element.is_number() && key == ".map.cameraStartPos.pos.z")
+	else if (element.is_number() && key == ".map.cameraStartPos.pos.z"
+	&& checkFloat(element, -18446744073709551616.0f, 18446744073709551615.0f))
 		s.m.cameraStartPos.pos.z = element.get<float>();
 	else if (element.is_number() && key == ".map.cameraStartPos.yaw")
 		s.m.cameraStartPos.yaw = element.get<float>();
 	else if (element.is_number() && key == ".map.cameraStartPos.pitch")
 		s.m.cameraStartPos.pitch = element.get<float>();
+	/// others
 	else if (element.is_number() && key == ".map.seed")
 		s.m.seed = element.get<uint32_t>();
 	else if (element.is_array() && key == ".map.flatMap")
 		loadFlatMap(element);
-	else if (element.is_number() && key == ".map.handBlockID")
+	else if (element.is_number() && key == ".map.handBlockID" && checkUint32(element, 1, NB_TYPE_BLOCKS))
 		s.m.handBlockID = element.get<uint32_t>();
-	else if (element.is_number() && key == ".map.gamemode" && element.get<uint8_t>() <= 1)
+	else if (element.is_number() && key == ".map.gamemode" && checkUint32(element, 0, 1))
 		s.m.gamemode = element.get<uint8_t>();
 	else
 		std::cout << "[WARN]: invalid argument or argument type in settings: " << key << ": " << element << std::endl;

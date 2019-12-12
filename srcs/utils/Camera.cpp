@@ -8,6 +8,7 @@ Camera::Camera(glm::vec3 pos, glm::vec3 up, float yaw, float pitch)
   pitch(pitch),
   movementSpeed(MOVEMENT_SPEED),
   mouseSensitivity(MOUSE_SENSITIVITY),
+  runFactor(RUN_FACTOR),
   zoom(45.0f),
   _startPos(pos),
   _startYaw(yaw),
@@ -50,7 +51,7 @@ glm::mat4 Camera::getViewMatrix() const {
 void Camera::processKeyboard(CamMovement direction, float dtTime, bool isRun) {
 	float	velocity;
 
-	velocity = movementSpeed * dtTime * ((isRun) ? RUN_FACTOR : 1);
+	velocity = movementSpeed * dtTime * ((isRun) ? runFactor : 1);
 	if (direction == CamMovement::Forward) {
 		#if CONSTRAINT_Y == true
 			glm::vec3 tmpFront = front;

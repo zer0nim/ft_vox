@@ -64,6 +64,7 @@ class Camera {
 
 		float		movementSpeed;
 		float		mouseSensitivity;
+		float		runFactor;
 		float		zoom;
 
 	private:

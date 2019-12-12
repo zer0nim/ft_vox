@@ -1,6 +1,6 @@
 {
 	"global": {
-		"renderDist": 8,
+		"renderDist": 16,
 		"files": {
 			"mapsPath": "/tmp/ft_vox/maps/",
 			"chunkPath": "chunks/",
@@ -27,8 +27,24 @@
 				}
 			}
 		},
-		"delayPutMs": 200,
-		"delayDestroyMs": 200
+		"player": {
+			"survival": {
+				"movementSpeed": 8.0,
+				"runFactor": 1.5,
+				"gravity": 18.0,
+				"jumpHeight": 1.4,
+				"jumpSpeed": 7.0,
+				"height": 1.8,
+				"radius": 0.4
+			},
+			"creative": {
+				"movementSpeed": 15.0,
+				"runFactor": 3.0
+			},
+			"mouseSensitivity": 0.1,
+			"delayPutMs": 200,
+			"delayDestroyMs": 200
+		}
 	},
 	"map": {
 		"seed": 0,

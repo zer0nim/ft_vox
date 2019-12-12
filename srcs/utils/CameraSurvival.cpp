@@ -1,17 +1,17 @@
 #include "CameraSurvival.hpp"
 #include "ChunkManager.hpp"
 
-CameraSurvival::CameraSurvival(tWinUser * winU, glm::vec3 pos, glm::vec3 up, float yaw, float pitch,
-	float gravity, float jumpHeight, float height, float radius)
+CameraSurvival::CameraSurvival(tWinUser * winU, glm::vec3 pos, glm::vec3 up, float yaw, float pitch)
 : Camera(pos, up, yaw, pitch),
+  gravity(SURV_GRAVITY),
+  jumpHeight(SURV_JUMP_HEIGHT),
+  jumpSpeed(SURV_JUMP_SPEED),
+  height(SURV_HEIGHT),
+  radius(SURV_RADIUS),
   _winU(winU),
-  _height(height),
-  _radius(radius),
-  _gravity(gravity),
-  _jumpHeight(jumpHeight),
-  _jumpSpeed(SURV_JUMP_SPEED),
   _curJumping(-1) {
 	  movementSpeed = SURV_MOVEMENT_SPEED;
+	  runFactor = SURV_RUN_FACTOR;
   }
 
 CameraSurvival::CameraSurvival(CameraSurvival const &src)
@@ -29,31 +29,31 @@ CameraSurvival &CameraSurvival::operator=(CameraSurvival const &rhs) {
 }
 
 void CameraSurvival::run(float dtTime) {
-	if (_curJumping >= 0 && _curJumping <= _jumpHeight) {
-		_curJumping += _jumpSpeed * dtTime;
+	if (_curJumping >= 0 && _curJumping <= jumpHeight) {
+		_curJumping += jumpSpeed * dtTime;
 		glm::vec3 tmpPos = pos;
 		// move up
-		_move(pos + worldUp * _jumpSpeed * dtTime);
+		_move(pos + worldUp * jumpSpeed * dtTime);
 		if (tmpPos.y == pos.y) {
 			_curJumping = -1;
 		}
 	}
-	else if (_curJumping >= 0 && _curJumping <= _jumpHeight * 2) {
-		_curJumping += _jumpSpeed * dtTime;
+	else if (_curJumping >= 0 && _curJumping <= jumpHeight * 2) {
+		_curJumping += jumpSpeed * dtTime;
 		// slow gravity
-		_move(pos - worldUp * _jumpSpeed * dtTime);
+		_move(pos - worldUp * jumpSpeed * dtTime);
 	}
 	else {
 		_curJumping = -1;
 		// gravity
-		_move(pos - worldUp * _gravity * dtTime);
+		_move(pos - worldUp * gravity * dtTime);
 	}
 }
 
 void CameraSurvival::processKeyboard(CamMovement direction, float dtTime, bool isRun) {
 	float	velocity;
 
-	velocity = movementSpeed * dtTime * ((isRun) ? SURV_RUN_FACTOR : 1);
+	velocity = movementSpeed * dtTime * ((isRun) ? runFactor : 1);
 	if (direction == CamMovement::Forward) {
 		glm::vec3 tmpFront = front;
 		tmpFront.y = 0;
@@ -73,7 +73,7 @@ void CameraSurvival::processKeyboard(CamMovement direction, float dtTime, bool i
 		_move(pos + right * velocity);
 	}
 	if (direction == CamMovement::Up) {
-		Constraints tmpCons = _getConstraints(pos + -worldUp * _gravity * dtTime);
+		Constraints tmpCons = _getConstraints(pos + -worldUp * gravity * dtTime);
 
 		if (_curJumping < 0 && tmpCons.negativeY == true) {  // if we are on the ground
 			_curJumping = 0;
@@ -109,53 +109,52 @@ void CameraSurvival::_move(glm::vec3 dest) {
 }
 
 CameraSurvival::Constraints CameraSurvival::_getConstraints(glm::vec3 dest) {
-	dest.x -= 1;  // update x pos
 	Constraints constraints = Constraints();
-	glm::vec3 posBottom = dest + (-worldUp * _height);
+	glm::vec3 posBottom = dest + (-worldUp * height);
 	glm::vec3 posUp = dest;
 	glm::vec3 tmpPos;
 
 	// Y constraints
-	tmpPos = posBottom; tmpPos.x += _radius; tmpPos.z += _radius;
+	tmpPos = posBottom; tmpPos.x += radius; tmpPos.z += radius;
 	if (_winU->chunkManager->getBlock(tmpPos) > 0) constraints.negativeY = true;
 
-	tmpPos = posBottom; tmpPos.x -= _radius; tmpPos.z += _radius;
+	tmpPos = posBottom; tmpPos.x -= radius; tmpPos.z += radius;
 	if (_winU->chunkManager->getBlock(tmpPos) > 0) constraints.negativeY = true;
 
-	tmpPos = posBottom; tmpPos.x += _radius; tmpPos.z -= _radius;
+	tmpPos = posBottom; tmpPos.x += radius; tmpPos.z -= radius;
 	if (_winU->chunkManager->getBlock(tmpPos) > 0) constraints.negativeY = true;
 
-	tmpPos = posBottom; tmpPos.x -= _radius; tmpPos.z -= _radius;
+	tmpPos = posBottom; tmpPos.x -= radius; tmpPos.z -= radius;
 	if (_winU->chunkManager->getBlock(tmpPos) > 0) constraints.negativeY = true;
 
-	tmpPos = posUp; tmpPos.x += _radius; tmpPos.z += _radius;
+	tmpPos = posUp; tmpPos.x += radius; tmpPos.z += radius;
 	if (_winU->chunkManager->getBlock(tmpPos) > 0) constraints.positiveY = true;
 
-	tmpPos = posUp; tmpPos.x -= _radius; tmpPos.z += _radius;
+	tmpPos = posUp; tmpPos.x -= radius; tmpPos.z += radius;
 	if (_winU->chunkManager->getBlock(tmpPos) > 0) constraints.positiveY = true;
 
-	tmpPos = posUp; tmpPos.x += _radius; tmpPos.z -= _radius;
+	tmpPos = posUp; tmpPos.x += radius; tmpPos.z -= radius;
 	if (_winU->chunkManager->getBlock(tmpPos) > 0) constraints.positiveY = true;
 
-	tmpPos = posUp; tmpPos.x -= _radius; tmpPos.z -= _radius;
+	tmpPos = posUp; tmpPos.x -= radius; tmpPos.z -= radius;
 	if (_winU->chunkManager->getBlock(tmpPos) > 0) constraints.positiveY = true;
 
 	// test at a few height
-	for (float yAdd = 0.1; yAdd <= _height; yAdd += 0.5) {
+	for (float yAdd = 0.1; yAdd <= height; yAdd += 0.5) {
 		glm::vec3 posY = posBottom + (worldUp * yAdd);
 
 		// X constraints
-		tmpPos = posY; tmpPos.x -= _radius;
+		tmpPos = posY; tmpPos.x -= radius;
 		if (_winU->chunkManager->getBlock(tmpPos) > 0) constraints.negativeX = true;
 
-		tmpPos = posY; tmpPos.x += _radius;
+		tmpPos = posY; tmpPos.x += radius;
 		if (_winU->chunkManager->getBlock(tmpPos) > 0) constraints.positiveX = true;
 
 		// Z constraints
-		tmpPos = posY; tmpPos.z -= _radius;
+		tmpPos = posY; tmpPos.z -= radius;
 		if (_winU->chunkManager->getBlock(tmpPos) > 0) constraints.negativeZ = true;
 
-		tmpPos = posY; tmpPos.z += _radius;
+		tmpPos = posY; tmpPos.z += radius;
 		if (_winU->chunkManager->getBlock(tmpPos) > 0) constraints.positiveZ = true;
 	}
 

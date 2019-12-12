@@ -155,8 +155,27 @@ struct Settings {
 			std::map<std::string, Text> text;
 		};
 		Screen		screen;
-		uint32_t	delayPutMs;  // delay between put 2 blocks
-		uint32_t	delayDestroyMs;  // delay between destroy 2 blocks
+		struct Player {
+			struct Survival {
+				float	movementSpeed;
+				float	runFactor;
+				float	gravity;
+				float	jumpHeight;
+				float	jumpSpeed;
+				float	height;
+				float	radius;
+			};
+			Survival	survival;
+			struct Creative {
+				float	movementSpeed;
+				float	runFactor;
+			};
+			Creative	creative;
+			float		mouseSensitivity;
+			uint32_t	delayPutMs;  // delay between put 2 blocks
+			uint32_t	delayDestroyMs;  // delay between destroy 2 blocks
+		};
+		Player		player;
 	};
 	Global	g;  // global
 	struct Map {

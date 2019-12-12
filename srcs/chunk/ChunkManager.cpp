@@ -290,7 +290,7 @@ void ChunkManager::destroyBlock() {
 	std::chrono::milliseconds	time = getMs();
 	bool						canChangeBlock = false;
     { std::lock_guard<std::mutex>	guard(s.mutexOthers);
-		if ((time - _lastDestroyed).count() > s.g.delayDestroyMs) {
+		if ((time - _lastDestroyed).count() > s.g.player.delayDestroyMs) {
 			_lastDestroyed = time;
 			canChangeBlock = true;
 		}
@@ -310,7 +310,7 @@ void ChunkManager::putBlock(uint8_t type) {
 	std::chrono::milliseconds	time = getMs();
 	bool						canChangeBlock = false;
     { std::lock_guard<std::mutex>	guard(s.mutexOthers);
-		if ((time - _lastPut).count() > s.g.delayPutMs) {
+		if ((time - _lastPut).count() > s.g.player.delayPutMs) {
 			_lastPut = time;
 			canChangeBlock = true;
 		}
@@ -429,6 +429,9 @@ uint32_t								ChunkManager::getNbChunkLoaded() const {
 }
 uint32_t	ChunkManager::getNbChunkRendered() const { return _nbChunkRendered; }
 uint8_t		ChunkManager::getBlock(wordFVec3 pos) const {
+	if (pos.x < 0) pos.x -= 1;
+	if (pos.y < 0) pos.y -= 1;
+	if (pos.z < 0) pos.z -= 1;
 	return getBlock(static_cast<wordIVec3>(pos));
 }
 uint8_t		ChunkManager::getBlock(wordIVec3 pos) const {
@@ -449,6 +452,9 @@ uint8_t		ChunkManager::getBlock(wordIVec3 pos) const {
 	return ret;
 }
 void	ChunkManager::updateBlock(wordFVec3 pos, uint8_t value) const {
+	if (pos.x < 0) pos.x -= 1;
+	if (pos.y < 0) pos.y -= 1;
+	if (pos.z < 0) pos.z -= 1;
 	updateBlock(static_cast<wordIVec3>(pos), value);
 }
 void	ChunkManager::updateBlock(wordIVec3 pos, uint8_t value) const {
