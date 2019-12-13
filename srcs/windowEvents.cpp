@@ -80,6 +80,27 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 		winU->cam->resetPosition();
 	}
 
+	// gamemode key
+	if (key == GLFW_KEY_G && action == GLFW_PRESS) {
+	    { std::lock_guard<std::mutex>	guard(s.mutexCamera);
+			Camera * tmp = winU->cam;
+			if (s.m.gamemode == GAMEMODE_CREATIVE) {
+				s.m.gamemode = GAMEMODE_SURVIVAL;
+				winU->cam = winU->camSurv;
+			}
+			else {
+				s.m.gamemode = GAMEMODE_CREATIVE;
+				winU->cam = winU->camCrea;
+			}
+			winU->cam->pos = tmp->pos;
+			winU->cam->front = tmp->front;
+			winU->cam->up = tmp->up;
+			winU->cam->yaw = tmp->yaw;
+			winU->cam->pitch = tmp->pitch;
+			winU->cam->processMouseMovement(0, 0);  // simulate a movement to update camera
+		}
+	}
+
 	// F3 key -> debug mode
 	if (key == GLFW_KEY_F3 && action == GLFW_RELEASE) {
 		if (launchF3Cmd == false)
@@ -116,26 +137,6 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 		}
 		else {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-		}
-	}
-
-	// gamemode key
-	if (key == GLFW_KEY_G && action == GLFW_PRESS) {
-	    { std::lock_guard<std::mutex>	guard(s.mutexCamera);
-			Camera * tmp = winU->cam;
-			if (s.m.gamemode == GAMEMODE_CREATIVE) {
-				s.m.gamemode = GAMEMODE_SURVIVAL;
-				winU->cam = winU->camSurv;
-			}
-			else {
-				s.m.gamemode = GAMEMODE_CREATIVE;
-				winU->cam = winU->camCrea;
-			}
-			winU->cam->pos = tmp->pos;
-			winU->cam->front = tmp->front;
-			winU->cam->up = tmp->up;
-			winU->cam->yaw = tmp->yaw;
-			winU->cam->pitch = tmp->pitch;
 		}
 	}
 }
