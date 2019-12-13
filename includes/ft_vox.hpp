@@ -8,7 +8,7 @@
 #define checkError() checkError_(__FILE__, __LINE__)
 #define checkErrorExit() checkErrorExit_(__FILE__, __LINE__)
 
-#define SETTINGS_FILE "assets/settings.json"
+#define DEF_SETTINGS_FILE "assets/settings.json"
 
 #define MAX_MAP_SIZE_X 16384  // [bloc] type: int
 #define MAX_MAP_SIZE_Y 256    // [bloc] type: int
@@ -124,7 +124,7 @@ std::chrono::milliseconds getMs();
 bool	usage();
 class TextRender;
 class ChunkManager;
-bool	argparse(int nbArgs, char const **args);
+bool	argparse(int nbArgs, char const **args, bool isBeforeSettings = false);
 void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManager &chunkManager);
 bool	createDir(std::string const &dirNames);
 bool	createDir(char const *dirNames);
@@ -137,6 +137,7 @@ struct Settings {
 	struct Global {
 		int32_t	renderDist;
 		struct Files {
+			std::string settingsFile;
 			std::string	mapsPath;
 			std::string	chunkPath;
 			std::string mapSettingsPath;

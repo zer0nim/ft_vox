@@ -249,8 +249,13 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *camCrea
 
 int		main(int ac, char const **av) {
 	setDefaultSettings();
+
+	if (argparse(ac - 1, av + 1, true) == false) {
+		return 0;
+	}
+
 	try {
-		loadSettings(std::string(SETTINGS_FILE));
+		loadSettings(s.g.files.settingsFile);
 	}
 	catch (Settings::SettingsError &e) {
 		return 1;
@@ -260,7 +265,7 @@ int		main(int ac, char const **av) {
 		s.m.seed = rand_r(&seedRand);
 	}
 
-	if (argparse(ac - 1, av + 1) == false) {
+	if (argparse(ac - 1, av + 1, false) == false) {
 		return 0;
 	}
 
@@ -271,7 +276,6 @@ int		main(int ac, char const **av) {
 		if (createMapFiles() == false) {
 			return 1;
 		}
-		std::cout << "[INFO]: map " << s.m.mapName << std::endl;
 	}
 	setSeed(s.m.seed);
 
@@ -293,11 +297,8 @@ int		main(int ac, char const **av) {
 	dynamic_cast<CameraSurvival *>(camSurv)->radius = s.g.player.survival.radius;
 	TextureManager	*textureManager = nullptr;
 
-	std::cout << "[INFO]: starting at " << s.m.cameraStartPos.pos.x << " "
-	<< s.m.cameraStartPos.pos.y << " " << s.m.cameraStartPos.pos.z << std::endl;
-	std::cout << "[INFO]: random seed " << s.m.seed << std::endl;
-	std::cout << "[INFO]: chunk size " << CHUNK_SZ_X << " " << CHUNK_SZ_Y << " " << CHUNK_SZ_Z << std::endl;
-	std::cout << "[INFO]: render distance " << s.g.renderDist << " chunks" << std::endl;
+	std::cout << "[INFO]: chunk size " << CHUNK_SZ_X << " " << CHUNK_SZ_Y << " " << CHUNK_SZ_Z
+		<< " -> render distance " << s.g.renderDist << " chunks" << std::endl;
 
 	if (!init(&window, "ft_vox", &winU, camCrea, camSurv))
 		return (1);

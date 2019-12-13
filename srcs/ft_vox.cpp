@@ -13,6 +13,7 @@ Settings s;
 
 void	setDefaultSettings() {
 	s.g.renderDist = 8;
+	s.g.files.settingsFile = DEF_SETTINGS_FILE;
 	s.g.files.mapsPath = "/tmp/ft_vox/maps/";
 	s.g.files.chunkPath = "chunks/";
 	s.g.files.mapSettingsPath = "map_settings.json";
@@ -116,6 +117,8 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 	if (element.is_number() && key == ".global.renderDist" && checkUint32(element, 1, 128))
 		s.g.renderDist = element.get<uint32_t>();
 	/// files
+	else if (element.is_string() && key == ".global.files.settingsFile")
+		s.g.files.settingsFile = element.get<std::string>();
 	else if (element.is_string() && key == ".global.files.mapsPath")
 		s.g.files.mapsPath = element.get<std::string>();
 	else if (element.is_string() && key == ".global.files.chunkPath")
@@ -227,7 +230,7 @@ void	loadSettings(std::string settingFile) {
 		}
 	}
 	catch (const nlohmann::json::parse_error& e) {
-		std::cerr << "error in json loading" << std::endl;
+		std::cerr << "[ERROR]: unable to load settings: " << settingFile << std::endl;
 		throw Settings::JsonParseException();
 	}
 	catch (std::exception &e) {
@@ -246,28 +249,43 @@ bool	usage() {
 	std::cout << "\t--usage|-u: display usage of the program" << std::endl;
 	std::cout << "\t--name|-n mapName: set map name" << std::endl;
 	std::cout << "\t--seed|-s seed: set seed (seed should be an int)" << std::endl;
+	std::cout << "\t--settings settingsFile: set the settings file (def " << s.g.files.settingsFile << ")" << std::endl;
 	return false;
 }
 
-bool	argparse(int nbArgs, char const **args) {
+bool	argparse(int nbArgs, char const **args, bool isBeforeSettings) {
 	int i = 0;
 	while (i < nbArgs) {
 		if (strcmp(args[i], "--usage") == 0 || strcmp(args[i], "-u") == 0) {
 			return usage();
 		}
+		// before settings
+		else if (strcmp(args[i], "--settings") == 0) {
+			i++;
+			if (isBeforeSettings == true) {  // load this before settings
+				if (i == nbArgs || args[i][0] == '-')
+					return usage();
+				s.g.files.settingsFile = args[i];
+			}
+		}
+		// after settings
 		else if (strcmp(args[i], "--name") == 0 || strcmp(args[i], "-n") == 0) {
 			i++;
-			if (i == nbArgs || args[i][0] == '-')
-				return usage();
-			s.m.mapName = args[i];
+			if (isBeforeSettings == false) {  // load this after settings
+				if (i == nbArgs || args[i][0] == '-')
+					return usage();
+				s.m.mapName = args[i];
+			}
 		}
 		else if (strcmp(args[i], "--seed") == 0 || strcmp(args[i], "-s") == 0) {
 			i++;
-			if (i == nbArgs)
-				return usage();
-			s.m.seed = static_cast<uint32_t>(atoi(args[i]));
-			if (s.m.seed == 0)
-				return usage();
+			if (isBeforeSettings == false) {  // load this after settings
+				if (i == nbArgs)
+					return usage();
+				s.m.seed = static_cast<uint32_t>(atoi(args[i]));
+				if (s.m.seed == 0)
+					return usage();
+			}
 		}
 		else {
 			return usage();
