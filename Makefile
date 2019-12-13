@@ -77,10 +77,17 @@ LIBS_INC	=	~/.brew/include \
 
 DEPFLAGS	= -MT $@ -MD -MP -MF $(DEP_DIR)/$*.Td
 CFLAGS		= -Ofast -std=c++11 -Wall -Wextra -Wno-deprecated
+DEFINE		=
 
+# setup debug mode or normal mode
 ifneq ($(DEBUG),)
 	CFLAGS := $(CFLAGS) $(DEBUG_FLAGS)
+else
+	CFLAGS := $(CFLAGS) -Werror
 endif
+
+# send define to program
+CFLAGS := $(CFLAGS) $(addprefix -D, $(DEFINE))
 
 # pre-commit rules
 PRE_COMMIT_FILE = .git/hooks/pre-commit
