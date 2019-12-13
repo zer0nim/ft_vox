@@ -108,7 +108,7 @@ void Skybox::load(std::vector<std::string> &faces) {
         unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
         if (data) {
 			if ((width & (width - 1)) != 0 || (height & (height - 1)) != 0) {
-				std::cout << "WARNING: image " << faces[i] << " is not power-of-2 dimensions" << std::endl;
+				logErr("image " << faces[i] << " is not power-of-2 dimensions");
 			}
 			GLenum format = GL_RGB;
 			if (nrChannels == 1) {
@@ -125,7 +125,7 @@ void Skybox::load(std::vector<std::string> &faces) {
             stbi_image_free(data);
         }
         else {
-            std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+            logErr("Skyboox texture failed to load at path: " << faces[i]);
             stbi_image_free(data);
         }
     }

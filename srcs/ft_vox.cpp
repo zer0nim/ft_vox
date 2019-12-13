@@ -100,12 +100,12 @@ static void	loadFlatMap(nlohmann::json &element) {
 				s.m.flatMap.push_back(flatMapElem);
 			}
 			else {
-				std::cerr << "[WARN]: flatMap need fromY (0-256), toY (0-256) and blockName keys" << std::endl;
+				logWarn("flatMap need fromY (0-256), toY (0-256) and blockName keys");
 				return;
 			}
 		}
 		catch (std::exception & e) {
-			std::cerr << "[WARN]: flatMap need fromY (0-256), toY (0-256) and blockName keys" << std::endl;
+			logWarn("flatMap need fromY (0-256), toY (0-256) and blockName keys");
 			return;
 		}
 	}
@@ -230,11 +230,11 @@ void	loadSettings(std::string settingFile) {
 		}
 	}
 	catch (const nlohmann::json::parse_error& e) {
-		std::cerr << "[ERROR]: unable to load settings: " << settingFile << std::endl;
+		logErr("unable to load settings: " << settingFile);
 		throw Settings::JsonParseException();
 	}
 	catch (std::exception &e) {
-		std::cerr << "[ERROR]: unexpected exception in json loading" << std::endl;
+		logErr("unable to load settings: " << settingFile);
 		throw Settings::JsonParseException();
 	}
 }

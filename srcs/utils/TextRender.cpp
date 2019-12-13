@@ -1,5 +1,6 @@
 #include "TextRender.hpp"
 #include "debug.hpp"
+#include "Logging.hpp"
 
 TextRender::TextRender(Shader &sh, uint32_t width, uint32_t height) :
 _shader(sh),
@@ -22,12 +23,12 @@ _projection(glm::ortho(0.0f, static_cast<GLfloat>(width), 0.0f, static_cast<GLfl
 void TextRender::loadFont(std::string name, std::string const &filename, uint32_t size) {
 	FT_Library ft;
 	if (FT_Init_FreeType(&ft)) {
-		std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+		logErr("Could not init FreeType Library");
 		throw TextRender::LoadTextRenderException();
 	}
 	FT_Face face;
 	if (FT_New_Face(ft, filename.c_str(), 0, &face)) {
-		std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
+		logErr("Failed to load font: " << filename);
 		FT_Done_FreeType(ft);
 		throw TextRender::LoadTextRenderException();
 	}
@@ -40,7 +41,7 @@ void TextRender::loadFont(std::string name, std::string const &filename, uint32_
 	for (GLubyte c = 0; c < 128; c++) {
 		// load char
 		if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
-			std::cout << "ERROR::FREETYTPE: Failed to load Glyph: " << c << std::endl;
+			logErr("Failed to load char: " << c << " in " << filename);
 			continue;
 		}
 		// generate texture

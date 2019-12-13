@@ -3,6 +3,7 @@
 
 #include "commonInclude.hpp"
 #include "utils/Camera.hpp"
+#include "utils/Logging.hpp"
 
 #include "utils/debug.hpp"
 #define checkError() checkError_(__FILE__, __LINE__)

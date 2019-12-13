@@ -1,6 +1,7 @@
 #include "Texture.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "lib/stb_image.h"
+#include "Logging.hpp"
 
 u_int32_t	textureFromFile(const std::string path, bool inSpaceSRGB) {
 	u_int32_t	textureID;
@@ -29,7 +30,7 @@ u_int32_t	textureFromFile(const std::string path, bool inSpaceSRGB) {
 			format = GL_RGBA;
 		}
 		else {
-			std::cout << "Error in component per pixel (" << nrComponents << ")\n";
+			logErr("failed to load texture " << path);
 			throw TextureFailToLoad();
 		}
 
@@ -47,7 +48,7 @@ u_int32_t	textureFromFile(const std::string path, bool inSpaceSRGB) {
 		stbi_image_free(data);
 	}
 	else {
-		std::cerr << "Texture failed to load at path: " << path << std::endl;
+		logErr("Texture failed to load at path: " << path);
 		stbi_image_free(data);
 		throw TextureFailToLoad();
 	}

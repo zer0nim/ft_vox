@@ -1,4 +1,5 @@
 #include "utils/debug.hpp"
+#include "Logging.hpp"
 
 GLenum checkError_(const char *file, int line) {
     GLenum errorCode;
@@ -14,7 +15,7 @@ GLenum checkError_(const char *file, int line) {
             case GL_OUT_OF_MEMORY: error = "OUT_OF_MEMORY"; break;
             case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
         }
-        std::cout << "OpenGL error: " << error << " > " << file << " (" << line << ")" << std::endl;
+        logErr("OpenGL error: " << error << " > " << file << " (" << line << ")");
         lastError = errorCode;
     }
     return lastError;

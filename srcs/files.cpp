@@ -6,12 +6,12 @@ bool	createDir(std::string const &dirNames) {
 	if (boost::filesystem::is_directory(dirNames) == false) {
 		try {
 			if (boost::filesystem::create_directories(dirNames) == false) {
-				std::cout << "failed to create " << dirNames << std::endl;
+				logErr("failed to create " << dirNames);
 				return false;
 			}
 		}
 		catch (boost::filesystem::filesystem_error &e) {
-			std::cout << "failed to create " << dirNames << " -> " << e.what() << std::endl;
+			logErr("failed to create " << dirNames << " -> " << e.what());
 			return false;
 		}
 	}

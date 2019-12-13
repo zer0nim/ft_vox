@@ -1,4 +1,5 @@
 #include "Camera.hpp"
+#include "Logging.hpp"
 
 Camera::Camera(glm::vec3 pos, glm::vec3 up, float yaw, float pitch)
 : pos(pos),
@@ -158,7 +159,7 @@ int		Camera::frustumCullingCheckPoint(glm::vec3 const &point) {
 	int		res = FRCL_INSIDE;
 
 	if (!_frustumCulling.enabled) {
-		std::cerr << "init frustumCulling before using it: frustumCullingInit" << std::endl;
+		logWarn("init frustumCulling before using it: frustumCullingInit");
 		return FRCL_INSIDE;
 	}
 

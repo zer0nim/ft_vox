@@ -1,4 +1,5 @@
 #include "Shader.hpp"
+#include "Logging.hpp"
 
 /*
 	load shader source code to string
@@ -37,7 +38,7 @@ std::string *vsCode, std::string *fsCode, std::string *gsCode
 		}
 	}
 	catch (std::ifstream::failure e) {
-		std::cerr << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+		logErr("failed to load Shader file" << vsPath);
 		throw Shader::ShaderCompileException();
 	}
 }
@@ -163,8 +164,7 @@ void	Shader::checkCompileErrors(u_int32_t shader, std::string type) {
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 		if (!success) {
 			glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-			std::cerr << "Error: Shader Compilation, type: " << type << "\n" \
-			<< infoLog << std::endl;
+			logErr("Shader Compilation, type: " << type << std::endl << infoLog);
 			throw Shader::ShaderCompileException();
 		}
 	}
@@ -172,8 +172,7 @@ void	Shader::checkCompileErrors(u_int32_t shader, std::string type) {
 		glGetProgramiv(shader, GL_LINK_STATUS, &success);
 		if (!success) {
 			glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-			std::cerr << "Error: Shader Linking, type: " << type << "\n" \
-			<< infoLog << std::endl;
+			logErr("Shader Linking, type: " << type << std::endl << infoLog);
 			throw Shader::ShaderCompileException();
 		}
 	}

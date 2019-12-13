@@ -48,7 +48,7 @@ void	*threadUpdateFunction(void *args_) {
 		if (time_loop.count() > loopTime) {
 			#if DEBUG_FPS_LOW == true
 				if (!firstLoop)
-					std::cerr << "update loop slow -> " << time_loop.count() << "ms / " << loopTime << "ms (" << FPS << "fps)\n";
+					logDebug("update loop slow -> " << time_loop.count() << "ms / " << loopTime << "ms (" << FPS << "fps)");
 			#endif
 		}
 		else {
@@ -105,7 +105,7 @@ TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textur
 	for (uint8_t i = 0; i < NB_UPDATE_THREADS; i++) {
 		int rc = pthread_create(&(threadUpdate[i]), NULL, threadUpdateFunction, reinterpret_cast<void*>(threadUpdateArgs[i]));
 		if (rc) {
-			std::cout << "Error: unable to create thread," << rc << std::endl;
+			logErr("unable to create thread," << rc);
 			return;
 		}
 	}
@@ -197,7 +197,7 @@ TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textur
 			lastFps = static_cast<int>(1000.0f / time_loop.count());
 			#if DEBUG_FPS_LOW == true
 				if (!firstLoop)
-					std::cerr << "loop slow -> " << time_loop.count() << "ms / " << loopTime << "ms (" << FPS << "fps)\n";
+					logDebug("loop slow -> " << time_loop.count() << "ms / " << loopTime << "ms (" << FPS << "fps)");
 			#endif
 		}
 		else {
@@ -248,6 +248,15 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *camCrea
 }
 
 int		main(int ac, char const **av) {
+	// init logging
+	#if DEBUG
+		logging.setLoglevel(LOGDEBUG);
+		logging.setPrintFileLine(LOGWARN, true);
+		logging.setPrintFileLine(LOGERROR, true);
+		logging.setPrintFileLine(LOGFATAL, true);
+	#else
+		logging.setLoglevel(LOGINFO);
+	#endif
 	setDefaultSettings();
 
 	if (argparse(ac - 1, av + 1, true) == false) {
@@ -270,7 +279,7 @@ int		main(int ac, char const **av) {
 	}
 
 	if (s.m.mapName == "") {  // load without mapName
-		std::cout << "[WARN]: no mapname -> you can't save the map" << std::endl;
+		logWarn("no mapname -> you can't save the map");
 	}
 	else {
 		if (createMapFiles() == false) {
@@ -297,12 +306,12 @@ int		main(int ac, char const **av) {
 	dynamic_cast<CameraSurvival *>(camSurv)->radius = s.g.player.survival.radius;
 	TextureManager	*textureManager = nullptr;
 
-	std::cout << "[INFO]: chunk size " << CHUNK_SZ_X << " " << CHUNK_SZ_Y << " " << CHUNK_SZ_Z
-		<< " -> render distance " << s.g.renderDist << " chunks" << std::endl;
+	logInfo("chunk size " << CHUNK_SZ_X << " " << CHUNK_SZ_Y << " " << CHUNK_SZ_Z
+		<< " -> render distance " << s.g.renderDist << " chunks");
 
 	if (!init(&window, "ft_vox", &winU, camCrea, camSurv))
 		return (1);
-	std::cout << "[INFO]: window size " << s.g.screen.width << " * " << s.g.screen.height << std::endl;
+	logInfo("window size " << s.g.screen.width << " * " << s.g.screen.height);
 
 	try {
 		// load textures
@@ -333,7 +342,7 @@ int		main(int ac, char const **av) {
 		chunkManager.saveAndQuit();
 	}
 	catch(const TextureManager::TextureManagerError& e) {
-		std::cerr << e.what() << std::endl;
+		logErr("when loading textures: " << e.what());
 
 		glfwDestroyWindow(window);
 		glfwPollEvents();
@@ -341,11 +350,10 @@ int		main(int ac, char const **av) {
 		return 1;
 	}
 	catch(const Shader::ShaderError& e) {
-		std::cout << "ShaderError !" << std::endl;
-		std::cerr << e.what() << std::endl;
+		logErr("when loading shader: " << e.what());
 	}
 	catch (const TextRender::TextRenderError & e) {
-		std::cerr << "TextRenderError: " << e.what() << std::endl;
+		logErr("when loading TextRender: " << e.what());
 	}
 
 	glfwDestroyWindow(window);
@@ -353,11 +361,13 @@ int		main(int ac, char const **av) {
 	glfwTerminate();
 
 	if (s.m.mapName != "") {  // if we have a map
-		std::cout << "[INFO]: saving..." << std::endl;
-		if (saveMap(winU.cam))
-			std::cout << "[INFO]: settings saved" << std::endl;
-		else
-			std::cout << "[WARN]: unable to save settings" << std::endl;
+		logInfo("saving...");
+		if (saveMap(winU.cam)) {
+			logInfo("settings saved");
+		}
+		else {
+			logWarn("unable to save settings");
+		}
 	}
 
 	delete textureManager;

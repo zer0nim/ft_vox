@@ -3,6 +3,8 @@
 #include <fstream>
 
 #include "utils/Texture.hpp"
+#include "Logging.hpp"
+
 
 std::map<std::string, uint8_t>	TextureManager::blocksNames = {
 	{"dirt",		1},
@@ -26,14 +28,12 @@ TextureManager::TextureManager(std::string const &texturesSettings) {
 			loadBlocksTextures(data);
 		}
 		else {
-			std::cout << "throw FailedToOpenException" << std::endl;
+			logErr("failed to load texture json");
 			throw TextureManager::FailedToOpenException(std::string(texturesSettings));
 		}
 	}
 	catch (const nlohmann::json::parse_error& e) {
-		std::cerr << "message: " << e.what() << std::endl;
-		std::cerr << "exception id: " << e.id << std::endl;
-		std::cerr << "byte position of error: " << e.byte << std::endl;
+		logErr("failed to load texture json" << e.what());
 		throw TextureManager::JsonParseException();
 	}
 }
@@ -141,14 +141,12 @@ void	TextureManager::loadBlocksTextures(nlohmann::json const &data) {
 							blockTexture->bottom = loadTextures(blockText.value());
 						}
 						else {
-							std::cout << "WARNING ! block \"" << block.key() << \
-							"\", unrecognized texture key \"" <<  key  << '"' << std::endl;
+							logWarn("block \"" << block.key() << "\", unrecognized texture key \"" <<  key  << '"');
 						}
 					}
 
 					if (blockTexture->side == -1) {
-						std::cerr << "missing default texture for block \"" << \
-						block.key() << '"' << std::endl;
+						logErr("missing default texture for block \"" << block.key() << '"');
 						throw TextureManager::missingBlockException();
 					}
 
@@ -156,7 +154,7 @@ void	TextureManager::loadBlocksTextures(nlohmann::json const &data) {
 				}
 			}
 			else {
-				std::cerr << "invalid block name in textures.json: " << block.key() << std::endl;
+				logErr("invalid block name in textures.json: " << block.key());
 				throw TextureManager::missingBlockException();
 			}
 		}
@@ -167,7 +165,7 @@ void	TextureManager::loadBlocksTextures(nlohmann::json const &data) {
 	for (size_t i = 0; i < _blocks.size(); ++i) {
 		if (_blocks[i] == nullptr) {
 			missingBlock = true;
-			std::cerr << "missing block: " << i << std::endl;
+			logErr(std::string("missing block: ") << i << " in textures.json");
 		}
 	}
 	if (missingBlock) {

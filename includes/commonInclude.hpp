@@ -1,7 +1,9 @@
 #ifndef COMMONINCLUDE_HPP_
 #define COMMONINCLUDE_HPP_
 
-#define DEBUG						true  // type: bool -> enable / disable the debug mode
+#ifndef DEBUG
+	#define DEBUG						false  // type: bool -> enable / disable the debug mode
+#endif
 #define DEBUG_FPS_LOW				DEBUG & false
 #define DEBUG_SHOW_FPS				DEBUG & false  // show all fps count
 #define DEBUG_SHOW_FPS_ALLTHREAD	DEBUG & false  // show all fps count for all threads

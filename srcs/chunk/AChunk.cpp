@@ -46,14 +46,14 @@ void	AChunk::draw(glm::mat4 &view) {
 bool	AChunk::_createChunkFromFile() {
 	std::ifstream chunkFile(_filename);
 	if (chunkFile.fail()) {
-		std::cout << "Error: " << strerror(errno) << std::endl;
+		logErr("failed to open file " << _filename << " " << strerror(errno));
 		return 1;
 	}
 	std::string line;
 	std::getline(chunkFile, line);
 	if (!chunkFile) {
 		if (!chunkFile.eof()) {
-			std::cout << "corrupted file: " << _filename << " empty file" << std::endl;
+			logErr("corrupted file: " << _filename << " empty file");
 			chunkFile.close();
 			return false;
 		}
@@ -69,14 +69,14 @@ bool	AChunk::_createChunkFromFile() {
 				std::getline(ss, strNumber, '|');
 				if (!ss) {
 					if (ss.eof()) {
-						std::cout << "corrupted file: " << _filename << " not enouth values" << std::endl;
+						logErr("corrupted file: " << _filename << " not enouth values");
 						return false;
 					}
 				}
 				number = std::atoi(strNumber.c_str());
 				if (number < 0 || number > std::numeric_limits<uint8_t>::max()
 				|| (number == 0 && strNumber != "0")) {
-					std::cout << "corrupted file: " << _filename << " invalid value " << strNumber << std::endl;
+						logErr("corrupted file: " << _filename << " invalid value " << strNumber);
 					return false;
 				}
 				_data.data[x][y][z] = number;
@@ -132,12 +132,12 @@ void AChunk::save() {
 	fileData.pop_back();  // remove the last |
 	std::ofstream chunkFile(_filename);
 	if (chunkFile.fail()) {
-		std::cout << "unable to save chunk: " << _filename << " " << strerror(errno) << std::endl;
+		logWarn("unable to save chunk: " << _filename << " " << strerror(errno));
 		return;
 	}
 	chunkFile << fileData << std::endl;
 	if (chunkFile.fail()) {
-		std::cout << "unable to save chunk: " << _filename << " " << strerror(errno) << std::endl;
+		logWarn("unable to save chunk: " << _filename << " " << strerror(errno));
 		return;
 	}
 	chunkFile.close();
