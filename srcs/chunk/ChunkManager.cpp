@@ -62,6 +62,7 @@ _textureManager(src.getTextureManager()) {
 }
 
 ChunkManager::~ChunkManager() {
+	std::lock_guard<std::mutex>	guard(s.mutexChunkMap), guard2(s.mutexToDelete);
 	// update all chunks
 	for (auto it = _chunkMap.begin(); it != _chunkMap.end(); it++) {
 		toDelete.push_back(it->first);
@@ -78,6 +79,7 @@ ChunkManager::~ChunkManager() {
 ChunkManager &ChunkManager::operator=(ChunkManager const &rhs) {
 	if (this != &rhs) {
 		_winU = rhs.getWinU();
+		std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
 		_chunkMap = rhs.getChunkMap();
 	}
 	return *this;
@@ -356,7 +358,9 @@ void ChunkManager::updateRaycast() {
 		if (tmpPoint.y < 0) tmpPoint.y -= 1;
 		if (tmpPoint.z < 0) tmpPoint.z -= 1;
 		point = wordIVec3(tmpPoint);
-		block = getBlock(point);
+	    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
+			block = getBlock(point);
+		}
 		if (dist > start) {
 			if (pointLastBlock != point && block == 0) {
 				pointLastBlock = point;

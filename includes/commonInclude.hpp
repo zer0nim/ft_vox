@@ -8,6 +8,8 @@
 #ifndef SHOWFPS
 	#define DEBUG_SHOW_FPS				DEBUG & false  // show all fps count
 #else
+	#undef DEBUG
+	#define DEBUG					true
 	#define DEBUG_SHOW_FPS				true  // show all fps count
 #endif
 #define DEBUG_SHOW_FPS_ALLTHREAD	DEBUG & false  // show all fps count for all threads

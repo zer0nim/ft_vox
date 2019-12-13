@@ -106,7 +106,10 @@ bool CameraSurvival::isOnBlock(wordIVec3 blockPos) const {
 }
 
 void CameraSurvival::_move(glm::vec3 dest) {
-	Constraints tmpCons = _getConstraints(dest);
+	Constraints tmpCons;
+    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
+		tmpCons = _getConstraints(dest);
+	}
 
 	// X constraints
 	if (dest.x - pos.x > 0 && tmpCons.positiveX == false)
