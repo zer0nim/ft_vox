@@ -25,21 +25,9 @@ class GreedyChunk2 : public AChunk {
 		virtual void	_draw(glm::mat4 &view);
 
 	private:
-		struct VoxFace {
-			uint8_t		type;
-			bool		transparent;  // for face culling
-			Direction	side;
-
-			bool operator==(VoxFace const &rhs) const {
-				return (this->transparent == rhs.transparent && this->type == rhs.type);
-			};
-			bool operator!=(VoxFace const &rhs) const {
-				return !(*this == rhs);
-			};
-		};
-
 		struct Quad {
-			VoxFace		voxFace;
+			uint8_t		type;
+			Direction	side;
 			uint8_t		width;
 			uint8_t		height;
 			bool		backFace;
@@ -51,7 +39,6 @@ class GreedyChunk2 : public AChunk {
 
 		void	sendMeshData();
 		static void	sendConstUniforms(TextureManager const &textureManager);
-		VoxFace	*getVoxFace(chunkVec3 const pos, Direction const side);
 		void	calcGreedyChunk();
 		void	fillVectLine(std::vector<float> &vertices, int & i, \
 		chunkVec3 const &pos, glm::tvec2<int8_t> textUv, Quad const &q);

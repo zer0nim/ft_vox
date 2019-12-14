@@ -38,32 +38,14 @@ void	GreedyChunk2::initShader(glm::mat4 &projection, TextureManager const &textu
 }
 
 /*
-	get an instance of VoxelFace containing the attributes for
-	one side of a voxel.
-	check if the voxel face should be culled.
-*/
-GreedyChunk2::VoxFace	*GreedyChunk2::getVoxFace(chunkVec3 const pos, Direction const side) {
-	VoxFace *voxFace = nullptr;
-	uint8_t	type = _data.data[pos.x][pos.y][pos.z];
-
-	if (type == 0) {
-		return nullptr;
-	}
-	voxFace = new VoxFace();
-	voxFace->type = type;
-	voxFace->transparent = false;  // TODO(zer0nim): set transparency according to face culling
-	voxFace->side = side;
-
-	return voxFace;
-}
-
-/*
 	generate faces by merging consecutive identicals blocks
 */
 void	GreedyChunk2::calcGreedyChunk() {
 	chunkVec3 chunkSz = {CHUNK_SZ_X, CHUNK_SZ_Y, CHUNK_SZ_Z};
 
-	std::array<VoxFace *, CHUNK_SZ_Y * CHUNK_SZ_X>	mask = { nullptr };
+	_quads.clear();
+
+	std::array<uint8_t, CHUNK_SZ_Y * CHUNK_SZ_X>	mask = { 0 };
 	/*
 		the greedy chunk algorithm work with a mask.
 		the mask will contain the faces position, size, and type for the current
@@ -138,29 +120,22 @@ void	GreedyChunk2::calcGreedyChunk() {
 						chunkVec3 voxPos = {it[0], it[1], it[2]};
 
 						// get curent block
-						VoxFace	*a = (it[d] >= 0)
-							? getVoxFace(voxPos, side)
-							: nullptr;
-
+						uint8_t a = (it[d] >= 0)
+							? _data.data[voxPos.x][voxPos.y][voxPos.z] : 0;
 						// get next block
 						voxPos[d] += 1;  // next block
-						VoxFace	*b = (it[d] < chunkSz[d] - 1)
-							? getVoxFace(voxPos, side)
-							: nullptr;
+						uint8_t b = (it[d] < chunkSz[d] - 1)
+							? _data.data[voxPos.x][voxPos.y][voxPos.z] : 0;
 
 						// fill the mask
-						if (a != nullptr && b != nullptr && *a == *b) {
-							mask[n] = nullptr;
-							delete a;
-							delete b;
+						if (a != 0 && b != 0 && a == b) {
+							mask[n] = 0;
 						}
 						else if (backFace) {
 							mask[n] = b;
-							delete a;
 						}
 						else {
 							mask[n] = a;
-							delete b;
 						}
 					}
 				}
@@ -169,19 +144,19 @@ void	GreedyChunk2::calcGreedyChunk() {
 				n = 0;
 				for (uint8_t j = 0; j < chunkSz[v]; ++j) {
 					for (uint8_t i = 0; i < chunkSz[u];) {
-						if (mask[n] != nullptr) {
+						if (mask[n] != 0) {
 							uint8_t w, h;  // face size
 
 							// compute the width
-							for (w = 1; i + w < chunkSz[u] && mask[n + w] != nullptr && \
-							*(mask[n + w]) == *(mask[n]); ++w) {}
+							for (w = 1; i + w < chunkSz[u] && mask[n + w] != 0 && \
+							mask[n + w] == mask[n]; ++w) {}
 
 							// compute the height
 							bool done = false;
 							for (h = 1; j + h < chunkSz[v]; ++h) {
 								for (uint8_t k = 0; k < w; ++k) {
-									if (mask[n + k + h * chunkSz[u]] == nullptr || \
-										*(mask[n + k + h * chunkSz[u]]) != *(mask[n])) {
+									if (mask[n + k + h * chunkSz[u]] == 0 || \
+										mask[n + k + h * chunkSz[u]] != mask[n]) {
 										done = true;
 										break;
 									}
@@ -191,52 +166,46 @@ void	GreedyChunk2::calcGreedyChunk() {
 								}
 							}
 
-							/*
-								check the "transparent" attribute in the VoxelFace
-								to ensure that we don't mesh any culled faces.
-							*/
-							if (!mask[n]->transparent) {
-								// add quad
-								it[u] = i;
-								it[v] = j;
+							// add quad
+							it[u] = i;
+							it[v] = j;
 
-								std::array<uint8_t, 3> du = {0, 0, 0};
-								du[u] = w;
-								std::array<uint8_t, 3> dv = {0, 0, 0};
-								dv[v] = h;
+							std::array<uint8_t, 3> du = {0, 0, 0};
+							du[u] = w;
+							std::array<uint8_t, 3> dv = {0, 0, 0};
+							dv[v] = h;
 
-								++it[d];  // increment curent direction to get correct position
+							++it[d];  // increment curent direction to get correct position
 
-								// create and save the face
-								Quad	quad;
-								quad.voxFace = *(mask[n]);
-								quad.width = (d != 2) ? h : w;
-								quad.height = (d != 2) ? w : h;
-								quad.backFace = backFace;
-								if (d != 2) {
-									quad.bottomLeft = chunkVec3(it[0],					it[1],					it[2]);
-									quad.topLeft = chunkVec3(it[0] + du[0],				it[1] + du[1],			it[2] + du[2]);
-									quad.topRight = chunkVec3(it[0] + du[0] + dv[0],	it[1] + du[1] + dv[1],	it[2] + du[2] + dv[2]);
-									quad.bottomRight = chunkVec3(it[0] + dv[0],			it[1] + dv[1],			it[2] + dv[2]);
-								}
-								else {
-									quad.bottomRight = chunkVec3(it[0],					it[1],					it[2]);
-									quad.bottomLeft = chunkVec3(it[0] + du[0],				it[1] + du[1],			it[2] + du[2]);
-									quad.topLeft = chunkVec3(it[0] + du[0] + dv[0],	it[1] + du[1] + dv[1],	it[2] + du[2] + dv[2]);
-									quad.topRight = chunkVec3(it[0] + dv[0],			it[1] + dv[1],			it[2] + dv[2]);
-								}
-
-								--it[d];  // reset curent direction
-
-								_quads.push_back(quad);
+							// create and save the face
+							Quad	quad;
+							quad.type = mask[n];
+							quad.side = side;
+							quad.width = (d != 2) ? h : w;
+							quad.height = (d != 2) ? w : h;
+							quad.backFace = backFace;
+							if (d != 2) {
+								quad.bottomLeft = chunkVec3(it[0],					it[1],					it[2]);
+								quad.topLeft = chunkVec3(it[0] + du[0],				it[1] + du[1],			it[2] + du[2]);
+								quad.topRight = chunkVec3(it[0] + du[0] + dv[0],	it[1] + du[1] + dv[1],	it[2] + du[2] + dv[2]);
+								quad.bottomRight = chunkVec3(it[0] + dv[0],			it[1] + dv[1],			it[2] + dv[2]);
 							}
+							else {
+								quad.bottomRight = chunkVec3(it[0],					it[1],					it[2]);
+								quad.bottomLeft = chunkVec3(it[0] + du[0],				it[1] + du[1],			it[2] + du[2]);
+								quad.topLeft = chunkVec3(it[0] + du[0] + dv[0],	it[1] + du[1] + dv[1],	it[2] + du[2] + dv[2]);
+								quad.topRight = chunkVec3(it[0] + dv[0],			it[1] + dv[1],			it[2] + dv[2]);
+							}
+
+							--it[d];  // reset curent direction
+
+							_quads.push_back(quad);
 
 							// zero out the mask
 							for (uint8_t l = 0; l < h; ++l) {
 								for (uint8_t k = 0; k < w; ++k) {
-									if (mask[n + k + l * chunkSz[u]] != nullptr) {
-										delete mask[n + k + l * chunkSz[u]];
-										mask[n + k + l * chunkSz[u]] = nullptr;
+									if (mask[n + k + l * chunkSz[u]] != 0) {
+										mask[n + k + l * chunkSz[u]] = 0;
 									}
 								}
 							}
@@ -276,9 +245,9 @@ chunkVec3 const &pos, glm::tvec2<int8_t> textUv, Quad const &q) {
 	vertices[++i] = textUv.x * q.width;
 	vertices[++i] = textUv.y * q.height;
 	// faceId
-	vertices[++i] = static_cast<float>(q.voxFace.side);
+	vertices[++i] = static_cast<float>(q.side);
 	// blockId
-	vertices[++i] = static_cast<float>(q.voxFace.type - 1);
+	vertices[++i] = static_cast<float>(q.type - 1);
 }
 
 void	GreedyChunk2::sendMeshData() {
