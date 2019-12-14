@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <iomanip>
 
 #define COLOR_EOC	"\x1B[0m"
 #define COLOR_RED  "\x1B[31m"
