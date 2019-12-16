@@ -9,12 +9,13 @@
 #if SKYBOX_USING == 0
 	#define SKYBOX_START	"./assets/skybox/skybox0/"
 	#define SKYBOX_EXT		".jpg"
+	#define SKYBOX_NAME_TYPE 0
 #else
 	#define SKYBOX_START	"./assets/skybox/skybox1/miramar_"
 	#define SKYBOX_EXT		".tga"
+	#define SKYBOX_NAME_TYPE 1
 #endif
 
-#define SKYBOX_NAME_TYPE SKYBOX_USING
 #if SKYBOX_NAME_TYPE == 0
 	#define SKYBOX_NAME_RIGHT	"right"
 	#define SKYBOX_NAME_LEFT	"left"
