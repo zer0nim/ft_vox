@@ -7,6 +7,7 @@ SRCS_DIR	= srcs
 OBJS_DIR	= objs
 INC_DIR		= includes
 DEP_DIR		= .dep
+DEBUG_DIR	= $(DEP_DIR)
 
 SRC =	main.cpp \
 		windowEvents.cpp \
@@ -135,9 +136,23 @@ START = @printf $(GREEN)$(BOLD)"$(PROJECT_NAME)\n--------------------\n"$(NORMAL
 END = @printf $(GREEN)$(BOLD)"--------------------\n"$(NORMAL)
 
 all:
+ifneq ($(DEBUG),)
+	@if [[ -d $(DEBUG_DIR) && ! -f $(DEBUG_DIR)/DEBUG ]] ; then \
+		make fclean; \
+	fi;
+else
+	@if [[ -d $(DEBUG_DIR) && -f $(DEBUG_DIR)/DEBUG ]] ; then \
+		make fclean; \
+	fi;
+endif
 	$(START)
 	@make $(NAME)
 	$(END)
+ifneq ($(DEBUG),)
+	@touch $(DEBUG_DIR)/DEBUG
+else
+	@rm -f $(DEBUG_DIR)/DEBUG
+endif
 
 init:
 	$(START)
@@ -174,6 +189,7 @@ clean:
 	@printf $(RED)"-x remove .o & .d files\n"$(NORMAL)
 	@rm -rf $(OBJS_DIR)
 	@rm -rf $(DEP_DIR)
+	@rm -rf $(DEBUG_DIR)
 	$(END)
 
 fclean: clean
