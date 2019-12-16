@@ -68,11 +68,13 @@ float cavernY1, float cavernY2, float bedrockElevation) {
 }
 
 void		getChunkVoid(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_SZ_Y][CHUNK_SZ_Z]) {
-	(void)chunkPos;
 	for (uint8_t ix = 0; ix < CHUNK_SZ_X; ix++) {
 		for (uint8_t iy = 0; iy < CHUNK_SZ_Y; iy++) {
 			for (uint8_t iz = 0; iz < CHUNK_SZ_Z; iz++) {
-				data[ix][iy][iz] = 0;
+				if (chunkPos.x == 0 && chunkPos.y + iy == 0 && chunkPos.z  == 0)
+					data[ix][iy][iz] = TextureManager::blocksNames["stone"];
+				else
+					data[ix][iy][iz] = 0;
 			}
 		}
 	}
