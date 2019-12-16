@@ -105,8 +105,30 @@ bool CameraSurvival::isOnBlock(wordIVec3 blockPos) const {
 	return true;
 }
 
-void CameraSurvival::_move(glm::vec3 dest) {
-	Constraints tmpCons;
+void CameraSurvival::_move(glm::vec3 dest, bool _underMove) {
+	Constraints	tmpCons;
+	float		moveLength = glm::length(dest - pos);
+
+	if (_underMove == false && moveLength > MOVING_COLISION_PRECISION) {  // split into multiple move
+		// call move multiple times
+		glm::vec3	moveDir = glm::normalize(dest - pos);
+		glm::vec3	startPos = pos;
+		glm::vec3	tmpPos = pos;
+		bool		stopMoving = false;
+
+		for (float i = MOVING_COLISION_PRECISION; i < moveLength; i += MOVING_COLISION_PRECISION) {
+			_move(startPos + moveDir * i, true);
+			if (tmpPos == pos) {  // if the "move" call doesn't move the player
+				stopMoving = true;
+				break;
+			}
+			tmpPos = pos;
+		}
+		if (stopMoving == false) {  // if the "move" call doesn't move the player
+			_move(dest, true);
+		}
+		return;
+	}
     { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
 		tmpCons = _getConstraints(dest);
 	}

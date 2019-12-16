@@ -13,6 +13,8 @@
 #define SURV_HEIGHT			1.8f
 #define SURV_RADIUS			0.4f
 
+#define MOVING_COLISION_PRECISION	0.1f  // when moving with more than x, check colision each x block
+
 class CameraSurvival : public Camera {
 	public:
 		CameraSurvival(tWinUser * winU, glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = \
@@ -49,7 +51,7 @@ class CameraSurvival : public Camera {
 		};
 
 		CameraSurvival();
-		void _move(glm::vec3 dest);
+		void _move(glm::vec3 dest, bool _underMove = false);
 		Constraints _getConstraints(glm::vec3 dest);
 
 		tWinUser *	_winU;
