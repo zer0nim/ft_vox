@@ -293,10 +293,12 @@ int		main(int ac, char const **av) {
 	Camera			*camCrea = new CameraCreative(s.m.cameraStartPos.pos, glm::vec3(0, 1, 0),
 		s.m.cameraStartPos.yaw, s.m.cameraStartPos.pitch);
 	camCrea->movementSpeed = s.g.player.creative.movementSpeed;
+	camCrea->mouseSensitivity = s.g.player.mouseSensitivity;
 	camCrea->runFactor = s.g.player.creative.runFactor;
 	Camera			*camSurv = new CameraSurvival(&winU, s.m.cameraStartPos.pos, glm::vec3(0, 1, 0),
 		s.m.cameraStartPos.yaw, s.m.cameraStartPos.pitch);
 	camSurv->movementSpeed = s.g.player.survival.movementSpeed;
+	camSurv->mouseSensitivity = s.g.player.mouseSensitivity;
 	camSurv->runFactor = s.g.player.survival.runFactor;
 	dynamic_cast<CameraSurvival *>(camSurv)->gravity = s.g.player.survival.gravity;
 	dynamic_cast<CameraSurvival *>(camSurv)->jumpHeight = s.g.player.survival.jumpHeight;
