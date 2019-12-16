@@ -72,7 +72,7 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 		glfwSetWindowShouldClose(window, true);
 
 	// toggle cursor visibility key
-	if (key == GLFW_KEY_C && action == GLFW_PRESS)
+	if (key == GLFW_KEY_V && action == GLFW_PRESS)
 		toggleCursor(window);
 
 	// reset key
@@ -101,6 +101,16 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 		}
 	}
 
+	// inventory keep element
+	for (int i = GLFW_KEY_1; i <= GLFW_KEY_9; i++) {
+		if (key == i && action == GLFW_PRESS) {
+			int nb = i - GLFW_KEY_1 + 1;
+			if (nb >= 1 && nb <= NB_TYPE_BLOCKS) {
+				s.m.handBlockID = nb;
+			}
+		}
+	}
+
 	// F3 key -> debug mode
 	if (key == GLFW_KEY_F3 && action == GLFW_RELEASE) {
 		if (launchF3Cmd == false)
@@ -114,14 +124,41 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 		launchF3Cmd = true;
 	}
 
-	// F3 + H -> freeze chunk update
+	// F3 + H -> toggle help menu
 	if (key == GLFW_KEY_H && action == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
 		if (winU->showInfo == false) {
 			winU->showHelp = true;
 			winU->showInfo = true;
 		}
 		else {
-			winU->showHelp = !winU->showHelp;
+			if (winU->showCommands == true && winU->showHelp == true)
+				winU->showCommands = false;
+			else
+				winU->showHelp = !winU->showHelp;
+		}
+		launchF3Cmd = true;
+	}
+
+	// F3 + C -> toggle commands list
+	if (key == GLFW_KEY_C && action == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
+		if (winU->showInfo == false) {
+			winU->showCommands = true;
+			winU->showInfo = true;
+		}
+		else {
+			winU->showCommands = !winU->showCommands;
+		}
+		launchF3Cmd = true;
+	}
+
+	// F3 + L -> toggle block list
+	if (key == GLFW_KEY_L && action == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
+		if (winU->showInfo == false) {
+			winU->showObjList = true;
+			winU->showInfo = true;
+		}
+		else {
+			winU->showObjList = !winU->showObjList;
 		}
 		launchF3Cmd = true;
 	}

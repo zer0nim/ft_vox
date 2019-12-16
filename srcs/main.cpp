@@ -235,8 +235,10 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *camCrea
 	winU->chunkManager = nullptr;
 	winU->dtTime = 0.0f;
 	winU->lastFrame = 0.0f;
-	winU->showInfo = true;
+	winU->showInfo = DEBUG;
 	winU->showHelp = false;
+	winU->showCommands = false;
+	winU->showObjList = false;
 	winU->freezeChunkUpdate = false;
 	winU->putBlock = false;
 	winU->destroyBlock = false;

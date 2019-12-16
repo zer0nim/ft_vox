@@ -80,6 +80,8 @@ typedef struct		sWinUser {
 
 	bool			showInfo;  // show info module (F3)
 	bool			showHelp;  // show help module (F3 + H)
+	bool			showObjList;  // show objects list (F3 + L)
+	bool			showCommands;  // show commands list (F3 + C)
 	bool			freezeChunkUpdate;  // freeze chunk update (F3 + F)
 	bool			putBlock;  // mouse left clicked
 	bool			destroyBlock;  // mouse right clicked

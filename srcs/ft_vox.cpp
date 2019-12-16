@@ -410,8 +410,6 @@ int savedFps = 0;
 void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManager &chunkManager) {
 	tWinUser	*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
 
-	if (winU->showInfo == false)
-		return;
 
 	if (counter % 10 == 0) {
 		savedFps = actFps;
@@ -422,6 +420,12 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 	GLfloat lineSz = s.g.screen.text["normal"].size * 1.2;
 	GLfloat textX = 10;
 	GLfloat textY = s.g.screen.height - lineSz;
+
+	if (winU->showInfo == false) {
+		std::string sBaseHelp = "F3 to show debug module";
+		textRender.write("normal", sBaseHelp, textX, textY);
+		return;
+	}
 
 	// fps
 	std::string sFps = std::to_string(savedFps) + " fps";
@@ -494,10 +498,14 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 		textRender.write("normal", sFreeze, textX, textY, 1, glm::vec4(1, 0, 0, 1));
 	}
 
-	if (winU->showHelp) {
+	if (winU->showHelp || winU->showCommands) {
 		// show help
 		textY -= lineSz;
-		std::string sHelp = "Help:";
+		std::string sHelp;
+		if (winU->showCommands)
+			sHelp = "Commands:";
+		else
+			sHelp = "Help:";
 		textRender.write("normal", sHelp, textX, textY);
 		textY -= lineSz;
 		sHelp = "F3 + F: freeze chunk update";
@@ -508,5 +516,73 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 		textY -= lineSz;
 		sHelp = "F3 + P: toggle polygon render mode";
 		textRender.write("normal", sHelp, textX + 20, textY);
+		textY -= lineSz;
+		sHelp = "F3 + C: show commands list";
+		textRender.write("normal", sHelp, textX + 20, textY);
+		textY -= lineSz;
+		sHelp = "F3 + L: show objects list";
+		textRender.write("normal", sHelp, textX + 20, textY);
+		if (winU->showCommands) {
+			textY -= lineSz;
+			sHelp = "ARROWS / WASD: move";
+			textRender.write("normal", sHelp, textX + 20, textY);
+			textY -= lineSz;
+			sHelp = "SPACE / E: jump (survival) / fly up (creative)";
+			textRender.write("normal", sHelp, textX + 20, textY);
+			textY -= lineSz;
+			sHelp = "LEFT-CTRL / Q: fly down (creative)";
+			textRender.write("normal", sHelp, textX + 20, textY);
+			textY -= lineSz;
+			sHelp = "SHIFT: run";
+			textRender.write("normal", sHelp, textX + 20, textY);
+			textY -= lineSz;
+			sHelp = "LEFT-CLICK: destroy block under cursor";
+			textRender.write("normal", sHelp, textX + 20, textY);
+			textY -= lineSz;
+			sHelp = "RIGHT-CLICK: put block under cursor";
+			textRender.write("normal", sHelp, textX + 20, textY);
+			textY -= lineSz;
+			sHelp = "MOUSE-WEEL: change selected block";
+			textRender.write("normal", sHelp, textX + 20, textY);
+			textY -= lineSz;
+			sHelp = "MOUSE-WEEL-CLICK: select block under cursor";
+			textRender.write("normal", sHelp, textX + 20, textY);
+			textY -= lineSz;
+			sHelp = "1-9: select block 1-9";
+			textRender.write("normal", sHelp, textX + 20, textY);
+			textY -= lineSz;
+			sHelp = "V: enable / disable mouse cursor";
+			textRender.write("normal", sHelp, textX + 20, textY);
+			textY -= lineSz;
+			sHelp = "G: change gamemode";
+			textRender.write("normal", sHelp, textX + 20, textY);
+			textY -= lineSz;
+			sHelp = "R: reset position to last saved (creative)";
+			textRender.write("normal", sHelp, textX + 20, textY);
+			textY -= lineSz;
+			sHelp = "ESCAPE: save and quit game";
+			textRender.write("normal", sHelp, textX + 20, textY);
+		}
+	}
+	else {
+		textY -= lineSz;
+		std::string sHelp = "F3 + H: toggle help menu";
+		textRender.write("normal", sHelp, textX, textY);
+	}
+
+	if (winU->showObjList) {
+		// objects list
+		textY -= lineSz;
+		std::string sObjs = "Objects list: (F3 + L)";
+		textRender.write("normal", sObjs, textX, textY);
+		for (int i = 1; i <= NB_TYPE_BLOCKS; i++) {
+			for (auto it = TextureManager::blocksNames.begin(); it != TextureManager::blocksNames.end(); it++) {
+				if (it->second == i) {
+					textY -= lineSz;
+					sObjs = std::to_string(i) + ": " + it->first;
+					textRender.write("normal", sObjs, textX + 20, textY);
+				}
+			}
+		}
 	}
 }
