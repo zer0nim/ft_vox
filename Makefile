@@ -1,3 +1,28 @@
+# Makefile
+# for each projects, change value of:
+#	-> NAME
+#	-> SRC
+#	-> HEAD
+#	-> LIBS_FLAGS
+#	-> LIBS_INC
+
+# you can also configure your Makefile with these variables:
+#	-> ARGS
+#	-> LINTER_RULES
+#	-> DEBUG_FLAGS
+#	-> PRE_COMMIT
+#	-> PRE_PUSH
+
+# after this, init the project:
+#	make init
+
+# to get help:
+#	make help
+
+# to run:
+#	make -j8
+#	make DEBUG=1 -j8
+
 NAME = ft_vox
 PROJECT_NAME = $(shell echo $(NAME) | tr a-z A-Z)  # name in MAJUSCULE
 
