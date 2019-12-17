@@ -35,7 +35,10 @@ GreedyChunk
 GreedyChunk2
 GreedyChunk3
 */
-#define CHUNK_OBJECT	GreedyChunk3  // the chunk object used
+#ifndef CHUNK  // make DEFINE="CHUNK=Chunk"
+	#define CHUNK		GreedyChunk3
+#endif
+#define CHUNK_OBJECT	CHUNK  // the chunk object used
 
 
 /*
