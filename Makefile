@@ -227,7 +227,7 @@ check:
 
 help:
 	@printf $(YELLOW)$(BOLD)"HELP\n--------------------\n"$(NORMAL)
-	@printf $(NORMAL)"-> make "$(BOLD)"init"$(NORMAL)": init the project\n"
+	@printf $(NORMAL)"-> make "$(BOLD)"init"$(NORMAL)": init the project (add pre-commit & pre-push files)\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"all"$(NORMAL)": build the project and create $(NAME)\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"clean"$(NORMAL)": remove all .o files\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"fclean"$(NORMAL)": make clean and remove executable\n"
@@ -238,6 +238,7 @@ help:
 	@printf $(NORMAL)"-> make "$(BOLD)"check"$(NORMAL)": make fclean, make lint, make exec-nolint -> stop if there is an error\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"help"$(NORMAL)": show the help\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"... DEBUG=1"$(NORMAL)": use debug mode\n"
+	@printf $(NORMAL)"-> make "$(BOLD)"... DEFINE=\"DEFINE=value\""$(NORMAL)": use send `#define DEFINE value` to all files\n"
 	@printf $(YELLOW)$(BOLD)"--------------------\n"$(NORMAL)
 
 .PHONY: init all clean fclean re exec-nolint exec lint check help
