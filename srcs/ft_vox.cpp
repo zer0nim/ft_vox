@@ -42,6 +42,9 @@ void	setDefaultSettings() {
 	s.g.player.delayPutMs = 100;
 	s.g.player.delayDestroyMs = 100;
 	uint32_t seedRand = time(nullptr);
+	rand_r(&seedRand);
+	rand_r(&seedRand);
+	rand_r(&seedRand);
 	s.m.seed = rand_r(&seedRand);
 	s.m.generationType = GENERATION_NORMAL;
 	s.m.cameraStartPos.pos.x = 0;
