@@ -25,29 +25,15 @@ class GreedyChunk3 : public AChunk {
 		virtual void	_draw(glm::mat4 &view);
 
 	private:
-		struct Quad {
-			uint8_t		type;
-			Direction	side;
-			uint8_t		width;
-			uint8_t		height;
-			bool		backFace;
-			chunkVec3	bottomLeft;
-			chunkVec3	topLeft;
-			chunkVec3	topRight;
-			chunkVec3	bottomRight;
-		};
-
 		void	sendMeshData();
 		static void	sendConstUniforms(TextureManager const &textureManager);
 		void	calcGreedyChunk();
-		void	fillFaceLine(std::vector<float> &faces, int & i, \
-		chunkVec3 const &pos, Quad const &q);
 
 		bool					_meshUpdated;
 		bool					_needInitVao;
 		u_int32_t				_vbo;
 		u_int32_t				_vao;
-		std::vector<Quad>		_quads;
+		std::vector<float>		_faces;
 		int						_nbVertices;
 };
 
