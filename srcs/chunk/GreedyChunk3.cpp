@@ -44,7 +44,7 @@ void	GreedyChunk3::initShader(glm::mat4 &projection, TextureManager const &textu
 void	GreedyChunk3::calcGreedyChunk() {
 	chunkVec3 chunkSz = {CHUNK_SZ_X, CHUNK_SZ_Y, CHUNK_SZ_Z};
 
-	_quads.clear();
+	_faces.clear();
 
 	std::array<uint8_t, CHUNK_SZ_Y * CHUNK_SZ_X>	mask = { 0 };
 	/*
@@ -179,28 +179,60 @@ void	GreedyChunk3::calcGreedyChunk() {
 							++it[d];  // increment curent direction to get correct position
 
 							// create and save the face
-							Quad	quad;
-							quad.type = mask[n];
-							quad.side = side;
-							quad.width = (d != 2) ? h : w;
-							quad.height = (d != 2) ? w : h;
-							quad.backFace = backFace;
+							chunkVec3 pos = {0, 0, 0};
 							if (d != 2) {
-								quad.bottomLeft = chunkVec3(it[0],					it[1],					it[2]);
-								quad.topLeft = chunkVec3(it[0] + du[0],				it[1] + du[1],			it[2] + du[2]);
-								quad.topRight = chunkVec3(it[0] + du[0] + dv[0],	it[1] + du[1] + dv[1],	it[2] + du[2] + dv[2]);
-								quad.bottomRight = chunkVec3(it[0] + dv[0],			it[1] + dv[1],			it[2] + dv[2]);
+								if (side == Direction::FRONT || side == Direction::RIGHT) {
+									pos.x = it[0] + dv[0];
+									pos.y = it[1] + dv[1];
+									pos.z = it[2] + dv[2];
+								}
+								else if (side == Direction::BACK || side == Direction::LEFT || \
+									side == Direction::BOTTOM) {
+									pos.x = it[0];
+									pos.y = it[1];
+									pos.z = it[2];
+								}
+								else if (side == Direction::TOP) {
+									pos.x = it[0] + du[0];
+									pos.y = it[1] + du[1];
+									pos.z = it[2] + du[2];
+								}
 							}
 							else {
-								quad.bottomRight = chunkVec3(it[0],					it[1],					it[2]);
-								quad.bottomLeft = chunkVec3(it[0] + du[0],				it[1] + du[1],			it[2] + du[2]);
-								quad.topLeft = chunkVec3(it[0] + du[0] + dv[0],	it[1] + du[1] + dv[1],	it[2] + du[2] + dv[2]);
-								quad.topRight = chunkVec3(it[0] + dv[0],			it[1] + dv[1],			it[2] + dv[2]);
+								if (side == Direction::FRONT || side == Direction::RIGHT) {
+									pos.x = it[0];
+									pos.y = it[1];
+									pos.z = it[2];
+								}
+								else if (side == Direction::BACK || side == Direction::LEFT || \
+									side == Direction::BOTTOM) {
+									pos.x = it[0] + du[0];
+									pos.y = it[1] + du[1];
+									pos.z = it[2] + du[2];
+								}
+								else if (side == Direction::TOP) {
+									pos.x = it[0] + du[0] + dv[0];
+									pos.y = it[1] + du[1] + dv[1];
+									pos.z = it[2] + du[2] + dv[2];
+								}
 							}
 
-							--it[d];  // reset curent direction
+							// add the quad to the result array
+							_faces.insert(_faces.end(), {
+								// position
+								static_cast<float>(pos.x),
+								static_cast<float>(pos.y),
+								static_cast<float>(pos.z),
+								// size
+								static_cast<float>((d != 2) ? h : w),
+								static_cast<float>((d != 2) ? w : h),
+								// faceId
+								static_cast<float>(side),
+								// blockId
+								static_cast<float>(mask[n] - 1)
+							});
 
-							_quads.push_back(quad);
+							--it[d];  // reset curent direction
 
 							// zero out the mask
 							for (uint8_t l = 0; l < h; ++l) {
@@ -236,43 +268,10 @@ void	GreedyChunk3::update() {
 	_meshUpdated = true;
 }
 
-void	GreedyChunk3::fillFaceLine(std::vector<float> &faces, int & i, \
-chunkVec3 const &pos, Quad const &q) {
-	// position
-	faces[++i] = pos.x;
-	faces[++i] = pos.y;
-	faces[++i] = pos.z;
-	// size
-	faces[++i] = q.width;
-	faces[++i] = q.height;
-	// faceId
-	faces[++i] = static_cast<float>(q.side);
-	// blockId
-	faces[++i] = static_cast<float>(q.type - 1);
-}
-
 void	GreedyChunk3::sendMeshData() {
-	if (_quads.size() > 0) {
+	if (_faces.size() > 0) {
 		int const rowSize = 7;
-		_nbVertices = _quads.size();
-		int const size = _nbVertices * rowSize;
-		std::vector<float> faces(size);
-
-		// fill faces array
-		int i = -1;
-		for (Quad &q : _quads) {
-			switch (q.side) {
-				case Direction::FRONT: case Direction::RIGHT:
-					fillFaceLine(faces, i, q.bottomRight, q);
-					break;
-				case Direction::BACK: case Direction::LEFT: case Direction::BOTTOM:
-					fillFaceLine(faces, i, q.bottomLeft, q);
-					break;
-				case Direction::TOP:
-					fillFaceLine(faces, i, q.topLeft, q);
-					break;
-			}
-		}
+		_nbVertices = _faces.size() / rowSize;
 
 		if (_nbVertices > 0) {
 			_shaderData->shader->use();
@@ -285,7 +284,7 @@ void	GreedyChunk3::sendMeshData() {
 			}
 
 			glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-			glBufferData(GL_ARRAY_BUFFER, faces.size() * sizeof(float), &faces[0], GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, _faces.size() * sizeof(float), &_faces[0], GL_STATIC_DRAW);
 
 			glBindVertexArray(_vao);
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, rowSize * sizeof(float), reinterpret_cast<void*>(0));
