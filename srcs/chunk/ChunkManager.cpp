@@ -299,6 +299,8 @@ void ChunkManager::destroyBlock() {
 	if (canChangeBlock) {
 	    { std::lock_guard<std::mutex>	guard(s.mutexOthers), guard2(s.mutexChunkMap);
 			if (raycast.isBlockSelected) {
+				if (_winU->cam == _winU->camSurv && raycast.blockType == TextureManager::blocksNames["bedrock"])
+					return;  // you can't destroy blocks in survival mode
 				updateBlock(raycast.selectedBlock, 0);
 				raycast.isBlockSelected = false;
 				raycast.blockType = 0;
