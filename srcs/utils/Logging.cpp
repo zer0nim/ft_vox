@@ -44,45 +44,26 @@ void Logging::setPrintFileLine(bool printFileLine) {
 	}
 }
 
-void Logging::_savePrecision() {
-	_precision = std::cout.precision();
-}
-void Logging::_setFileLine(std::string file, int line) {
-	_file = file;
-	_line = line;
+void	Logging::log(eLoglevel level, std::string message, std::string file, int line) {
+	if (level < _loglevel)
+		return;
+	std::stringstream ss;
+	// start logging
+	ss << _colors[level];
+	if (level == LOGDEBUG) ss << "[DEBUG]";
+	else if (level == LOGINFO) ss << "[INFO]";
+	else if (level == LOGSUCCESS) ss << "[SUCCESS]";
+	else if (level == LOGWARN) ss << "[WARN]";
+	else if (level == LOGERROR) ss << "[ERROR]";
+	else if (level == LOGFATAL) ss << "[FATAL]";
+	if (_printFileLine[level])
+		ss << "[" << file << " " << line << "]";
+	ss << ": ";
+	ss << message;
+	ss << COLOR_EOC << std::endl;
+
+	std::cout << ss.str();
 }
 
-void Logging::_log(int precision, std::ostream & out) const {
-	eLoglevel level;
-	if (precision < NBLOG) {
-		level = static_cast<eLoglevel>(precision);
-		// start logging
-		out << getColor(level);
-		if (level == LOGDEBUG) out << "[DEBUG]";
-		else if (level == LOGINFO) out << "[INFO]";
-		else if (level == LOGSUCCESS) out << "[SUCCESS]";
-		else if (level == LOGWARN) out << "[WARN]";
-		else if (level == LOGERROR) out << "[ERROR]";
-		else if (level == LOGFATAL) out << "[FATAL]";
-		if (_printFileLine[level])
-			out << "[" << _file << " " << _line << "]";
-		out << ": ";
-	}
-	else {
-		level = static_cast<eLoglevel>(precision - NBLOG);
-		// end logging
-		out << COLOR_EOC << std::endl;
-	}
-}
-
-std::ostream & operator << (std::ostream & out, const Logging & log) {
-	// log
-	logging._log(static_cast<int>(std::cout.precision()), out);
-	// reset precision
-	out << std::setprecision(log.getSavedPrecision());
-	return out;
-}
-
-std::streamsize		Logging::getSavedPrecision() const { return _precision; }
 std::string const &	Logging::getColor(eLoglevel loglevel) const { return _colors[loglevel]; }
 eLoglevel			Logging::getLoglevel() const { return _loglevel; }
