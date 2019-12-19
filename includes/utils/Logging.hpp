@@ -4,6 +4,7 @@
 #include <string>
 #include <fstream>
 #include <iomanip>
+#include <sstream>
 
 #define COLOR_EOC		"\x1B[0m"
 #define COLOR_RED		"\x1B[31m"
@@ -30,26 +31,16 @@ enum	eLoglevel {
 	LOGDEBUG, LOGINFO, LOGSUCCESS, LOGWARN, LOGERROR, LOGFATAL, NBLOG
 };
 
-#define _baselogStart(loglevel)	logging._savePrecision(); logging._setFileLine(__FILE__, __LINE__); \
-	std::cout << std::setprecision(loglevel) << logging
-#define _baselogEnd(loglevel)	std::setprecision(NBLOG + loglevel) << logging;
+#define log_(level, x) { std::stringstream ss; ss << x; logging.log(level, ss.str(), __FILE__, __LINE__); }
 
-#define logDebug(x) { if (logging.getLoglevel() <= LOGDEBUG) \
-    { _baselogStart(LOGDEBUG) << x << _baselogEnd(LOGDEBUG) } }
-#define logInfo(x) { if (logging.getLoglevel() <= LOGINFO) \
-    { _baselogStart(LOGINFO) << x << _baselogEnd(LOGINFO) } }
-#define logSuccess(x) { if (logging.getLoglevel() <= LOGSUCCESS) \
-    { _baselogStart(LOGSUCCESS) << x << _baselogEnd(LOGSUCCESS) } }
-#define logWarn(x) { if (logging.getLoglevel() <= LOGWARN) \
-    { _baselogStart(LOGWARN) << x << _baselogEnd(LOGWARN) } }
-#define logErr(x) { if (logging.getLoglevel() <= LOGERROR) \
-    { _baselogStart(LOGERROR) << x << _baselogEnd(LOGERROR) } }
-#define logFatal(x) { if (logging.getLoglevel() <= LOGFATAL) \
-    { _baselogStart(LOGFATAL) << x << _baselogEnd(LOGFATAL) } }
-#define logErrExit(x) { if (logging.getLoglevel() <= LOGERROR) \
-    { _baselogStart(LOGERROR) << x << _baselogEnd(LOGERROR); exit(1); } }
-#define logFatalExit(x) { if (logging.getLoglevel() <= LOGFATAL) \
-    { _baselogStart(LOGFATAL) << x << _baselogEnd(LOGFATAL); exit(1); } }
+#define logDebug(x) log_(LOGDEBUG, x)
+#define logInfo(x) log_(LOGINFO, x)
+#define logSuccess(x) log_(LOGSUCCESS, x)
+#define logWarn(x) log_(LOGWARN, x)
+#define logErr(x) log_(LOGERROR, x)
+#define logFatal(x) log_(LOGFATAL, x)
+#define logErrExit(x) log_(LOGERROR, x)
+#define logFatalExit(x) log_(LOGFATAL, x)
 
 class Logging {
 	public:
@@ -64,25 +55,15 @@ class Logging {
 		void				setPrintFileLine(eLoglevel loglevel, bool printFileLine);
 		void				setPrintFileLine(bool printFileLine);
 
-		void				_savePrecision();
-		void				_setFileLine(std::string file, int line);
-		void				_log(int level, std::ostream & out) const;
+		void				log(eLoglevel level, std::string message, std::string file = "", int line = -1);
 
-		std::streamsize		getSavedPrecision() const;
 		std::string const &	getColor(eLoglevel loglevel) const;
 		eLoglevel			getLoglevel() const;
 
 	private:
-		std::streamsize	_precision;
 		std::string		_colors[NBLOG];
 		bool			_printFileLine[NBLOG];
 		eLoglevel		_loglevel;
-
-		std::string		_file;
-		int				_line;
 };
 
-std::ostream & operator << (std::ostream & out, Logging const & log);
-
-extern eLoglevel	logging_loglevel;
 extern Logging		logging;

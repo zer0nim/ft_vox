@@ -69,7 +69,7 @@ class ChunkManager {
 		TextureManager const			&_textureManager;
 		glm::mat4						_projection;
 		std::array<std::deque<wordIVec3>, NB_UPDATE_THREADS>	_toCreate;  // list of chunks to create
-		std::array<uint32_t, NB_UPDATE_THREADS>					_nbChunkLoaded;  // number of chunks loaded in memory
+		uint32_t						_nbChunkLoaded;  // number of chunks loaded in memory
 		uint32_t						_nbChunkRendered;  // number of chunks rendered on screen
 
 		std::chrono::milliseconds		_lastDestroyed;  // last ts for destroy a block

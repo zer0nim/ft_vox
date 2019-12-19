@@ -45,6 +45,9 @@ void	setDefaultSettings() {
 	s.g.fog.width = 70;
 	s.g.fog.color = glm::vec4(0.509, 0.8, 0.905, 1.0);
 	uint32_t seedRand = time(nullptr);
+	rand_r(&seedRand);
+	rand_r(&seedRand);
+	rand_r(&seedRand);
 	s.m.seed = rand_r(&seedRand);
 	s.m.generationType = GENERATION_NORMAL;
 	s.m.cameraStartPos.pos.x = 0;
@@ -74,20 +77,25 @@ static void	loadSettingElementFont(nlohmann::json &element, std::string &key) {
 	static std::string textFont = ".global.screen.text.";
 	if (element.is_string() && boost::ends_with(key, ".path")) {
 		std::string name = key.substr(textFont.size(), key.size() - textFont.size() - std::string(".path").size());
-		if (s.g.screen.text.find(name) == s.g.screen.text.end())
-			std::cout << "[WARN]: invalid font name: " << name << std::endl;
-		else
+		if (s.g.screen.text.find(name) == s.g.screen.text.end()) {
+			logWarn("invalid font name: " << name);
+		}
+		else {
 			s.g.screen.text[name].path = element.get<std::string>();
+		}
 	}
 	else if (element.is_number() && boost::ends_with(key, ".size") && checkUint32(element, 1, 128)) {
 		std::string name = key.substr(textFont.size(), key.size() - textFont.size() - std::string(".size").size());
-		if (s.g.screen.text.find(name) == s.g.screen.text.end())
-			std::cout << "[WARN]: invalid font name: " << name << std::endl;
-		else
+		if (s.g.screen.text.find(name) == s.g.screen.text.end()) {
+			logWarn("invalid font name: " << name);
+		}
+		else {
 			s.g.screen.text[name].size = element.get<uint32_t>();
+		}
 	}
-	else
-		std::cout << "[WARN]: invalid argument or argument type in settings: " << key << ": " << element << std::endl;
+	else {
+		logWarn("invalid argument or argument type in settings: " << key << ": " << element);
+	}
 }
 
 static void	loadFlatMap(nlohmann::json &element) {
@@ -212,7 +220,7 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 	else if (element.is_number() && key == ".map.gamemode" && checkUint32(element, 0, 1))
 		s.m.gamemode = element.get<uint8_t>();
 	else
-		std::cout << "[WARN]: invalid argument or argument type in settings: " << key << ": " << element << std::endl;
+		logWarn("invalid argument or argument type in settings: " << key << ": " << element);
 }
 
 static void	loadSettingsJson(nlohmann::json &data, std::string startKey = "") {
@@ -242,7 +250,7 @@ void	loadSettings(std::string settingFile) {
 			loadSettingsJson(data);
 		}
 		else {
-			std::cout << "throw FailedToOpenException" << std::endl;
+			logErr("unable to load settings: " << settingFile);
 			throw Settings::FailedToOpenException(std::string(settingFile));
 		}
 	}
@@ -317,12 +325,12 @@ bool	createDir(std::string const &dirNames) {
 	if (boost::filesystem::is_directory(dirNames) == false) {
 		try {
 			if (boost::filesystem::create_directories(dirNames) == false) {
-				std::cout << "failed to create " << dirNames << std::endl;
+				logErr("failed to create " << dirNames);
 				return false;
 			}
 		}
 		catch (boost::filesystem::filesystem_error &e) {
-			std::cout << "failed to create " << dirNames << " -> " << e.what() << std::endl;
+			logErr("failed to create " << dirNames << " -> " << e.what());
 			return false;
 		}
 	}
@@ -337,10 +345,12 @@ bool	createMapFiles() {
 	}
 
 	s.m.fullMapName = std::string(s.g.files.mapsPath) + s.m.mapName;
-	if (boost::filesystem::is_directory(s.m.fullMapName) == false)
-		std::cout << "[INFO]: create " << s.m.mapName << std::endl;
-	else
-		std::cout << "[INFO]: load " << s.m.mapName << std::endl;
+	if (boost::filesystem::is_directory(s.m.fullMapName) == false) {
+		logInfo("create " << s.m.mapName);
+	}
+	else {
+		logInfo("load " << s.m.mapName);
+	}
 	// create map (if needed)
 	if (createDir(s.m.fullMapName) == false) {
 		return false;
@@ -359,12 +369,12 @@ bool	createMapFiles() {
 			loadSettings(settingsFilename);
 		}
 		catch (Settings::SettingsError &e) {
-			std::cout << "[ERROR]: unable to load settings from map" << std::endl;
+			logErr("unable to load settings from map " << settingsFilename);
 			return false;
 		}
 	}
 	else if (boost::filesystem::is_directory(s.m.fullMapName) == true) {
-		std::cout << "[WARN]: unable to load settings from map" << std::endl;
+		logWarn("unable to load settings from map");
 	}
 	return true;
 }
@@ -410,12 +420,12 @@ bool	saveMap(Camera *cam) {
 	lastSettings.merge_patch(settings);
 	std::ofstream settingsFile(settingsFilename);
 	if (settingsFile.fail()) {
-		std::cout << "unable to save map settings: " << settingsFilename << " " << strerror(errno) << std::endl;
+		logErr("unable to save map settings: " << settingsFilename << " " << strerror(errno));
 		return false;
 	}
 	settingsFile << std::setw(4) << lastSettings << std::endl;
 	if (settingsFile.fail()) {
-		std::cout << "unable to save map settigns: " << settingsFilename << " " << strerror(errno) << std::endl;
+		logErr("unable to save map settings: " << settingsFilename << " " << strerror(errno));
 		return false;
 	}
 	settingsFile.close();
