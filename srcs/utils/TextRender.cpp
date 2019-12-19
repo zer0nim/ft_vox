@@ -78,6 +78,8 @@ _shader(src.getShader()) {
 }
 
 TextRender::~TextRender() {
+	glDeleteVertexArrays(1, &_vao);
+	glDeleteBuffers(1, &_vbo);
 }
 
 TextRender &TextRender::operator=(TextRender const &rhs) {

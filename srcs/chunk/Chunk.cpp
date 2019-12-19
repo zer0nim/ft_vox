@@ -79,6 +79,7 @@ void	Chunk::initShader(glm::mat4 &projection, TextureManager const &textureManag
 		_shaderData->shader->use();
 		_shaderData->shader->setMat4("projection", projection);
 		sendCubeData(textureManager);
+		_shaderData->vaoUsed = true;
 	}
 }
 

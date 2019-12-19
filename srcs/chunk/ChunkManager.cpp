@@ -73,6 +73,8 @@ ChunkManager::~ChunkManager() {
 		toDelete.pop_front();
 	}
 
+	glDeleteVertexArrays(1, &_borderShaderVAO);
+	glDeleteBuffers(1, &_borderShaderVBO);
 	delete _borderShader;
 }
 

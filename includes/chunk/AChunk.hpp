@@ -39,8 +39,10 @@ class AChunk {
 			Shader		*shader;
 			u_int32_t	vbo;
 			u_int32_t	vao;
+			bool		vaoUsed;
 
 			ShaderData(std::string const vs, std::string const fs, std::string const gs = "") {
+				vaoUsed = false;
 				if (gs.empty()) {
 					shader = new Shader(vs, fs);
 				}
@@ -49,6 +51,10 @@ class AChunk {
 				}
 			}
 			~ShaderData() {
+				if (vaoUsed) {
+					glDeleteVertexArrays(1, &vao);
+					glDeleteBuffers(1, &vbo);
+				}
 				delete shader;
 			}
 		};
