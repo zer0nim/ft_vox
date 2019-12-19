@@ -91,7 +91,7 @@ LINTER_RULES =	--filter=-whitespace/tab,-legal/copyright,-build/c++11,-whitespac
 				--linelength=120 --quiet
 
 CC = g++
-DEBUG_FLAGS = -g3 -fsanitize=address -DDEBUG=true
+DEBUG_FLAGS = -g3 -DDEBUG=true
 LIBS_FLAGS	=	-L ~/.brew/lib -framework OpenGL -lglfw -L ~/.brew/opt/freetype/lib -lfreetype \
 				-lboost_filesystem
 LIBS_INC	=	~/.brew/include \
