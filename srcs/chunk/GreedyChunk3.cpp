@@ -18,6 +18,10 @@ GreedyChunk3::GreedyChunk3(GreedyChunk3 const &src) : AChunk(src) {
 }
 
 GreedyChunk3::~GreedyChunk3() {
+	if (_needInitVao == false) {
+		glDeleteVertexArrays(1, &_vao);
+		glDeleteBuffers(1, &_vbo);
+	}
 }
 
 GreedyChunk3 &GreedyChunk3::operator=(GreedyChunk3 const &rhs) {
