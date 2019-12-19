@@ -50,7 +50,7 @@ _chunkMap(),
 _chunkActPos(-1, -1, -1),
 _textureManager(textureManager),
 _toCreate(),
-_nbChunkLoaded{0},
+_nbChunkLoaded(0),
 _borderShader(nullptr) {
 	_lastDestroyed = getMs();
 	_lastPut = getMs();
@@ -111,8 +111,12 @@ void ChunkManager::init(wordFVec3 camPos, glm::mat4 &projection) {
 void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 	AChunk *	newChunk;
 	if (threadID == 0) {
-		std::lock_guard<std::mutex>	guard(s.mutexOthers), guard2(s.mutexCamera);
-		_updateChunkPos(camPos);  // update once only
+		{ std::lock_guard<std::mutex>	guard(s.mutexOthers), guard2(s.mutexCamera);
+			_updateChunkPos(camPos);  // update once only
+		}
+	    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
+			_nbChunkLoaded = _chunkMap.size();  // update only once
+		}
 	}
 
 	// add new chunks if needed
@@ -201,11 +205,9 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 	}
 
 	// update all chunks
-	uint32_t	chunkLoaded = 0;
     { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
 		for (auto it = _chunkMap.begin(); it != _chunkMap.end(); it++) {
 			if (_getID(it->first) == threadID) {
-				chunkLoaded++;
 				if (_isInChunkLoaded(it->first)) {
 				    { std::lock_guard<std::mutex>	guard(it->second->mutexChunk);
 						it->second->update();
@@ -220,9 +222,6 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 				}
 			}
 		}
-	}
-    { std::lock_guard<std::mutex>	guard(s.mutexOthers);
-		_nbChunkLoaded[threadID] = chunkLoaded;
 	}
 }
 
@@ -428,13 +427,7 @@ std::map<wordIVec3, AChunk*>			&ChunkManager::getChunkMap() { return _chunkMap; 
 std::map<wordIVec3, AChunk*> const		&ChunkManager::getChunkMap() const { return _chunkMap; }
 wordIVec3 const							&ChunkManager::getChunkActPos() const { return _chunkActPos; }
 TextureManager const					&ChunkManager::getTextureManager() const { return _textureManager; };
-uint32_t								ChunkManager::getNbChunkLoaded() const {
-	uint32_t ret = 0;
-	for (uint8_t i = 0; i < NB_UPDATE_THREADS; i++) {
-		ret += _nbChunkLoaded[i];
-	}
-	return ret;
-}
+uint32_t								ChunkManager::getNbChunkLoaded() const { return _nbChunkLoaded; }
 uint32_t	ChunkManager::getNbChunkRendered() const { return _nbChunkRendered; }
 uint8_t		ChunkManager::getBlock(wordFVec3 pos) const {
 	if (pos.x < 0) pos.x -= 1;
