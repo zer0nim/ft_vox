@@ -37,9 +37,9 @@ AChunk &AChunk::operator=(AChunk const &rhs) {
 	return *this;
 }
 
-void	AChunk::draw(glm::mat4 &view) {
+void	AChunk::draw(glm::mat4 &view, glm::vec3 &pos) {
     { std::lock_guard<std::mutex>	guard(mutexChunk);
-		_draw(view);
+		_draw(view, pos);
 	}
 }
 

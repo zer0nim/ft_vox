@@ -176,10 +176,11 @@ void	GreedyChunk::update() {
 	}
 }
 
-void	GreedyChunk::_draw(glm::mat4 &view) {
+void	GreedyChunk::_draw(glm::mat4 &view, glm::vec3 &pos) {
 	_textureManager.activateTextures();
 
 	_shaderData->shader->use();
+	_shaderData->shader->setVec3("viewPos", pos);
 	_shaderData->shader->setMat4("view", view);
 	glBindVertexArray(_shaderData->vao);
 

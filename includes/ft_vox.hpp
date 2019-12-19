@@ -184,6 +184,13 @@ struct Settings {
 			uint32_t	delayDestroyMs;  // delay between destroy 2 blocks
 		};
 		Player		player;
+
+		struct Fog {
+			bool		enabled;
+			uint32_t	width;
+			glm::vec4	color;
+		};
+		Fog		fog;
 	};
 	Global	g;  // global
 	struct Map {

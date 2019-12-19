@@ -45,6 +45,16 @@
 			"mouseSensitivity": 0.1,
 			"delayPutMs": 200,
 			"delayDestroyMs": 200
+		},
+		"fog": {
+			"enabled": true,
+			"width": 15,
+			"color": {
+				"r": 0.572,
+				"g": 0.85,
+				"b": 0.85,
+				"a": 1.0
+			}
 		}
 	},
 	"map": {

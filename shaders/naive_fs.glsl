@@ -25,11 +25,24 @@ struct DirLight {
 	vec3		specular;
 };
 
+struct Fog {
+	bool	enabled;
+	int	maxDist;
+	int	minDist;
+	vec4	color;
+};
+
 uniform sampler2D[MAX_TEXTURES] blockTextures;
 
 uniform vec3		viewPos;
 uniform Material	material;
 uniform DirLight	dirLight;
+uniform Fog			fog = Fog(
+	true,
+	256,
+	180,
+	vec4(0.509, 0.8, 0.905, 1.0)
+);
 
 vec3 calcDirLight(DirLight light, vec3 norm, vec3 viewDir) {
 	vec3	lightDir = normalize(-light.direction);
@@ -64,4 +77,13 @@ void main() {
 
 	// apply gamma correction
     FragColor.rgb = pow(FragColor.rgb, vec3(1.0 / GAMMA));
+
+	// Calculate fog
+	if (fog.enabled) {
+		float dist = distance(viewPos, fs_in.FragPos);
+		float fog_factor = (fog.maxDist - dist) / (fog.maxDist - fog.minDist);
+		fog_factor = clamp(fog_factor, 0.0, 1.0);
+
+		FragColor = mix(fog.color, FragColor, fog_factor);
+	}
 }

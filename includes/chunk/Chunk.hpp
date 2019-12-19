@@ -17,7 +17,7 @@ class Chunk : public AChunk {
 		virtual void	update();
 
 	protected:
-		virtual void	_draw(glm::mat4 &view);
+		virtual void	_draw(glm::mat4 &view, glm::vec3 &pos);
 
 	private:
 		static void	sendCubeData(TextureManager const &textureManager);

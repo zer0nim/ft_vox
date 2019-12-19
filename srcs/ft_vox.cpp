@@ -41,6 +41,9 @@ void	setDefaultSettings() {
 	s.g.player.mouseSensitivity = 0.1f;
 	s.g.player.delayPutMs = 100;
 	s.g.player.delayDestroyMs = 100;
+	s.g.fog.enabled = true;
+	s.g.fog.width = 70;
+	s.g.fog.color = glm::vec4(0.509, 0.8, 0.905, 1.0);
 	uint32_t seedRand = time(nullptr);
 	s.m.seed = rand_r(&seedRand);
 	s.m.generationType = GENERATION_NORMAL;
@@ -170,6 +173,20 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		s.g.player.delayDestroyMs = element.get<uint32_t>();
 	else if (element.is_number() && key == ".map.generationType" && checkUint32(element, 0, 2))
 		s.m.generationType = element.get<uint32_t>();
+	// fog
+	else if (element.is_boolean() && key == ".global.fog.enabled")
+		s.g.fog.enabled = element.get<bool>();
+	else if (element.is_number() && key == ".global.fog.width" && checkUint32(element, 0, 8192))
+		s.g.fog.width = element.get<uint32_t>();
+	/// color
+	else if (element.is_number() && key == ".global.fog.color.r" && checkFloat(element, 0.0f, 1.0f))
+		s.g.fog.color.r = element.get<float>();
+	else if (element.is_number() && key == ".global.fog.color.g" && checkFloat(element, 0.0f, 1.0f))
+		s.g.fog.color.g = element.get<float>();
+	else if (element.is_number() && key == ".global.fog.color.b" && checkFloat(element, 0.0f, 1.0f))
+		s.g.fog.color.b = element.get<float>();
+	else if (element.is_number() && key == ".global.fog.color.a" && checkFloat(element, 0.0f, 1.0f))
+		s.g.fog.color.a = element.get<float>();
 	// map
 	/// camera
 	else if (element.is_number() && key == ".map.cameraStartPos.pos.x"

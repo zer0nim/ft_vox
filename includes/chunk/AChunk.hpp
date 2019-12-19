@@ -22,7 +22,7 @@ class AChunk {
 
 		AChunk &operator=(AChunk const &rhs);
 
-		virtual void	draw(glm::mat4 &view);
+		virtual void	draw(glm::mat4 &view, glm::vec3 &pos);
 		virtual void	update() = 0;
 		void			createChunk(wordIVec3 const &chunkPos);
 		void			updateBlock(chunkVec3 pos, uint8_t value);
@@ -60,7 +60,7 @@ class AChunk {
 		};
 		static std::unique_ptr<ShaderData>	_shaderData;
 
-		virtual void	_draw(glm::mat4 &view) = 0;
+		virtual void	_draw(glm::mat4 &view, glm::vec3 &pos) = 0;
 		bool			_createChunkFromFile();
 		virtual void	_createChunk();
 

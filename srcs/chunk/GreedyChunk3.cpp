@@ -1,5 +1,6 @@
 #include <array>
 #include <vector>
+#include <algorithm>
 
 #include "GreedyChunk3.hpp"
 #include "utils/Material.hpp"
@@ -303,7 +304,7 @@ void	GreedyChunk3::sendMeshData() {
 	}
 }
 
-void	GreedyChunk3::_draw(glm::mat4 &view) {
+void	GreedyChunk3::_draw(glm::mat4 &view, glm::vec3 &pos) {
 	if (_meshUpdated) {
 		_meshUpdated = false;
 		_nbVertices = 0;
@@ -313,6 +314,8 @@ void	GreedyChunk3::_draw(glm::mat4 &view) {
 	if (_nbVertices > 0) {
 		_shaderData->shader->use();
 		_textureManager.activateTextures();
+
+		_shaderData->shader->setVec3("viewPos", pos);
 		_shaderData->shader->setMat4("view", view);
 
 		glm::mat4 model = glm::translate(glm::mat4(1.0), glm::vec3(_chunkPos));
@@ -339,4 +342,12 @@ void	GreedyChunk3::sendConstUniforms(TextureManager const &textureManager) {
 
 	// send textures
 	textureManager.setUniform(*_shaderData->shader);
+
+	// set fog settings
+	int dist = s.g.renderDist * std::min(CHUNK_SZ_X, CHUNK_SZ_Z);
+
+	_shaderData->shader->setBool("fog.enabled", s.g.fog.enabled);
+	_shaderData->shader->setInt("fog.maxDist", dist);
+	_shaderData->shader->setInt("fog.minDist", dist - s.g.fog.width);
+	_shaderData->shader->setVec4("fog.color", s.g.fog.color);
 }

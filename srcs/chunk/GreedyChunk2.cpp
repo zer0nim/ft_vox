@@ -310,7 +310,7 @@ void	GreedyChunk2::sendMeshData() {
 	}
 }
 
-void	GreedyChunk2::_draw(glm::mat4 &view) {
+void	GreedyChunk2::_draw(glm::mat4 &view, glm::vec3 &pos) {
 	if (_meshUpdated) {
 		_meshUpdated = false;
 		_nbVertices = 0;
@@ -319,6 +319,7 @@ void	GreedyChunk2::_draw(glm::mat4 &view) {
 
 	if (_nbVertices > 0) {
 		_shaderData->shader->use();
+		_shaderData->shader->setVec3("viewPos", pos);
 		_textureManager.activateTextures();
 		_shaderData->shader->setMat4("view", view);
 

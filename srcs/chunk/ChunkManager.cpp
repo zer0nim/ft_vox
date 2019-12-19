@@ -251,7 +251,7 @@ void ChunkManager::draw(glm::mat4 view, Camera *cam) {
 					if (frclInside) {
 						++chunkRendered;
 						std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
-						_chunkMap[chunkPos]->draw(view);
+						_chunkMap[chunkPos]->draw(view, cam->pos);
 					}
 				}
 			}
