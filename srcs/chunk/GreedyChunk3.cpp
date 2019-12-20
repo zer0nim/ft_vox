@@ -335,7 +335,7 @@ void	GreedyChunk3::sendConstUniforms(TextureManager const &textureManager) {
 	_shaderData->shader->setFloat("material.shininess", material.shininess);
 
 	// set direction light
-	_shaderData->shader->setVec3("dirLight.direction", -0.2f, -0.8f, -0.6f);
+	_shaderData->shader->setVec3("dirLight.direction", -0.2f, -0.8f, 0.6f);
 	_shaderData->shader->setVec3("dirLight.ambient", 0.4f, 0.4f, 0.4f);
 	_shaderData->shader->setVec3("dirLight.diffuse", 0.8f, 0.8f, 0.8f);
 	_shaderData->shader->setVec3("dirLight.specular", 0.1f, 0.1f, 0.1f);
