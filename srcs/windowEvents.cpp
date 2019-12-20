@@ -80,6 +80,13 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 		winU->cam->resetPosition();
 	}
 
+	// enable / disable fog
+	if (key == GLFW_KEY_F && action == GLFW_PRESS) {
+		s.g.fog.enabled = !s.g.fog.enabled;
+		AChunk::getShader().use();
+		AChunk::getShader().setBool("fog.enabled", s.g.fog.enabled);
+	}
+
 	// gamemode key
 	if (key == GLFW_KEY_G && action == GLFW_PRESS) {
 	    { std::lock_guard<std::mutex>	guard(s.mutexCamera);

@@ -581,6 +581,9 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 			sHelp = "V: enable / disable mouse cursor";
 			textRender.write("normal", sHelp, textX + 20, textY);
 			textY -= lineSz;
+			sHelp = "F: enable / disable fog";
+			textRender.write("normal", sHelp, textX + 20, textY);
+			textY -= lineSz;
 			sHelp = "G: change gamemode";
 			textRender.write("normal", sHelp, textX + 20, textY);
 			textY -= lineSz;

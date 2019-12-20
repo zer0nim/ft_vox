@@ -143,6 +143,7 @@ void AChunk::save() {
 	chunkFile.close();
 }
 
+Shader					&AChunk::getShader() { return *(_shaderData->shader); }
 AChunk::ChunkData const	&AChunk::getData() const { return _data; }
 TextureManager const	&AChunk::getTextureManager() const { return _textureManager; }
 bool					AChunk::isModifiedFromBegining() const { return _isModifiedFromBegining; }

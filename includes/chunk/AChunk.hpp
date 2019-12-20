@@ -28,6 +28,7 @@ class AChunk {
 		void			updateBlock(chunkVec3 pos, uint8_t value);
 		void			save();
 
+		static Shader			&getShader();
 		AChunk::ChunkData const	&getData() const;
 		TextureManager const	&getTextureManager() const;
 		bool					isModifiedFromBegining() const;
