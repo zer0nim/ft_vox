@@ -1,5 +1,7 @@
 #version 410 core
 
+#define TEXTURE_ATLAS_WIDTH 16
+
 layout (points) in;
 layout (triangle_strip, max_vertices = 4) out;
 
@@ -22,6 +24,8 @@ uniform mat4 view;
 uniform mat4 projection;
 
 void buildFace(vec4 bottomLeft, vec4 tl, vec4 br) {
+	float TILE_SIZE = 1.0 / TEXTURE_ATLAS_WIDTH;
+
 	// topLeft
 	gl_Position = projection * view * model * (bottomLeft + tl);
 	gs_out.TexCoords = vec2(0, 0);
@@ -31,21 +35,21 @@ void buildFace(vec4 bottomLeft, vec4 tl, vec4 br) {
 	EmitVertex();
 	// bottomLeft
 	gl_Position = projection * view * model * bottomLeft;
-	gs_out.TexCoords = vec2(0, gs_in[0].FSize.y);
+	gs_out.TexCoords = vec2(0, gs_in[0].FSize.y * TILE_SIZE);
 	gs_out.FragPos = vec3(model * bottomLeft);
 	gs_out.Normal = gs_in[0].Normal;
 	gs_out.TextureId = gs_in[0].TextureId;
 	EmitVertex();
 	// topRight
 	gl_Position = projection * view * model * (bottomLeft + tl + br);
-	gs_out.TexCoords = vec2(gs_in[0].FSize.x, 0);
+	gs_out.TexCoords = vec2(gs_in[0].FSize.x * TILE_SIZE, 0);
 	gs_out.FragPos = vec3(model * (bottomLeft + tl + br));
 	gs_out.Normal = gs_in[0].Normal;
 	gs_out.TextureId = gs_in[0].TextureId;
 	EmitVertex();
 	// bottomRight
 	gl_Position = projection * view * model * (bottomLeft + br);
-	gs_out.TexCoords = vec2(gs_in[0].FSize.x, gs_in[0].FSize.y);
+	gs_out.TexCoords = vec2(gs_in[0].FSize.x * TILE_SIZE, gs_in[0].FSize.y * TILE_SIZE);
 	gs_out.FragPos = vec3(model * (bottomLeft + br));
 	gs_out.Normal = gs_in[0].Normal;
 	gs_out.TextureId = gs_in[0].TextureId;

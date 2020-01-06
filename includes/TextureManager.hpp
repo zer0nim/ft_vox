@@ -41,7 +41,7 @@ class TextureManager {
 
 		void									setUniform(Shader &sh) const;
 		void									activateTextures() const;
-		std::vector<Texture *> const &			getTexturesLoaded() const;
+		Texture const *							getTextureAtlas() const;
 		std::array<BlockTexture *, NB_TYPE_BLOCKS> const &	getBlocks() const;
 
 		// Exceptions _______________________________
@@ -84,12 +84,11 @@ class TextureManager {
 		};
 
 	private:
-		int8_t	loadTextures(std::string const &path);
 		void	loadBlocksTextures(nlohmann::json const &data);
 		void	drawBlocks() const;
 
 
-		std::vector<Texture *>					_texturesLoaded;
+		Texture *	_textureAtlas;
 		std::array<BlockTexture *, NB_TYPE_BLOCKS>			_blocks;
 };
 
