@@ -29,6 +29,14 @@
 			"default": "./assets/textures/block/snow-dirt.png",
 			"top": "./assets/textures/block/snow.png",
 			"bottom": "./assets/textures/block/dirt.png"
+		},
+		"oak-wood": {
+			"default": "./assets/textures/block/oak-wood-side.png",
+			"top": "./assets/textures/block/oak-wood-top.png",
+			"bottom": "./assets/textures/block/oak-wood-side.png"
+		},
+		"oak-leaves": {
+			"default": "./assets/textures/block/oak-leaves.png"
 		}
 	}
 }

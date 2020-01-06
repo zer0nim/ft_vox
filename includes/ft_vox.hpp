@@ -19,6 +19,9 @@
 #define CHUNK_SZ_Y 128  // [bloc] type: int
 #define CHUNK_SZ_Z 16   // [bloc] type: int
 
+#define TREE_RADIUS	2 	// [bloc] type: int -> max radius of a tree (if 2 -> max is 5*5)
+#define TREE_HEIGHT	8 	// [bloc] type: int -> max height of a tree
+
 #define MAX_Y_CHUNK				MAX_MAP_SIZE_Y / CHUNK_SZ_Y  // [chunk] type: int
 
 #define ENABLE_MAX_CREATED_CHUNK_UPDATE	true  // enable / disable option

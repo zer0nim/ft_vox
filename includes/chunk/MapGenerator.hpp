@@ -2,6 +2,7 @@
 
 #include "ft_vox.hpp"
 #include "lib/PerlinNoise.hpp"
+#include "TextureManager.hpp"
 
 #define PERLIN mapInfo.perlin.noise     // shortcut to perlin call
 
@@ -89,6 +90,14 @@ struct MapInfo {
 		yFactor(1.0 / (MAX_MAP_SIZE_Y - 1)),
 		zFactor(1.0 / (MAX_MAP_SIZE_Z - 1)),
 		perlin(1) {}
+};
+
+struct TreeInfo {
+	bool	isTree;
+	uint8_t	type;
+	float	elevation;
+
+	TreeInfo() : isTree(false) {}
 };
 
 void		setSeed(uint32_t seed);

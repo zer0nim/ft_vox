@@ -1,7 +1,7 @@
 #version 410 core
 
 #define MAX_TEXTURES 12
-#define NB_BLOCK_TYPES 8
+#define NB_BLOCK_TYPES 10
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
