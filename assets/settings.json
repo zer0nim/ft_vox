@@ -60,6 +60,7 @@
 	"map": {
 		"seed": 0,
 		"generationType": 2,
+		"generateTree": true,
 		"cameraStartPos": {
 			"pos": {
 				"x": 0,

@@ -201,6 +201,7 @@ struct Settings {
 		std::string fullMapName;  // don't set it in settings.json
 		uint32_t	seed;
 		uint32_t	generationType;
+		bool		generateTree;
 		struct CameraStartPos {
 			glm::vec3	pos;
 			float		yaw;

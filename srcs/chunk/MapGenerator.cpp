@@ -9,14 +9,16 @@ float			fseed;
 
 
 // tree description
-#define NB_TREE_MODELS	4
+#define NB_TREE_MODELS	5
 #define TREE_CACTUS		0
 #define TREE_BASIC_1	1
 #define TREE_BASIC_2	2
 #define TREE_BASIC_3	3
-uint8_t	ca = TextureManager::blocksNames["oak-leaves"];
-uint8_t	ow = TextureManager::blocksNames["oak-wood"];
-uint8_t	ol = TextureManager::blocksNames["oak-leaves"];
+#define TREE_ROC		4
+uint8_t	ca = TextureManager::blocksNames["oak-leaves"];  // cactus
+uint8_t	ow = TextureManager::blocksNames["oak-wood"];  // oak wood
+uint8_t	ol = TextureManager::blocksNames["oak-leaves"];  // oak leaves
+uint8_t	cb = TextureManager::blocksNames["bedrock"];  // cobblestone
 uint8_t	TREE_MODELS[NB_TREE_MODELS][TREE_HEIGHT][TREE_RADIUS * 2 + 1][TREE_RADIUS * 2 + 1] = {
 	// [0] cactus
 	{
@@ -251,6 +253,64 @@ uint8_t	TREE_MODELS[NB_TREE_MODELS][TREE_HEIGHT][TREE_RADIUS * 2 + 1][TREE_RADIU
 			{ 0,  0,  0,  0,  0},
 		},
 	},
+	{  // [5] roc for mountains
+		{  // height 0
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0, cb,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{  // height 1
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{  // height 2
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{  // height 3
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{  // height 4
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{  // height 5
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{  // height 6
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{  // height 7
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+	},
 };
 
 void		setSeed(uint32_t seed) {
@@ -312,7 +372,7 @@ TreeInfo treeMap[CHUNK_SZ_X + TREE_RADIUS * 2][CHUNK_SZ_Z + TREE_RADIUS * 2], ui
 	}
 
 	// tree generation
-	if (fy > montainsElevation) {
+	if (s.m.generateTree && fy > montainsElevation) {
 		// check for tree
 		for (uint8_t i = treeX - TREE_RADIUS; i <= treeX + TREE_RADIUS; i++) {
 			for (uint8_t j = treeZ - TREE_RADIUS; j <= treeZ + TREE_RADIUS; j++) {
@@ -424,65 +484,76 @@ void		getChunkNormalPerlin(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_S
 
 	TreeInfo	treeMap[CHUNK_SZ_X + TREE_RADIUS * 2][CHUNK_SZ_Z + TREE_RADIUS * 2];
 
-	int i = 0;
-	for (int8_t ix = -TREE_RADIUS; ix < CHUNK_SZ_X + TREE_RADIUS; ix++) {
-		x = (chunkPos.x + ix) * mapInfo.xFactor * NORMALIZE_MULTIPLIER + 0.5;
-		int j = 0;
-		for (int8_t iz = -TREE_RADIUS; iz < CHUNK_SZ_Z + TREE_RADIUS; iz++) {
-			z = (chunkPos.z + iz) * mapInfo.zFactor * NORMALIZE_MULTIPLIER + 0.5;
+	if (s.m.generateTree) {
+		int i = 0;
+		for (int8_t ix = -TREE_RADIUS; ix < CHUNK_SZ_X + TREE_RADIUS; ix++) {
+			x = (chunkPos.x + ix) * mapInfo.xFactor * NORMALIZE_MULTIPLIER + 0.5;
+			int j = 0;
+			for (int8_t iz = -TREE_RADIUS; iz < CHUNK_SZ_Z + TREE_RADIUS; iz++) {
+				z = (chunkPos.z + iz) * mapInfo.zFactor * NORMALIZE_MULTIPLIER + 0.5;
 
-			// is tree
-			if (isTree(chunkPos.x + ix, chunkPos.z + z, x * 2, z * 2)) {
-					treeMap[i][j].isTree = true;
-					float heightDiv;
-					float biome = getBiome(x, z, heightDiv);
+				// is tree
+				if (isTree(chunkPos.x + ix, chunkPos.z + iz, x * 2, z * 2)) {
+						treeMap[i][j].isTree = true;
+						float heightDiv;
+						float biome = getBiome(x, z, heightDiv);
+						treeMap[i][j].elevation = getMountainsElevation(x, z, heightDiv);
 
-					if (biome == MAP_BIOME_MOUNTAINS) {
-						treeMap[i][j].isTree = false;  // no tree in mountains
-					}
-					else if (biome == MAP_BIOME_PLAIN) {
-						treeMap[i][j].type = TREE_BASIC_1;  // basic tree
-					}
-					else if (biome == MAP_BIOME_DESERT) {
-						treeMap[i][j].type = TREE_CACTUS;  // cactus
-					}
-					treeMap[i][j].elevation = getMountainsElevation(x, z, heightDiv);
+						if (biome == MAP_BIOME_MOUNTAINS) {
+							if (treeMap[i][j].elevation < MAP_TOP_SNOW_HEIGHT)
+								treeMap[i][j].type = TREE_ROC;  // roc
+							else
+								treeMap[i][j].isTree = false;  // no roc in snow
+						}
+						else if (biome == MAP_BIOME_PLAIN) {
+							treeMap[i][j].type = TREE_BASIC_1;  // basic tree
+						}
+						else if (biome == MAP_BIOME_DESERT) {
+							treeMap[i][j].type = TREE_CACTUS;  // cactus
+						}
+				}
+				else if (isTree(chunkPos.x + ix, chunkPos.z + iz, x * 3, z * 3)) {
+						treeMap[i][j].isTree = true;
+						float heightDiv;
+						float biome = getBiome(x, z, heightDiv);
+						treeMap[i][j].elevation = getMountainsElevation(x, z, heightDiv);
+
+						if (biome == MAP_BIOME_MOUNTAINS) {
+							if (treeMap[i][j].elevation < MAP_TOP_SNOW_HEIGHT)
+								treeMap[i][j].type = TREE_ROC;  // roc
+							else
+								treeMap[i][j].isTree = false;  // no roc in snow
+						}
+						else if (biome == MAP_BIOME_PLAIN) {
+							treeMap[i][j].type = TREE_BASIC_2;  // basic tree
+						}
+						else if (biome == MAP_BIOME_DESERT) {
+							treeMap[i][j].isTree = false;  // no tree in mountains
+						}
+				}
+				else if (isTree(chunkPos.x + ix, chunkPos.z + iz, x * 4, z * 4)) {
+						treeMap[i][j].isTree = true;
+						float heightDiv;
+						float biome = getBiome(x, z, heightDiv);
+						treeMap[i][j].elevation = getMountainsElevation(x, z, heightDiv);
+
+						if (biome == MAP_BIOME_MOUNTAINS) {
+							if (treeMap[i][j].elevation < MAP_TOP_SNOW_HEIGHT)
+								treeMap[i][j].type = TREE_ROC;  // roc
+							else
+								treeMap[i][j].isTree = false;  // no roc in snow
+						}
+						else if (biome == MAP_BIOME_PLAIN) {
+							treeMap[i][j].type = TREE_BASIC_3;  // basic tree
+						}
+						else if (biome == MAP_BIOME_DESERT) {
+							treeMap[i][j].isTree = false;  // no tree in mountains
+						}
+				}
+				j++;
 			}
-			else if (isTree(chunkPos.x + ix, chunkPos.z + z, x * 3, z * 3)) {
-					treeMap[i][j].isTree = true;
-					float heightDiv;
-					float biome = getBiome(x, z, heightDiv);
-
-					if (biome == MAP_BIOME_MOUNTAINS) {
-						treeMap[i][j].isTree = false;  // no tree in mountains
-					}
-					else if (biome == MAP_BIOME_PLAIN) {
-						treeMap[i][j].type = TREE_BASIC_2;  // basic tree
-					}
-					else if (biome == MAP_BIOME_DESERT) {
-						treeMap[i][j].isTree = false;  // no tree in mountains
-					}
-					treeMap[i][j].elevation = getMountainsElevation(x, z, heightDiv);
-			}
-			else if (isTree(chunkPos.x + ix, chunkPos.z + z, x * 4, z * 4)) {
-					treeMap[i][j].isTree = true;
-					float heightDiv;
-					float biome = getBiome(x, z, heightDiv);
-
-					if (biome == MAP_BIOME_MOUNTAINS) {
-						treeMap[i][j].isTree = false;  // no tree in mountains
-					}
-					else if (biome == MAP_BIOME_PLAIN) {
-						treeMap[i][j].type = TREE_BASIC_3;  // basic tree
-					}
-					else if (biome == MAP_BIOME_DESERT) {
-						treeMap[i][j].isTree = false;  // no tree in mountains
-					}
-					treeMap[i][j].elevation = getMountainsElevation(x, z, heightDiv);
-			}
-			j++;
+			i++;
 		}
-		i++;
 	}
 
 	for (uint8_t ix = 0; ix < CHUNK_SZ_X; ix++) {

@@ -50,6 +50,7 @@ void	setDefaultSettings() {
 	rand_r(&seedRand);
 	s.m.seed = rand_r(&seedRand);
 	s.m.generationType = GENERATION_NORMAL;
+	s.m.generateTree = true;
 	s.m.cameraStartPos.pos.x = 0;
 	s.m.cameraStartPos.pos.y = 64;
 	s.m.cameraStartPos.pos.z = 0;
@@ -181,6 +182,8 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		s.g.player.delayDestroyMs = element.get<uint32_t>();
 	else if (element.is_number() && key == ".map.generationType" && checkUint32(element, 0, 2))
 		s.m.generationType = element.get<uint32_t>();
+	else if (element.is_boolean() && key == ".map.generateTree")
+		s.m.generateTree = element.get<bool>();
 	// fog
 	else if (element.is_boolean() && key == ".global.fog.enabled")
 		s.g.fog.enabled = element.get<bool>();
@@ -399,6 +402,7 @@ bool	saveMap(Camera *cam) {
 		{"map", {
 			{"seed", s.m.seed},
 			{"generationType", s.m.generationType},
+			{"generateTree", s.m.generateTree},
 			{"cameraStartPos", {
 				{"pos", {
 					{"x", cam->pos.x},
