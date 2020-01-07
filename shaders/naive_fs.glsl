@@ -70,15 +70,16 @@ vec3 calcDirLight(DirLight light, vec3 norm, vec3 viewDir) {
 }
 
 void main() {
+	// discard if it's a transparent pixel
+	if (enableTransparency && texture(blockTextures[fs_in.TextureId], fs_in.TexCoords).a < 0.2) {
+		discard;
+	}
 	vec3 norm = normalize(fs_in.Normal);
 	vec3 viewDir = normalize(viewPos - fs_in.FragPos);
 
 	// Directional lighting
 	vec3 result = calcDirLight(dirLight, norm, viewDir);
 
-	if (enableTransparency && texture(blockTextures[fs_in.TextureId], fs_in.TexCoords).a < 0.2) {
-		discard;
-	}
 	FragColor = vec4(result, 1.0);
 
 	// apply gamma correction
