@@ -16,11 +16,11 @@ float			fseed;
 #define TREE_BASIC_3	3
 #define TREE_ROC		4
 #define TREE_PYRAMID	5
-uint8_t	ca = TextureManager::blocksNames["oak-leaves"];  // cactus
+uint8_t	ca = TextureManager::blocksNames["cactus"];  // cactus
 uint8_t	ow = TextureManager::blocksNames["oak-wood"];  // oak wood
 uint8_t	ol = TextureManager::blocksNames["oak-leaves"];  // oak leaves
-uint8_t	cb = TextureManager::blocksNames["bedrock"];  // cobblestone
-uint8_t	ss = TextureManager::blocksNames["stone"];  // sand stone
+uint8_t	cb = TextureManager::blocksNames["cobblestone"];  // cobblestone
+uint8_t	ss = TextureManager::blocksNames["sandstone"];  // sand stone
 uint8_t	TREE_MODELS[NB_TREE_MODELS][TREE_HEIGHT][TREE_RADIUS * 2 + 1][TREE_RADIUS * 2 + 1] = {
 	{  // [0] cactus
 		{  // height 0
@@ -254,7 +254,7 @@ uint8_t	TREE_MODELS[NB_TREE_MODELS][TREE_HEIGHT][TREE_RADIUS * 2 + 1][TREE_RADIU
 			{ 0,  0,  0,  0,  0},
 		},
 	},
-	{  // [5] roc for mountains
+	{  // [5] roc for mountains (print at -7 in height)
 		{  // height 0
 			{cb, cb, cb, cb,  0},
 			{cb, cb, cb, cb, cb},
@@ -312,7 +312,7 @@ uint8_t	TREE_MODELS[NB_TREE_MODELS][TREE_HEIGHT][TREE_RADIUS * 2 + 1][TREE_RADIU
 			{ 0,  0,  0,  0,  0},
 		},
 	},
-	{  // [6] pyramid for desert
+	{  // [6] pyramid for desert (print at -1 in height)
 		{  // height 3
 			{ss, ss, ss, ss, ss},
 			{ss, ss, ss, ss, ss},
