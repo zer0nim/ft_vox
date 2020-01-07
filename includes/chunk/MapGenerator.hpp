@@ -6,69 +6,32 @@
 
 #define PERLIN mapInfo.perlin.noise     // shortcut to perlin call
 
-#define SIMPLEX glm::simplex  // shortcut to simplex call
+#define NORMALIZE_MULTIPLIER	910
+/* montains generation */
+#define MAP_FREQ_MONTAIN		0.5		// frequency -> nb of mountain
+#define MAP_HEIGHT_EXP			1		// bigger nb == small mountains
+#define MAP_START_HEIGHT		0.18    // [0..1] start at 0.5 (half of the height)
+/* cavern generation */
+#define MAP_CAVERN_Y_MULTIPLIER	3		// multiply Y by ... in cavern
+#define MAP_CAVERN_FREQ			0.3		// frequency of caverns
+#define MAP_CAVERN_BASE_Y		0.2		// [0..1] base y for cavern height
+#define MAP_CAVERN_HEIGHT		0.15    // [0..1] height of a cavern
+#define MAP_CAVERN_HEIGHT_EXP	1		// bigger nb == smaller cavern
+#define MAP_CAVERN_START		0.15    // [0..1] start cavern at this perlin value
+#define MAP_CAVERN_END			0.4		// [0..1] end cavern at this perlin value
+/* bedrock */
+#define MAP_MAX_BEDROCK_HEIGHT	3		// [block] max bedrock height
 
-#define USING_PERLIN	0
-#define USING_SIMLEX	1
-#ifndef NOISE_USED
-	#define NOISE_USED		USING_PERLIN
-#endif
+/* biomes */
+// biome size and offsets
+#define MAP_BIOME_SIZE				0.04 	// reverse of the size
+#define MOUNTAIN_OFFSET				0.003 	// less number == larger mountains biomes
+#define PLAIN_OFFSET				0.005 	// less numer == larger plain biome (transition biome)
 
-#if NOISE_USED == USING_PERLIN
-	#define NORMALIZE_MULTIPLIER	910
-	/* montains generation */
-	#define MAP_FREQ_MONTAIN		0.5		// frequency -> nb of mountain
-	#define MAP_HEIGHT_EXP			1		// bigger nb == small mountains
-	#define MAP_START_HEIGHT		0.18    // [0..1] start at 0.5 (half of the height)
-	/* cavern generation */
-	#define MAP_CAVERN_Y_MULTIPLIER	3		// multiply Y by ... in cavern
-	#define MAP_CAVERN_FREQ			0.3		// frequency of caverns
-	#define MAP_CAVERN_BASE_Y		0.2		// [0..1] base y for cavern height
-	#define MAP_CAVERN_HEIGHT		0.15    // [0..1] height of a cavern
-	#define MAP_CAVERN_HEIGHT_EXP	1		// bigger nb == smaller cavern
-	#define MAP_CAVERN_START		0.15    // [0..1] start cavern at this perlin value
-	#define MAP_CAVERN_END			0.4		// [0..1] end cavern at this perlin value
-	/* bedrock */
-	#define MAP_MAX_BEDROCK_HEIGHT	3		// [block] max bedrock height
-
-	/* biomes */
-	// biome size and offsets
-	#define MAP_BIOME_SIZE				0.04 	// reverse of the size
-	#define MOUNTAIN_OFFSET				0.003 	// less number == larger mountains biomes
-	#define PLAIN_OFFSET				0.005 	// less numer == larger plain biome (transition biome)
-
-	// biomes mountains height (bigger nb == smaller mountains)
-	#define MAP_HEIGHT_DIV_DESERT		40		// height divisor (to avoid big montains)
-	#define MAP_HEIGHT_DIV_MOUNTAINS	10		// height divisor (to avoid big montains)
-	// for plain it if btw desert and mountains
-#else
-	#define NORMALIZE_MULTIPLIER	910
-	/* montains generation */
-	#define MAP_FREQ_MONTAIN		0.5		// frequency -> nb of mountain
-	#define MAP_HEIGHT_EXP			1		// bigger nb == small mountains
-	#define MAP_START_HEIGHT		0.18    // [0..1] start at 0.5 (half of the height)
-	/* cavern generation */
-	#define MAP_CAVERN_Y_MULTIPLIER	3		// multiply Y by ... in cavern
-	#define MAP_CAVERN_FREQ			0.3		// frequency of caverns
-	#define MAP_CAVERN_BASE_Y		0.2		// [0..1] base y for cavern height
-	#define MAP_CAVERN_HEIGHT		0.15    // [0..1] height of a cavern
-	#define MAP_CAVERN_HEIGHT_EXP	1		// bigger nb == smaller cavern
-	#define MAP_CAVERN_START		0.15    // [0..1] start cavern at this perlin value
-	#define MAP_CAVERN_END			0.4		// [0..1] end cavern at this perlin value
-	/* bedrock */
-	#define MAP_MAX_BEDROCK_HEIGHT	3		// [block] max bedrock height
-
-	/* biomes */
-	// biome size and offsets
-	#define MAP_BIOME_SIZE				0.04 	// reverse of the size
-	#define MOUNTAIN_OFFSET				0.0045 	// less number == larger mountains biomes
-	#define PLAIN_OFFSET				0.008 	// bigger numer == larger plain biome (transition biome)
-
-	// biomes mountains height (bigger nb == smaller mountains)
-	#define MAP_HEIGHT_DIV_DESERT		80		// height divisor (to avoid big montains)
-	#define MAP_HEIGHT_DIV_MOUNTAINS	14		// height divisor (to avoid big montains)
-	// for plain it if btw desert and mountains
-#endif
+// biomes mountains height (bigger nb == smaller mountains)
+#define MAP_HEIGHT_DIV_DESERT		40		// height divisor (to avoid big montains)
+#define MAP_HEIGHT_DIV_MOUNTAINS	10		// height divisor (to avoid big montains)
+// for plain it if btw desert and mountains
 
 #define MAP_TOP_SNOW_HEIGHT			61		// after # height, the surface is snow on top
 #define MAP_FULL_SNOW_HEIGHT		64		// after # height, the surface is snow block
