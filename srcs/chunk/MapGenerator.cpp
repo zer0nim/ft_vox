@@ -384,7 +384,8 @@ void		setSeed(uint32_t seed) {
 
 static uint8_t	_getBlockElevation(uint32_t realY, float fy, uint8_t biome, float montainsElevation,
 float cavernY1, float cavernY2, float bedrockElevation,
-TreeInfo treeMap[CHUNK_SZ_X + TREE_RADIUS * 2][CHUNK_SZ_Z + TREE_RADIUS * 2], uint8_t treeX, uint8_t treeZ) {
+TreeInfo treeMap[CHUNK_SZ_X + TREE_RADIUS * 2][CHUNK_SZ_Z + TREE_RADIUS * 2], uint8_t treeX, uint8_t treeZ,
+bool &isTreeXZ) {
 	// create bedrock
 	if (realY < MAP_MAX_BEDROCK_HEIGHT
 	&& (realY == 0 || realY <= static_cast<uint8_t>(bedrockElevation))) {
@@ -431,10 +432,13 @@ TreeInfo treeMap[CHUNK_SZ_X + TREE_RADIUS * 2][CHUNK_SZ_Z + TREE_RADIUS * 2], ui
 	}
 
 	// tree generation
-	if (s.m.generateTree && fy > montainsElevation) {
+	if (isTreeXZ && s.m.generateTree && fy > montainsElevation) {
+		bool tmpIsTree = false;
 		// check for tree
 		for (uint8_t i = treeX - TREE_RADIUS; i <= treeX + TREE_RADIUS; i++) {
 			for (uint8_t j = treeZ - TREE_RADIUS; j <= treeZ + TREE_RADIUS; j++) {
+				if (treeMap[i][j].isTree && fy < treeMap[i][j].elevation + mapInfo.yFactor * TREE_HEIGHT)
+					tmpIsTree = true;
 				if (treeMap[i][j].isTree
 				&& fy >= treeMap[i][j].elevation && fy < treeMap[i][j].elevation + mapInfo.yFactor * TREE_HEIGHT) {
 					// [id][y][x][z]
@@ -447,6 +451,7 @@ TreeInfo treeMap[CHUNK_SZ_X + TREE_RADIUS * 2][CHUNK_SZ_Z + TREE_RADIUS * 2], ui
 				}
 			}
 		}
+		isTreeXZ = tmpIsTree;
 	}
 
 	// sky
@@ -670,6 +675,9 @@ void		getChunkNormalPerlin(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_S
 			bedrockElevation = std::pow(bedrockElevation, 0.4);
 			bedrockElevation *= MAP_MAX_BEDROCK_HEIGHT;
 
+			// used to reduce calculation in _getBlockElevation
+			bool isTreeXZ = true;  // true if we need to check if there is a tree in this position
+
 			for (uint8_t iy = 0; iy < CHUNK_SZ_Y; iy++) {
 				y = (chunkPos.y + iy) * mapInfo.yFactor;
 
@@ -680,7 +688,7 @@ void		getChunkNormalPerlin(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_S
 					cavernY2 = cavernY1 + (MAP_CAVERN_HEIGHT * 0.5 + (cavern - MAP_CAVERN_START) * 0.5);
 				}
 				data[ix][iy][iz] = _getBlockElevation(chunkPos.y + iy, y, biome, montainElevation, cavernY1, cavernY2,
-					bedrockElevation, treeMap, ix + TREE_RADIUS, iz + TREE_RADIUS);
+					bedrockElevation, treeMap, ix + TREE_RADIUS, iz + TREE_RADIUS, isTreeXZ);
 			}
 		}
 	}
