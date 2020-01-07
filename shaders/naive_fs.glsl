@@ -34,6 +34,7 @@ struct Fog {
 
 uniform sampler2D[MAX_TEXTURES] blockTextures;
 
+uniform bool		enableTransparency;
 uniform vec3		viewPos;
 uniform Material	material;
 uniform DirLight	dirLight;
@@ -43,6 +44,7 @@ uniform Fog			fog = Fog(
 	180,
 	vec4(0.509, 0.8, 0.905, 1.0)
 );
+
 
 vec3 calcDirLight(DirLight light, vec3 norm, vec3 viewDir) {
 	vec3	lightDir = normalize(-light.direction);
@@ -56,8 +58,9 @@ vec3 calcDirLight(DirLight light, vec3 norm, vec3 viewDir) {
 	vec3	ambient = light.ambient;
 	vec3	diffuse = light.diffuse;
 
-	ambient *= vec3(texture(blockTextures[fs_in.TextureId], fs_in.TexCoords));
-	diffuse *= diff * vec3(texture(blockTextures[fs_in.TextureId], fs_in.TexCoords));
+	vec3 tmp = vec3(texture(blockTextures[fs_in.TextureId], fs_in.TexCoords));
+	ambient *= tmp;
+	diffuse *= diff * tmp;
 
 	// use texture or color for the specular
 	vec3 specular = light.specular;
@@ -73,6 +76,9 @@ void main() {
 	// Directional lighting
 	vec3 result = calcDirLight(dirLight, norm, viewDir);
 
+	if (enableTransparency && texture(blockTextures[fs_in.TextureId], fs_in.TexCoords).a < 0.2) {
+		discard;
+	}
 	FragColor = vec4(result, 1.0);
 
 	// apply gamma correction

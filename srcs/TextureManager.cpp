@@ -17,9 +17,10 @@ std::map<std::string, uint8_t>	TextureManager::blocksNames = {
 	{"snow-dirt",	8},
 	{"oak-wood",	9},
 	{"oak-leaves",	10},
-	{"cobblestone",	10},
-	{"sandstone",	10},
-	{"cactus",		10},
+	{"cobblestone",	5},  // TODO(tnicolas42) add block
+	{"sandstone",	5},  // TODO(tnicolas42) add block
+	{"cactus",		5},  // TODO(tnicolas42) add block
+	{"glass",		5},  // TODO(tnicolas42) add block
 };
 
 TextureManager::TextureManager(std::string const &texturesSettings) {
@@ -144,6 +145,15 @@ void	TextureManager::loadBlocksTextures(nlohmann::json const &data) {
 						}
 						else if (key == "bottom") {
 							blockTexture->bottom = loadTextures(blockText.value());
+						}
+						else if (key == "isTransparent") {  // load transparency of the object
+							try {
+								blockTexture->isTransparent = blockText.value();
+							}
+							catch (nlohmann::detail::type_error &e) {
+								logErr("unable to load transparency of " << block.key() << " " << blockText.value()
+								<< " should be a boolean");
+							}
 						}
 						else {
 							logWarn("block \"" << block.key() << "\", unrecognized texture key \"" <<  key  << '"');

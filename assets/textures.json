@@ -36,7 +36,8 @@
 			"bottom": "./assets/textures/block/oak-wood-top.png"
 		},
 		"oak-leaves": {
-			"default": "./assets/textures/block/oak-leaves.png"
+			"default": "./assets/textures/block/oak-leaves.png",
+			"isTransparent": true
 		}
 	}
 }

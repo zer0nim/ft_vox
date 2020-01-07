@@ -158,6 +158,7 @@ struct Settings {
 			uint32_t	width;
 			uint32_t	height;
 			uint32_t	fps;
+			bool		enableTransparency;
 			struct Text {
 				std::string	path;
 				uint32_t	size;

@@ -118,6 +118,13 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 		}
 	}
 
+	// enable / disable transparency
+	if (key == GLFW_KEY_T && action == GLFW_PRESS) {
+		s.g.screen.enableTransparency = !s.g.screen.enableTransparency;
+		AChunk::getShader().use();
+		AChunk::getShader().setBool("enableTransparency", s.g.screen.enableTransparency);
+	}
+
 	// F3 key -> debug mode
 	if (key == GLFW_KEY_F3 && action == GLFW_RELEASE) {
 		if (launchF3Cmd == false)

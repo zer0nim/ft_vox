@@ -12,6 +12,7 @@
 			"width": 1200,
 			"height": 800,
 			"fps": 120,
+			"enableTransparency": true,
 			"text": {
 				"normal": {
 					"path": "assets/fonts/minecraft_normal.ttf",

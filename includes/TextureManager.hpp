@@ -30,11 +30,13 @@ class TextureManager {
 				side = -1;
 				top = -1;
 				bottom = -1;
+				isTransparent = false;
 			};
 
 			int8_t	side;
 			int8_t	top;
 			int8_t	bottom;
+			bool	isTransparent;
 		};
 
 		static std::map<std::string, uint8_t>	blocksNames;

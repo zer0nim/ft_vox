@@ -20,6 +20,7 @@ uint8_t	ow = TextureManager::blocksNames["oak-wood"];  // oak wood
 uint8_t	ol = TextureManager::blocksNames["oak-leaves"];  // oak leaves
 uint8_t	cb = TextureManager::blocksNames["cobblestone"];  // cobblestone
 uint8_t	ss = TextureManager::blocksNames["sandstone"];  // sand stone
+uint8_t	gl = TextureManager::blocksNames["glass"];  // glass
 uint8_t	TREE_MODELS[NB_TREE_MODELS][TREE_HEIGHT][TREE_RADIUS * 2 + 1][TREE_RADIUS * 2 + 1] = {
 	{  // [0] cactus
 		{  // height 0
@@ -321,22 +322,22 @@ uint8_t	TREE_MODELS[NB_TREE_MODELS][TREE_HEIGHT][TREE_RADIUS * 2 + 1][TREE_RADIU
 		},
 		{  // height 3
 			{ss, ss, ss, ss, ss},
-			{ss, ss, ss, ss, ss},
-			{ss, ss, ss, ss, ss},
-			{ss, ss, ss, ss, ss},
+			{ss, gl, gl, gl, ss},
+			{ss, gl, gl, gl, ss},
+			{ss, gl, gl, gl, ss},
 			{ss, ss, ss, ss, ss},
 		},
 		{  // height 0
 			{ss, ss, ss, ss, ss},
-			{ss, ss, ss, ss, ss},
-			{ss, ss, ss, ss, ss},
-			{ss, ss, ss, ss, ss},
+			{ss, gl, gl, gl, ss},
+			{ss, gl, gl, gl, ss},
+			{ss, gl, gl, gl, ss},
 			{ss, ss, ss, ss, ss},
 		},
 		{  // height 1
 			{ 0,  0,  0,  0,  0},
 			{ 0, ss, ss, ss,  0},
-			{ 0, ss, ss, ss,  0},
+			{ 0, ss, gl, ss,  0},
 			{ 0, ss, ss, ss,  0},
 			{ 0,  0,  0,  0,  0},
 		},
@@ -556,7 +557,7 @@ void		getChunkNormalPerlin(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_S
 				z = (chunkPos.z + iz) * mapInfo.zFactor * NORMALIZE_MULTIPLIER + 0.5;
 
 				// tree 1
-				if (isTree(chunkPos.x + ix, chunkPos.z + iz, x * 2, z * 2, 0.1, 0.0005)) {
+				if (isTree(chunkPos.x + ix, chunkPos.z + iz, x * 2, z * 2, 0.1, 0.001)) {
 						treeMap[i][j].isTree = true;
 						float heightDiv;
 						float biome = getBiome(x, z, heightDiv);
@@ -579,7 +580,7 @@ void		getChunkNormalPerlin(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_S
 						}
 				}
 				// tree 2
-				else if (isTree(chunkPos.x + ix, chunkPos.z + iz, x * 3, z * 3, 0.1, 0.0005)) {
+				else if (isTree(chunkPos.x + ix, chunkPos.z + iz, x * 3, z * 3, 0.1, 0.001)) {
 						treeMap[i][j].isTree = true;
 						float heightDiv;
 						float biome = getBiome(x, z, heightDiv);
@@ -602,7 +603,7 @@ void		getChunkNormalPerlin(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_S
 						}
 				}
 				// tree 3
-				else if (isTree(chunkPos.x + ix, chunkPos.z + iz, x * 4, z * 4, 0.1, 0.0005)) {
+				else if (isTree(chunkPos.x + ix, chunkPos.z + iz, x * 4, z * 4, 0.1, 0.001)) {
 						treeMap[i][j].isTree = true;
 						float heightDiv;
 						float biome = getBiome(x, z, heightDiv);

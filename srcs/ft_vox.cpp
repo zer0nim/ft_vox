@@ -22,6 +22,7 @@ void	setDefaultSettings() {
 	s.g.screen.width = 1200;
 	s.g.screen.height = 800;
 	s.g.screen.fps = 120;
+	s.g.screen.enableTransparency = true;
 	s.g.screen.text.insert(std::pair<std::string, Settings::Global::Screen::Text>(
 		"normal", {"assets/fonts/minecraft_normal.ttf", 20}));
 	s.g.screen.text.insert(std::pair<std::string, Settings::Global::Screen::Text>(
@@ -148,6 +149,8 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		s.g.screen.height = element.get<uint32_t>();
 	else if (element.is_number() && key == ".global.screen.fps" && checkUint32(element, 1, 1024))
 		s.g.screen.fps = element.get<uint32_t>();
+	else if (element.is_boolean() && key == ".global.screen.enableTransparency")
+		s.g.screen.enableTransparency = element.get<bool>();
 	else if (boost::starts_with(key, ".global.screen.text."))
 		loadSettingElementFont(element, key);
 	/// player
@@ -582,13 +585,16 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 			sHelp = "1-9: select block 1-9";
 			textRender.write("normal", sHelp, textX + 20, textY);
 			textY -= lineSz;
+			sHelp = "G: change gamemode";
+			textRender.write("normal", sHelp, textX + 20, textY);
+			textY -= lineSz;
 			sHelp = "V: enable / disable mouse cursor";
 			textRender.write("normal", sHelp, textX + 20, textY);
 			textY -= lineSz;
 			sHelp = "F: enable / disable fog";
 			textRender.write("normal", sHelp, textX + 20, textY);
 			textY -= lineSz;
-			sHelp = "G: change gamemode";
+			sHelp = "T: enable / disable transparency";
 			textRender.write("normal", sHelp, textX + 20, textY);
 			textY -= lineSz;
 			sHelp = "R: reset position to last saved (creative)";

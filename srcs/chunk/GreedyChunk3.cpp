@@ -134,7 +134,8 @@ void	GreedyChunk3::calcGreedyChunk() {
 							? _data.data[voxPos.x][voxPos.y][voxPos.z] : 0;
 
 						// fill the mask
-						if (a != 0 && b != 0) {
+						if (a != 0 && b != 0
+						&& _textureManager.getBlocks()[a - 1]->isTransparent == _textureManager.getBlocks()[b - 1]->isTransparent) {
 							mask[n] = 0;
 						}
 						else if (backFace) {
@@ -342,6 +343,8 @@ void	GreedyChunk3::sendConstUniforms(TextureManager const &textureManager) {
 
 	// send textures
 	textureManager.setUniform(*_shaderData->shader);
+
+	_shaderData->shader->setBool("enableTransparency", s.g.screen.enableTransparency);
 
 	// set fog settings
 	int dist = s.g.renderDist * std::min(CHUNK_SZ_X, CHUNK_SZ_Z);
