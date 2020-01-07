@@ -2,6 +2,7 @@
 
 #define MAX_TEXTURES 12
 #define TEXTURE_ATLAS_WIDTH 16
+#define TILE_SIZE 0.0625 // 1.0 / TEXTURE_ATLAS_WIDTH;
 #define GAMMA 2.2
 
 out vec4	FragColor;
@@ -10,6 +11,7 @@ in VS_OUT {
 	vec2 TexCoords;
 	vec3 FragPos;
 	vec3 Normal;
+	vec2 AtlasOffset;
 	flat int TextureId;
 } fs_in;
 
@@ -71,22 +73,13 @@ void main() {
 	vec3 norm = normalize(fs_in.Normal);
 	vec3 viewDir = normalize(viewPos - fs_in.FragPos);
 
-	// calc texture_atlas offset
-	ivec2 offset = ivec2(
-		fs_in.TextureId % TEXTURE_ATLAS_WIDTH, \
-		fs_in.TextureId / TEXTURE_ATLAS_WIDTH);
-
-	float TILE_SIZE = 1.0 / TEXTURE_ATLAS_WIDTH;
-
 	// calc texture coordinate
 	vec2 texCoords = vec2(
-		(offset.x * TILE_SIZE) + mod(fs_in.TexCoords.x, TILE_SIZE),
-		(offset.y * TILE_SIZE) + mod(fs_in.TexCoords.y, TILE_SIZE));
+		fs_in.AtlasOffset.x + mod(fs_in.TexCoords.x, TILE_SIZE),
+		fs_in.AtlasOffset.y + mod(fs_in.TexCoords.y, TILE_SIZE));
 
 	// Directional lighting
-	vec3 result = calcDirLight(dirLight, norm, viewDir, texCoords);
-
-	FragColor = vec4(result, 1.0);
+	FragColor = vec4(calcDirLight(dirLight, norm, viewDir, texCoords), 1.0);
 
 	// apply gamma correction
     FragColor.rgb = pow(FragColor.rgb, vec3(1.0 / GAMMA));
