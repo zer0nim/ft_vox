@@ -20,7 +20,7 @@ struct	BlockTexture {
 	int	textureBottom;
 };
 uniform BlockTexture[NB_BLOCK_TYPES] blockTexturesInfo;
-uniform sampler2D	textureAtlas;
+uniform sampler2DArray	textureAtlas;
 
 uniform mat4 model;
 uniform mat4 view;

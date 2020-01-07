@@ -83,7 +83,7 @@ void	TextureManager::loadBlocksTextures(nlohmann::json const &data) {
 	std::string path = "./assets/textures/blocs.png";
 	bool inSpaceSRGB = true;
 	try {
-		_textureAtlas->id = textureFromFile(path, inSpaceSRGB);
+		_textureAtlas->id = textureAtlasFromFile(path, inSpaceSRGB, 32, 256);
 	}
 	catch(TextureFailToLoad const & e) {
 		throw TextureManager::failed2LoadTextureException();
@@ -148,9 +148,9 @@ void	TextureManager::loadBlocksTextures(nlohmann::json const &data) {
 
 void	TextureManager::setUniform(Shader &sh) const {
 	// activate textures
-	glActiveTexture(GL_TEXTURE0 + 0);
+	glActiveTexture(GL_TEXTURE0);
 	sh.setInt("textureAtlas", 0);
-	glBindTexture(GL_TEXTURE_2D, _textureAtlas->id);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, _textureAtlas->id);
 
 	// set uniforms textures
 	for (size_t i = 0; i < _blocks.size(); ++i) {
@@ -177,7 +177,7 @@ void	TextureManager::setUniform(Shader &sh) const {
 void	TextureManager::activateTextures() const {
 	// activate textures
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, _textureAtlas->id);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, _textureAtlas->id);
 }
 
 TextureManager::Texture const *	TextureManager::getTextureAtlas() const {
