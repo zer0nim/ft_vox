@@ -145,11 +145,20 @@
 		"gold-ore": {
 			"default": 46
 		},
-		"lapis-ore": {
+		"lapis-lazuli": {
 			"default": 47
 		},
 		"emerald-ore": {
 			"default": 48
+		},
+		"andesite": {
+			"default": 49
+		},
+		"diorite": {
+			"default": 50
+		},
+		"granite": {
+			"default": 51
 		}
 	}
 }

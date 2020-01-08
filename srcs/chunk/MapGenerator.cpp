@@ -935,7 +935,7 @@ void		setSeed(uint32_t seed) {
 }
 
 static uint8_t	_getBlockElevation(uint32_t realY, float fy, uint8_t biome, float montainsElevation,
-float cavernY1, float cavernY2, float bedrockElevation,
+float cavernY1, float cavernY2, float bedrockElevation, uint8_t stoneOrOre,
 TreeInfo treeMap[CHUNK_SZ_X + TREE_RADIUS * 2][CHUNK_SZ_Z + TREE_RADIUS * 2], uint8_t treeX, uint8_t treeZ,
 bool &isTreeXZ) {
 	// create bedrock
@@ -961,14 +961,16 @@ bool &isTreeXZ) {
 				return TextureManager::blocksNames["snow-stone"];
 			else if (realY >= MAP_TOP_SNOW_HEIGHT && fy + mapInfo.yFactor * 1 >= montainsElevation)
 				return TextureManager::blocksNames["snow-stone"];
-			return TextureManager::blocksNames["stone"];
+			else if (fy + mapInfo.yFactor * 3 >= montainsElevation)
+				return TextureManager::blocksNames["stone"];
+			return stoneOrOre;
 		}
 		else if (biome == MAP_BIOME_DESERT) {
 			if (fy + mapInfo.yFactor * 2 >= montainsElevation)
 				return TextureManager::blocksNames["sand"];
 			else if (fy + mapInfo.yFactor * 3 >= montainsElevation)
 				return TextureManager::blocksNames["sandstone"];
-			return TextureManager::blocksNames["stone"];
+			return stoneOrOre;
 		}
 		else {  // plain (transition)
 			if (realY >= MAP_FULL_SNOW_HEIGHT && fy + mapInfo.yFactor * 1 >= montainsElevation)
@@ -981,7 +983,7 @@ bool &isTreeXZ) {
 				return TextureManager::blocksNames["grass"];
 			else if (fy + mapInfo.yFactor * 2 >= montainsElevation)
 				return TextureManager::blocksNames["dirt"];
-			return TextureManager::blocksNames["stone"];
+			return stoneOrOre;
 		}
 	}
 
@@ -1079,13 +1081,13 @@ static uint8_t	getBiome(float x, float z, float &heightDiv) {
 }
 
 static float	getMountainsElevation(float x, float z, float heightDiv) {
-	float	montainElevation = 1 * PERLIN(MAP_FREQ_MONTAIN * x * 1, MAP_FREQ_MONTAIN * z * 1)
+	float	montainsElevation = 1 * PERLIN(MAP_FREQ_MONTAIN * x * 1, MAP_FREQ_MONTAIN * z * 1)
 		+  0.5 * PERLIN(MAP_FREQ_MONTAIN * x * 2, MAP_FREQ_MONTAIN * z * 2)
 		+ 0.25 * PERLIN(MAP_FREQ_MONTAIN * x * 4, MAP_FREQ_MONTAIN * z * 4);
-	montainElevation = std::pow(montainElevation, MAP_HEIGHT_EXP);
-	montainElevation = montainElevation / heightDiv + MAP_START_HEIGHT;
+	montainsElevation = std::pow(montainsElevation, MAP_HEIGHT_EXP);
+	montainsElevation = montainsElevation / heightDiv + MAP_START_HEIGHT;
 
-	return montainElevation;
+	return montainsElevation;
 }
 
 static bool		isTree(int32_t ix, int32_t iz, float perlinX, float perlinZ, float startVal, float density) {
@@ -1098,6 +1100,48 @@ static bool		isTree(int32_t ix, int32_t iz, float perlinX, float perlinZ, float 
 		}
 	}
 	return false;
+}
+
+static uint8_t	getStoneOrOre(float x, float y, float z, float realY) {
+	float tmpX = x * 2;
+	float tmpY = y * 20;
+	float tmpZ = z * 2;
+	float	oreValue = 1 * PERLIN(tmpX * 1, tmpY * 1, tmpZ * 1);
+
+	// diamond
+	if (realY < 10 && oreValue > 0.4 && oreValue < 0.41)
+		return TextureManager::blocksNames["diamond-ore"];
+	// lapis
+	if (realY < 25 && oreValue > 0.3 && oreValue < 0.305)
+		return TextureManager::blocksNames["lapis-lazuli"];
+	// gold
+	if (realY < 30 && oreValue > 0.1 && oreValue < 0.102)
+		return TextureManager::blocksNames["gold-ore"];
+	// coal
+	if (oreValue > 0.6 && oreValue < 0.65)
+		return TextureManager::blocksNames["coal-ore"];
+	// iron
+	if (oreValue > 0.41 && oreValue < 0.43)
+		return TextureManager::blocksNames["iron-ore"];
+	// redstone
+	if (oreValue > 0.7 && oreValue < 0.702)
+		return TextureManager::blocksNames["redstone-ore"];
+	// emerald
+	if (oreValue > 0.05 && oreValue < 0.051)
+		return TextureManager::blocksNames["emerald-ore"];
+	// andesite
+	if (oreValue > 0.1 && oreValue < 0.15)
+		return TextureManager::blocksNames["andesite"];
+	// diorite
+	if (oreValue > 0.3 && oreValue < 0.4)
+		return TextureManager::blocksNames["diorite"];
+	// granite
+	if (oreValue > 0.5 && oreValue < 0.99)
+		return TextureManager::blocksNames["granite"];
+	// gravel
+	if (oreValue > 0.01 && oreValue < 0.06)
+		return TextureManager::blocksNames["gravel"];
+	return TextureManager::blocksNames["stone"];
 }
 
 void		getChunkNormalPerlin(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_SZ_Y][CHUNK_SZ_Z]) {
@@ -1309,7 +1353,7 @@ void		getChunkNormalPerlin(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_S
 			biome = getBiome(x, z, heightDiv);
 
 			// create normal montains
-			float	montainElevation = getMountainsElevation(x, z, heightDiv);
+			float	montainsElevation = getMountainsElevation(x, z, heightDiv);
 
 			// create cavern 1/2 (the second part is relative to y coordinate)
 			float	cavern;
@@ -1328,6 +1372,9 @@ void		getChunkNormalPerlin(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_S
 			// used to reduce calculation in _getBlockElevation
 			bool isTreeXZ = true;  // true if we need to check if there is a tree in this position
 
+			// when put stone, we can put an ore instead of the stone
+			uint8_t	stoneOrOre = TextureManager::blocksNames["stone"];
+
 			for (uint8_t iy = 0; iy < CHUNK_SZ_Y; iy++) {
 				y = (chunkPos.y + iy) * mapInfo.yFactor;
 
@@ -1337,8 +1384,12 @@ void		getChunkNormalPerlin(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_S
 					cavernY1 = (PERLIN(x, y, z) + MAP_CAVERN_BASE_Y) * 0.2 + MAP_CAVERN_BASE_Y;
 					cavernY2 = cavernY1 + (MAP_CAVERN_HEIGHT * 0.5 + (cavern - MAP_CAVERN_START) * 0.5);
 				}
-				data[ix][iy][iz] = _getBlockElevation(chunkPos.y + iy, y, biome, montainElevation, cavernY1, cavernY2,
-					bedrockElevation, treeMap, ix + TREE_RADIUS, iz + TREE_RADIUS, isTreeXZ);
+
+				if (chunkPos.y + iy > 2 && y + mapInfo.yFactor * 3 < montainsElevation)
+					stoneOrOre = getStoneOrOre(x, y, z, chunkPos.y + iy);
+
+				data[ix][iy][iz] = _getBlockElevation(chunkPos.y + iy, y, biome, montainsElevation, cavernY1, cavernY2,
+					bedrockElevation, stoneOrOre, treeMap, ix + TREE_RADIUS, iz + TREE_RADIUS, isTreeXZ);
 			}
 		}
 	}

@@ -44,8 +44,11 @@ std::map<std::string, uint8_t>	TextureManager::blocksNames = {
 	{"iron-ore",			35},
 	{"redstone-ore",		36},
 	{"gold-ore",			37},
-	{"lapis-ore",			38},
+	{"lapis-lazuli",		38},
 	{"emerald-ore",			39},
+	{"andesite",			40},
+	{"diorite",				41},
+	{"granite",				42},
 };
 
 TextureManager::TextureManager(std::string const &texturesSettings) {
