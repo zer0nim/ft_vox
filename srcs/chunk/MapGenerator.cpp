@@ -19,10 +19,13 @@ enum TREE_TYPE {
 	TREE_MUSHROOM,
 	TREE_MELON,
 	TREE_PUMPKIN,
+	TREE_PLAIN_HOUSE,
+	TREE_PLAIN_TOWER,
 	NB_TREE_MODELS,
 };
 uint8_t	ca = TextureManager::blocksNames["cactus"];
 uint8_t	ow = TextureManager::blocksNames["oak-wood"];
+uint8_t	sw = TextureManager::blocksNames["spruce-wood"];
 uint8_t	ol = TextureManager::blocksNames["oak-leaves"];
 uint8_t	cb = TextureManager::blocksNames["cobblestone"];
 uint8_t	gr = TextureManager::blocksNames["gravel"];
@@ -34,6 +37,11 @@ uint8_t	di = TextureManager::blocksNames["dirt"];
 uint8_t	dp = TextureManager::blocksNames["dirt-podzol"];
 uint8_t	me = TextureManager::blocksNames["melon"];
 uint8_t	pk = TextureManager::blocksNames["pumpkin"];
+uint8_t	sb = TextureManager::blocksNames["stonebrick"];
+uint8_t	br = TextureManager::blocksNames["brick"];
+uint8_t	op = TextureManager::blocksNames["oak-planks"];
+uint8_t	sc = TextureManager::blocksNames["stonebrick-cracked"];
+uint8_t	sm = TextureManager::blocksNames["stonebrick-mossy"];
 uint8_t	TREE_MODELS[NB_TREE_MODELS][TREE_HEIGHT][TREE_RADIUS * 2 + 1][TREE_RADIUS * 2 + 1] = {
 	{  // [0] cactus
 		{
@@ -97,35 +105,35 @@ uint8_t	TREE_MODELS[NB_TREE_MODELS][TREE_HEIGHT][TREE_RADIUS * 2 + 1][TREE_RADIU
 		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
-			{ 0,  0, ow,  0,  0},
+			{ 0,  0, sw,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
 		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
-			{ 0,  0, ow,  0,  0},
+			{ 0,  0, sw,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
 		{
 			{ 0, ol, ol, ol,  0},
 			{ol, ol, ol, ol, ol},
-			{ol, ol, ow, ol, ol},
+			{ol, ol, sw, ol, ol},
 			{ol, ol, ol, ol, ol},
 			{ 0, ol, ol, ol,  0},
 		},
 		{
 			{ol, ol, ol, ol, ol},
 			{ol, ol, ol, ol, ol},
-			{ol, ol, ow, ol, ol},
+			{ol, ol, sw, ol, ol},
 			{ol, ol, ol, ol, ol},
 			{ol, ol, ol, ol, ol},
 		},
 		{
 			{ 0,  0,  0,  0,  0},
 			{ 0, ol, ol, ol,  0},
-			{ 0, ol, ow, ol,  0},
+			{ 0, ol, sw, ol,  0},
 			{ 0, ol, ol, ol,  0},
 			{ 0,  0,  0,  0,  0},
 		},
@@ -615,6 +623,122 @@ uint8_t	TREE_MODELS[NB_TREE_MODELS][TREE_HEIGHT][TREE_RADIUS * 2 + 1][TREE_RADIU
 			{ 0,  0,  0,  0,  0},
 		},
 	},
+	{  // [10] plain-house (print at -2 in height)
+		{
+			{di, di, di, di, di},
+			{di, di, di, di, di},
+			{di, di, di, di, di},
+			{di, di, di, di, di},
+			{di, di, di, di, di},
+		},
+		{
+			{di, di, di, di, di},
+			{di, di, di, di, di},
+			{di, di, di, di, di},
+			{di, di, di, di, di},
+			{di, di, di, di, di},
+		},
+		{
+			{di, di, di, di, di},
+			{di, di, di, di, di},
+			{di, di, di, di, di},
+			{di, di, di, di, di},
+			{di, di, di, di, di},
+		},
+		{
+			{br, br, br, br, br},
+			{br, op, op, op, br},
+			{br, op, op, op, br},
+			{br, op, op, op, br},
+			{br, br, br, br, br},
+		},
+		{
+			{br, br, gl, br, br},
+			{br,  0,  0,  0, br},
+			{br,  0,  0,  0, br},
+			{br,  0,  0,  0, br},
+			{br, br, gl, br, br},
+		},
+		{
+			{op, op, gl, op, op},
+			{op,  0,  0,  0, op},
+			{op,  0,  0,  0, op},
+			{op,  0,  0,  0, op},
+			{op, op, gl, op, op},
+		},
+		{
+			{ 0, op, op, op,  0},
+			{ 0, op,  0, op,  0},
+			{ 0, op,  0, op,  0},
+			{ 0, op,  0, op,  0},
+			{ 0, op, op, op,  0},
+		},
+		{
+			{ 0,  0, op,  0,  0},
+			{ 0,  0, op,  0,  0},
+			{ 0,  0, op,  0,  0},
+			{ 0,  0, op,  0,  0},
+			{ 0,  0, op,  0,  0},
+		},
+	},
+	{  // [11] plain-tower (print at -2 in height)
+		{
+			{sb, sc, sb, sb, sb},
+			{sb, sb, sb, sb, sm},
+			{sb, sb, sc, sm, sc},
+			{sc, sb, sb, sm, sm},
+			{sc, sm, sm, sb, sm},
+		},
+		{
+			{sb, sc, sc, sm, sm},
+			{sm, sb, sc, sb, sm},
+			{sm, sm, sc, sb, sc},
+			{sb, sm, sm, sb, sb},
+			{sm, sb, sb, sm, sb},
+		},
+		{
+			{sm, sb, sm, sb, sb},
+			{sm, sb, sm, sb, sb},
+			{sb, sb, sm, sm, sb},
+			{sb, sb, sm, sb, sb},
+			{sb, sc, sm, sm, sm},
+		},
+		{
+			{sm, sc, sc, sb, sb},
+			{sm, op, op, op, sb},
+			{sb, op, op, op, sm},
+			{sc, op, op, op, sc},
+			{sb, sm, sb, sc, sc},
+		},
+		{
+			{sb, sc, sb, sb, sb},
+			{sb,  0,  0,  0, sc},
+			{sc,  0,  0,  0, sb},
+			{sc,  0,  0,  0, sb},
+			{sb, sb, sc, sb, sb},
+		},
+		{
+			{sc, gl, sb, gl, sc},
+			{gl,  0,  0,  0, gl},
+			{sc,  0,  0,  0, sb},
+			{gl,  0,  0,  0, gl},
+			{sb, gl, sc, gl, sb},
+		},
+		{
+			{sb, sb, sb, sb, sc},
+			{sc, sc, sb, sb, sb},
+			{sc, sb, sc, sc, sb},
+			{sb, sb, sc, sb, sc},
+			{sb, sb, sc, sb, sc},
+		},
+		{
+			{sc,  0, sc,  0, sb},
+			{ 0,  0,  0,  0,  0},
+			{sb,  0,  0,  0, sc},
+			{ 0,  0,  0,  0,  0},
+			{sb,  0, sc,  0, sb},
+		},
+	},
 };
 
 void		setSeed(uint32_t seed) {
@@ -933,6 +1057,42 @@ void		getChunkNormalPerlin(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_S
 						else if (biome == MAP_BIOME_DESERT) {
 							treeMap[i][j].type = TREE_PYRAMID;  // pyramid
 							treeMap[i][j].elevation -= mapInfo.yFactor * 1;
+						}
+				}
+				// structure 2
+				else if (isTree(chunkPos.x + ix, chunkPos.z + iz, x * 8, z * 8, 0.6, 0.001)) {
+						treeMap[i][j].isTree = true;
+						float heightDiv;
+						float biome = getBiome(x, z, heightDiv);
+						treeMap[i][j].elevation = getMountainsElevation(x, z, heightDiv);
+
+						if (biome == MAP_BIOME_MOUNTAINS) {
+							treeMap[i][j].isTree = false;  // no structure in mountains
+						}
+						else if (biome == MAP_BIOME_PLAIN) {
+							treeMap[i][j].type = TREE_PLAIN_HOUSE;  // plain house
+							treeMap[i][j].elevation -= mapInfo.yFactor * 2;
+						}
+						else if (biome == MAP_BIOME_DESERT) {
+							treeMap[i][j].isTree = false;
+						}
+				}
+				// structure 2
+				else if (isTree(chunkPos.x + ix, chunkPos.z + iz, x * 9, z * 9, 0.6, 0.001)) {
+						treeMap[i][j].isTree = true;
+						float heightDiv;
+						float biome = getBiome(x, z, heightDiv);
+						treeMap[i][j].elevation = getMountainsElevation(x, z, heightDiv);
+
+						if (biome == MAP_BIOME_MOUNTAINS) {
+							treeMap[i][j].isTree = false;  // no structure in mountains
+						}
+						else if (biome == MAP_BIOME_PLAIN) {
+							treeMap[i][j].type = TREE_PLAIN_TOWER;  // plain tower
+							treeMap[i][j].elevation -= mapInfo.yFactor * 2;
+						}
+						else if (biome == MAP_BIOME_DESERT) {
+							treeMap[i][j].isTree = false;
 						}
 				}
 				j++;

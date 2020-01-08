@@ -1,6 +1,6 @@
 #version 410 core
 
-#define NB_BLOCK_TYPES 24
+#define NB_BLOCK_TYPES 26
 
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec2 aSize;

@@ -87,6 +87,21 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 		AChunk::getShader().setBool("fog.enabled", s.g.fog.enabled);
 	}
 
+	// prev item
+	if (key == GLFW_KEY_LEFT_BRACKET && action == GLFW_PRESS) {
+		s.m.handBlockID--;
+		if (s.m.handBlockID <= 0) {
+			s.m.handBlockID = NB_TYPE_BLOCKS;
+		}
+	}
+	// next item
+	if (key == GLFW_KEY_RIGHT_BRACKET && action == GLFW_PRESS) {
+		s.m.handBlockID++;
+		if (s.m.handBlockID > NB_TYPE_BLOCKS) {
+			s.m.handBlockID = 1;
+		}
+	}
+
 	// gamemode key
 	if (key == GLFW_KEY_G && action == GLFW_PRESS) {
 	    { std::lock_guard<std::mutex>	guard(s.mutexCamera);

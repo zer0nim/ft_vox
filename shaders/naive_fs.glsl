@@ -70,7 +70,7 @@ vec3 calcDirLight(DirLight light, vec3 norm, vec3 viewDir) {
 
 void main() {
 	// discard if it's a transparent pixel
-	if (enableTransparency && texture(textureAtlas, vec3(fs_in.TexCoords, fs_in.TextureId)).a < 0.2) {
+	if (enableTransparency && texture(textureAtlas, vec3(fs_in.TexCoords, fs_in.TextureId)).a < 0.4) {
 		discard;
 	}
 	vec3 norm = normalize(fs_in.Normal);

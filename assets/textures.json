@@ -97,6 +97,12 @@
 			"default": 33,
 			"top": 34,
 			"bottom": 34
+		},
+		"stonebrick-cracked": {
+			"default": 35
+		},
+		"stonebrick-mossy": {
+			"default": 36
 		}
 	}
 }
