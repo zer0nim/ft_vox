@@ -354,3 +354,9 @@ void	GreedyChunk3::sendConstUniforms(TextureManager const &textureManager) {
 	_shaderData->shader->setInt("fog.minDist", dist - s.g.fog.width);
 	_shaderData->shader->setVec4("fog.color", s.g.fog.color);
 }
+
+uint32_t	GreedyChunk3::getNbSquareRendered() const {
+    { std::lock_guard<std::mutex>	guard(mutexChunk);
+		return _faces.size();
+	}
+}

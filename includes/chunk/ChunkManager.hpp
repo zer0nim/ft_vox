@@ -33,6 +33,7 @@ class ChunkManager {
 		glm::mat4 const							&getProjection() const;
 		uint32_t								getNbChunkLoaded() const;
 		uint32_t								getNbChunkRendered() const;
+		uint32_t								getNbSquareRendered() const;
 		uint8_t									getBlock(wordIVec3 pos) const;
 		uint8_t									getBlock(wordFVec3 pos) const;
 
@@ -71,6 +72,7 @@ class ChunkManager {
 		std::array<std::deque<wordIVec3>, NB_UPDATE_THREADS>	_toCreate;  // list of chunks to create
 		uint32_t						_nbChunkLoaded;  // number of chunks loaded in memory
 		uint32_t						_nbChunkRendered;  // number of chunks rendered on screen
+		uint32_t						_nbSquareRendrered;  // number of square rendered
 
 		std::chrono::milliseconds		_lastDestroyed;  // last ts for destroy a block
 		std::chrono::milliseconds		_lastPut;  // last ts for put a block

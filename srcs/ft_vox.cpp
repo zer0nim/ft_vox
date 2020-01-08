@@ -52,6 +52,7 @@ void	setDefaultSettings() {
 	s.m.seed = rand_r(&seedRand);
 	s.m.generationType = GENERATION_NORMAL;
 	s.m.generateTree = true;
+	s.m.generateOre = true;
 	s.m.cameraStartPos.pos.x = 0;
 	s.m.cameraStartPos.pos.y = 64;
 	s.m.cameraStartPos.pos.z = 0;
@@ -187,6 +188,8 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		s.m.generationType = element.get<uint32_t>();
 	else if (element.is_boolean() && key == ".map.generateTree")
 		s.m.generateTree = element.get<bool>();
+	else if (element.is_boolean() && key == ".map.generateOre")
+		s.m.generateOre = element.get<bool>();
 	// fog
 	else if (element.is_boolean() && key == ".global.fog.enabled")
 		s.g.fog.enabled = element.get<bool>();
@@ -491,6 +494,14 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 			+ std::to_string(chunkManager.getNbChunkLoaded()) + " loaded)";
 	}
 	textRender.write("normal", sPosChunk, textX, textY);
+
+	// actual chunk
+	textY -= lineSz;
+	std::string sFAceRendered;
+    { std::lock_guard<std::mutex>	guard(s.mutexOthers);
+		sFAceRendered = std::string("Faces rendered: ") + std::to_string(chunkManager.getNbSquareRendered());
+	}
+	textRender.write("normal", sFAceRendered, textX, textY);
 
 	// gamemode information
 	textY -= lineSz;

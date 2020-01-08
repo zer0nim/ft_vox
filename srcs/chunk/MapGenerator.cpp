@@ -1385,7 +1385,7 @@ void		getChunkNormalPerlin(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_S
 					cavernY2 = cavernY1 + (MAP_CAVERN_HEIGHT * 0.5 + (cavern - MAP_CAVERN_START) * 0.5);
 				}
 
-				if (chunkPos.y + iy > 2 && y + mapInfo.yFactor * 3 < montainsElevation)
+				if (s.m.generateOre && chunkPos.y + iy > 2 && y + mapInfo.yFactor * 3 < montainsElevation)
 					stoneOrOre = getStoneOrOre(x, y, z, chunkPos.y + iy);
 
 				data[ix][iy][iz] = _getBlockElevation(chunkPos.y + iy, y, biome, montainsElevation, cavernY1, cavernY2,

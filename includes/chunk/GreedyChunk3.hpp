@@ -18,8 +18,9 @@ class GreedyChunk3 : public AChunk {
 
 		GreedyChunk3 &operator=(GreedyChunk3 const &rhs);
 
-		static void	initShader(glm::mat4 &projection, TextureManager const &textureManager);
-		virtual void	update();
+		static void			initShader(glm::mat4 &projection, TextureManager const &textureManager);
+		virtual void		update();
+		virtual uint32_t	getNbSquareRendered() const;
 
 	protected:
 		virtual void	_draw(glm::mat4 &view, glm::vec3 &pos);

@@ -230,6 +230,7 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 void ChunkManager::draw(glm::mat4 view, Camera *cam) {
 	glm::vec3	chunkSize(CHUNK_SZ_X, CHUNK_SZ_Y, CHUNK_SZ_Z);
 	uint32_t	chunkRendered = 0;
+	uint32_t	squareRendered = 0;
 
 	for (int32_t x = _chunkActPos.x - CHUNK_SZ_X * (s.g.renderDist - 1);
 	x < _chunkActPos.x + CHUNK_SZ_X * s.g.renderDist; x += CHUNK_SZ_X) {
@@ -250,6 +251,7 @@ void ChunkManager::draw(glm::mat4 view, Camera *cam) {
 					if (frclInside) {
 						++chunkRendered;
 						std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
+						squareRendered += _chunkMap[chunkPos]->getNbSquareRendered();
 						_chunkMap[chunkPos]->draw(view, cam->pos);
 					}
 				}
@@ -273,6 +275,7 @@ void ChunkManager::draw(glm::mat4 view, Camera *cam) {
 	}
     { std::lock_guard<std::mutex>	guard(s.mutexOthers);
 		_nbChunkRendered = chunkRendered;
+		_nbSquareRendrered = squareRendered;
 	}
 }
 
@@ -430,7 +433,8 @@ std::map<wordIVec3, AChunk*> const		&ChunkManager::getChunkMap() const { return 
 wordIVec3 const							&ChunkManager::getChunkActPos() const { return _chunkActPos; }
 TextureManager const					&ChunkManager::getTextureManager() const { return _textureManager; };
 uint32_t								ChunkManager::getNbChunkLoaded() const { return _nbChunkLoaded; }
-uint32_t	ChunkManager::getNbChunkRendered() const { return _nbChunkRendered; }
+uint32_t								ChunkManager::getNbChunkRendered() const { return _nbChunkRendered; }
+uint32_t								ChunkManager::getNbSquareRendered() const { return _nbSquareRendrered; }
 uint8_t		ChunkManager::getBlock(wordFVec3 pos) const {
 	if (pos.x < 0) pos.x -= 1;
 	if (pos.y < 0) pos.y -= 1;

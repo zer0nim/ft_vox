@@ -203,6 +203,7 @@ struct Settings {
 		uint32_t	seed;
 		uint32_t	generationType;
 		bool		generateTree;
+		bool		generateOre;
 		struct CameraStartPos {
 			glm::vec3	pos;
 			float		yaw;

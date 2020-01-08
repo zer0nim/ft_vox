@@ -32,8 +32,9 @@ class AChunk {
 		AChunk::ChunkData const	&getData() const;
 		TextureManager const	&getTextureManager() const;
 		bool					isModifiedFromBegining() const;
+		virtual uint32_t		getNbSquareRendered() const { return 0; }
 
-		std::mutex				mutexChunk;
+		mutable std::mutex		mutexChunk;
 
 	protected:
 		struct ShaderData {
