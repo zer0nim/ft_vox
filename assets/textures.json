@@ -129,6 +129,27 @@
 			"default": 40,
 			"top": 41,
 			"bottom": 41
+		},
+		"diamond-ore": {
+			"default": 42
+		},
+		"coal-ore": {
+			"default": 43
+		},
+		"iron-ore": {
+			"default": 44
+		},
+		"redstone-ore": {
+			"default": 45
+		},
+		"gold-ore": {
+			"default": 46
+		},
+		"lapis-ore": {
+			"default": 47
+		},
+		"emerald-ore": {
+			"default": 48
 		}
 	}
 }

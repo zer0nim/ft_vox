@@ -61,7 +61,7 @@ void	setDefaultSettings() {
 	s.m.flatMap.push_back({0, 0, "bedrock"});
 	s.m.flatMap.push_back({1, 2, "stone"});
 	s.m.flatMap.push_back({3, 3, "grass"});
-	s.m.handBlockID = 2;
+	s.m.handBlockID = 1;
 	s.m.gamemode = GAMEMODE_CREATIVE;
 }
 

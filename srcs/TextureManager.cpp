@@ -39,6 +39,13 @@ std::map<std::string, uint8_t>	TextureManager::blocksNames = {
 	{"spruce-planks",		30},
 	{"spruce-door-upper",	31},
 	{"spruce-door-lower",	32},
+	{"diamond-ore",			33},
+	{"coal-ore",			34},
+	{"iron-ore",			35},
+	{"redstone-ore",		36},
+	{"gold-ore",			37},
+	{"lapis-ore",			38},
+	{"emerald-ore",			39},
 };
 
 TextureManager::TextureManager(std::string const &texturesSettings) {

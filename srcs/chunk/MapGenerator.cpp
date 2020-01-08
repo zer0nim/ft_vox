@@ -964,8 +964,10 @@ bool &isTreeXZ) {
 			return TextureManager::blocksNames["stone"];
 		}
 		else if (biome == MAP_BIOME_DESERT) {
-			if (fy + mapInfo.yFactor * 1 >= montainsElevation)
+			if (fy + mapInfo.yFactor * 2 >= montainsElevation)
 				return TextureManager::blocksNames["sand"];
+			else if (fy + mapInfo.yFactor * 3 >= montainsElevation)
+				return TextureManager::blocksNames["sandstone"];
 			return TextureManager::blocksNames["stone"];
 		}
 		else {  // plain (transition)
