@@ -33,6 +33,12 @@ std::map<std::string, uint8_t>	TextureManager::blocksNames = {
 	{"dirt-podzol",			24},
 	{"stonebrick-cracked",	25},
 	{"stonebrick-mossy",	26},
+	{"sandstone-smooth-1",	27},
+	{"sandstone-smooth-2",	28},
+	{"sandstone-carved",	29},
+	{"spruce-planks",		30},
+	{"spruce-door-upper",	31},
+	{"spruce-door-lower",	32},
 };
 
 TextureManager::TextureManager(std::string const &texturesSettings) {

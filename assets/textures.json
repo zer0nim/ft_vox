@@ -47,6 +47,19 @@
 			"top": 14,
 			"bottom": 15
 		},
+		"sandstone-smooth-1": {
+			"default": 37,
+			"top": 14,
+			"bottom": 15
+		},
+		"sandstone-smooth-2": {
+			"default": 14
+		},
+		"sandstone-carved": {
+			"default": 38,
+			"top": 14,
+			"bottom": 15
+		},
 		"cactus": {
 			"default": 16,
 			"top": 17,
@@ -71,6 +84,9 @@
 		},
 		"oak-planks": {
 			"default": 25
+		},
+		"spruce-planks": {
+			"default": 41
 		},
 		"stonebrick": {
 			"default": 26
@@ -103,6 +119,16 @@
 		},
 		"stonebrick-mossy": {
 			"default": 36
+		},
+		"spruce-door-upper": {
+			"default": 39,
+			"top": 41,
+			"bottom": 41
+		},
+		"spruce-door-lower": {
+			"default": 40,
+			"top": 41,
+			"bottom": 41
 		}
 	}
 }

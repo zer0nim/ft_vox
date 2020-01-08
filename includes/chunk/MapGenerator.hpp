@@ -58,9 +58,10 @@ struct MapInfo {
 struct TreeInfo {
 	bool	isTree;
 	uint8_t	type;
+	int8_t	priorityLvl;
 	float	elevation;
 
-	TreeInfo() : isTree(false) {}
+	TreeInfo() : isTree(false), type(0), priorityLvl(0), elevation(0) {}
 };
 
 void		setSeed(uint32_t seed);

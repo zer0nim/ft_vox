@@ -79,7 +79,13 @@ bool	AChunk::_createChunkFromFile() {
 						logErr("corrupted file: " << _filename << " invalid value " << strNumber);
 					return false;
 				}
-				_data.data[x][y][z] = number;
+				if (number > NB_TYPE_BLOCKS) {
+					logWarn("invalid block (" << number << "). replaced by bedrock");
+					_data.data[x][y][z] = TextureManager::blocksNames["bedrock"];
+				}
+				else {
+					_data.data[x][y][z] = number;
+				}
 			}
 		}
 	}

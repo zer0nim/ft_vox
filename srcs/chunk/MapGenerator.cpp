@@ -14,13 +14,16 @@ enum TREE_TYPE {
 	TREE_BASIC_2,
 	TREE_BASIC_3,
 	TREE_ROC_1,
-	TREE_PYRAMID,
+	TREE_DESERT_PYRAMID,
 	TREE_ROC_2,
 	TREE_MUSHROOM,
 	TREE_MELON,
 	TREE_PUMPKIN,
 	TREE_PLAIN_HOUSE,
 	TREE_PLAIN_TOWER,
+	TREE_DESERT_TOWER,
+	TREE_DESERT_TEMPLE,
+	TREE_MOUNTAIN_TOWER,
 	NB_TREE_MODELS,
 };
 uint8_t	ca = TextureManager::blocksNames["cactus"];
@@ -29,7 +32,11 @@ uint8_t	sw = TextureManager::blocksNames["spruce-wood"];
 uint8_t	ol = TextureManager::blocksNames["oak-leaves"];
 uint8_t	cb = TextureManager::blocksNames["cobblestone"];
 uint8_t	gr = TextureManager::blocksNames["gravel"];
+uint8_t	sd = TextureManager::blocksNames["sand"];
 uint8_t	ss = TextureManager::blocksNames["sandstone"];
+uint8_t	s1 = TextureManager::blocksNames["sandstone-smooth-1"];
+uint8_t	s2 = TextureManager::blocksNames["sandstone-smooth-2"];
+uint8_t	s3 = TextureManager::blocksNames["sandstone-carved"];
 uint8_t	gl = TextureManager::blocksNames["glass"];
 uint8_t	mb = TextureManager::blocksNames["mushroom-body"];
 uint8_t	mt = TextureManager::blocksNames["mushroom-top"];
@@ -42,6 +49,8 @@ uint8_t	br = TextureManager::blocksNames["brick"];
 uint8_t	op = TextureManager::blocksNames["oak-planks"];
 uint8_t	sc = TextureManager::blocksNames["stonebrick-cracked"];
 uint8_t	sm = TextureManager::blocksNames["stonebrick-mossy"];
+uint8_t	dl = TextureManager::blocksNames["spruce-door-lower"];
+uint8_t	du = TextureManager::blocksNames["spruce-door-upper"];
 uint8_t	TREE_MODELS[NB_TREE_MODELS][TREE_HEIGHT][TREE_RADIUS * 2 + 1][TREE_RADIUS * 2 + 1] = {
 	{  // [0] cactus
 		{
@@ -333,7 +342,7 @@ uint8_t	TREE_MODELS[NB_TREE_MODELS][TREE_HEIGHT][TREE_RADIUS * 2 + 1][TREE_RADIU
 			{ 0,  0,  0,  0,  0},
 		},
 	},
-	{  // [5] pyramid for desert (print at -1 in height)
+	{  // [5] pyramid for desert (print at -2 in height)
 		{
 			{ss, ss, ss, ss, ss},
 			{ss, ss, ss, ss, ss},
@@ -343,22 +352,22 @@ uint8_t	TREE_MODELS[NB_TREE_MODELS][TREE_HEIGHT][TREE_RADIUS * 2 + 1][TREE_RADIU
 		},
 		{
 			{ss, ss, ss, ss, ss},
-			{ss, gl, gl, gl, ss},
-			{ss, gl, gl, gl, ss},
-			{ss, gl, gl, gl, ss},
+			{ss,  0,  0,  0, ss},
+			{ss,  0,  0,  0, ss},
+			{ss,  0,  0,  0, ss},
 			{ss, ss, ss, ss, ss},
 		},
 		{
 			{ss, ss, ss, ss, ss},
-			{ss, gl, gl, gl, ss},
-			{ss, gl, gl, gl, ss},
-			{ss, gl, gl, gl, ss},
+			{ss,  0,  0,  0, ss},
+			{ss,  0,  0,  0, ss},
+			{ss,  0,  0,  0, ss},
 			{ss, ss, ss, ss, ss},
 		},
 		{
 			{ 0,  0,  0,  0,  0},
 			{ 0, ss, ss, ss,  0},
-			{ 0, ss, gl, ss,  0},
+			{ 0, ss,  0, ss,  0},
 			{ 0, ss, ss, ss,  0},
 			{ 0,  0,  0,  0,  0},
 		},
@@ -698,9 +707,9 @@ uint8_t	TREE_MODELS[NB_TREE_MODELS][TREE_HEIGHT][TREE_RADIUS * 2 + 1][TREE_RADIU
 		},
 		{
 			{sm, sb, sm, sb, sb},
-			{sm, sb, sm, sb, sb},
-			{sb, sb, sm, sm, sb},
-			{sb, sb, sm, sb, sb},
+			{sm, br, br, br, sb},
+			{sb, br, br, br, sb},
+			{sb, br, br, br, sb},
 			{sb, sc, sm, sm, sm},
 		},
 		{
@@ -737,6 +746,180 @@ uint8_t	TREE_MODELS[NB_TREE_MODELS][TREE_HEIGHT][TREE_RADIUS * 2 + 1][TREE_RADIU
 			{sb,  0,  0,  0, sc},
 			{ 0,  0,  0,  0,  0},
 			{sb,  0, sc,  0, sb},
+		},
+	},
+	{  // [12] desert-tower (print at -3 in height)
+		{
+			{ss, ss, ss, ss, ss},
+			{ss, ss, ss, ss, ss},
+			{ss, ss, ss, ss, ss},
+			{ss, ss, ss, ss, ss},
+			{ss, ss, ss, ss, ss},
+		},
+		{
+			{ss, ss, ss, ss, ss},
+			{ss, ss, ss, ss, ss},
+			{ss, ss, ss, ss, ss},
+			{ss, ss, ss, ss, ss},
+			{ss, ss, ss, ss, ss},
+		},
+		{
+			{ss, ss, ss, ss, ss},
+			{ss, ss, ss, ss, ss},
+			{ss, ss, ss, ss, ss},
+			{ss, ss, ss, ss, ss},
+			{ss, ss, ss, ss, ss},
+		},
+		{
+			{s2, s1, s2, s1, s2},
+			{s1,  0,  0,  0, s1},
+			{s2,  0,  0,  0, s2},
+			{s1,  0,  0,  0, s1},
+			{s2, s1, dl, s1, s2},
+		},
+		{
+			{s2, s1, s2, s1, s2},
+			{s1,  0,  0,  0, s1},
+			{s2,  0,  0,  0, s2},
+			{s1,  0,  0,  0, s1},
+			{s2, s1, du, s1, s2},
+		},
+		{
+			{s2, s3, s2, s3, s2},
+			{s3,  0,  0,  0, s3},
+			{s2,  0,  0,  0, s2},
+			{s3,  0,  0,  0, s3},
+			{s2, s3, s2, s3, s2},
+		},
+		{
+			{s1, s1, s1, s1, s1},
+			{s1, s1, s1, s1, s1},
+			{s1, s1, s1, s1, s1},
+			{s1, s1, s1, s1, s1},
+			{s1, s1, s1, s1, s1},
+		},
+		{
+			{s1,  0, s1,  0, s1},
+			{ 0,  0,  0,  0,  0},
+			{s1,  0,  0,  0, s1},
+			{ 0,  0,  0,  0,  0},
+			{s1,  0, s1,  0, s1},
+		},
+	},
+	{  // [13] desert-temple (print at -2 in height)
+		{
+			{sd, sd, sd, sd, sd},
+			{sd, sd, sd, sd, sd},
+			{sd, sd, sd, sd, sd},
+			{sd, sd, sd, sd, sd},
+			{sd, sd, sd, sd, sd},
+		},
+		{
+			{sd, sd, ss, sd, sd},
+			{sd, sd, ss, sd, sd},
+			{ss, ss, ss, ss, ss},
+			{sd, sd, ss, sd, sd},
+			{sd, sd, ss, sd, sd},
+		},
+		{
+			{ss, ss,  0, ss, ss},
+			{ss,  0,  0,  0, ss},
+			{ 0,  0,  0,  0,  0},
+			{ss,  0,  0,  0, ss},
+			{ss, ss,  0, ss, ss},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0, s1,  0, s1,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0, s1,  0, s1,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0, s1, s3, s1,  0},
+			{ 0, s3,  0, s3,  0},
+			{ 0, s1, s3, s1,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0, s1,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+	},
+	{  // [14] mountain-tower (print at -2 in height)
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0, sc, sc, sb,  0},
+			{ 0, sb, sc, sb,  0},
+			{ 0, sb, sb, sb,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0, sb, sc, sb,  0},
+			{ 0, sc, sb, sc,  0},
+			{ 0, sb, sb, sc,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0, sb, sc, sb,  0},
+			{ 0, sb, sc, sb,  0},
+			{ 0, sb, sc, sb,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0, sc, sc, sb,  0},
+			{ 0, sc, sb, sb,  0},
+			{ 0, sb, sb, sc,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0, sb, sb, sc,  0},
+			{ 0, sb,  0, sc,  0},
+			{ 0, sb, sc, sb,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0, sb, gl, sb,  0},
+			{ 0, gl,  0, gl,  0},
+			{ 0, sc, gl, sc,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0, sc, sb, sb,  0},
+			{ 0, sb, sc, sc,  0},
+			{ 0, sb, sc, sb,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0, sb,  0, sb,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0, sb,  0, sc,  0},
+			{ 0,  0,  0,  0,  0},
 		},
 	},
 };
@@ -804,22 +987,28 @@ bool &isTreeXZ) {
 	if (isTreeXZ && s.m.generateTree && fy > montainsElevation) {
 		bool tmpIsTree = false;
 		// check for tree
+		uint8_t	returnValue = 0;
+		int8_t	returnPriority = -1;
 		for (uint8_t i = treeX - TREE_RADIUS; i <= treeX + TREE_RADIUS; i++) {
 			for (uint8_t j = treeZ - TREE_RADIUS; j <= treeZ + TREE_RADIUS; j++) {
 				if (treeMap[i][j].isTree && fy < treeMap[i][j].elevation + mapInfo.yFactor * TREE_HEIGHT)
 					tmpIsTree = true;
-				if (treeMap[i][j].isTree
+				if (treeMap[i][j].isTree && treeMap[i][j].priorityLvl > returnPriority
 				&& fy >= treeMap[i][j].elevation && fy < treeMap[i][j].elevation + mapInfo.yFactor * TREE_HEIGHT) {
 					// [id][y][x][z]
 					uint8_t tree = TREE_MODELS[treeMap[i][j].type]
 						[static_cast<uint8_t>((fy - treeMap[i][j].elevation) / mapInfo.yFactor)]  /* y */
 						[treeX - i + TREE_RADIUS]  /* x */
 						[treeZ - j + TREE_RADIUS]  /* z */;
-					if (tree > 0)
-						return tree;
+					if (tree > 0) {
+						returnPriority = treeMap[i][j].priorityLvl;
+						returnValue = tree;
+					}
 				}
 			}
 		}
+		if (returnValue > 0)
+			return returnValue;
 		isTreeXZ = tmpIsTree;
 	}
 
@@ -1043,43 +1232,49 @@ void		getChunkNormalPerlin(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_S
 				// structure 1
 				else if (isTree(chunkPos.x + ix, chunkPos.z + iz, x * 7, z * 7, 0.6, 0.001)) {
 						treeMap[i][j].isTree = true;
+						treeMap[i][j].priorityLvl = 1;
 						float heightDiv;
 						float biome = getBiome(x, z, heightDiv);
 						treeMap[i][j].elevation = getMountainsElevation(x, z, heightDiv);
 
 						if (biome == MAP_BIOME_MOUNTAINS) {
-							treeMap[i][j].isTree = false;  // no structure in mountains
+							treeMap[i][j].type = TREE_MOUNTAIN_TOWER;
+							treeMap[i][j].elevation -= mapInfo.yFactor * 2;
 						}
 						else if (biome == MAP_BIOME_PLAIN) {
 							treeMap[i][j].type = TREE_MUSHROOM;  // mushroom
 							treeMap[i][j].elevation -= mapInfo.yFactor * 1;
 						}
 						else if (biome == MAP_BIOME_DESERT) {
-							treeMap[i][j].type = TREE_PYRAMID;  // pyramid
-							treeMap[i][j].elevation -= mapInfo.yFactor * 1;
+							treeMap[i][j].type = TREE_DESERT_PYRAMID;  // pyramid
+							treeMap[i][j].elevation -= mapInfo.yFactor * 2;
 						}
 				}
 				// structure 2
 				else if (isTree(chunkPos.x + ix, chunkPos.z + iz, x * 8, z * 8, 0.6, 0.001)) {
 						treeMap[i][j].isTree = true;
+						treeMap[i][j].priorityLvl = 1;
 						float heightDiv;
 						float biome = getBiome(x, z, heightDiv);
 						treeMap[i][j].elevation = getMountainsElevation(x, z, heightDiv);
 
 						if (biome == MAP_BIOME_MOUNTAINS) {
-							treeMap[i][j].isTree = false;  // no structure in mountains
+							treeMap[i][j].isTree = false;
 						}
 						else if (biome == MAP_BIOME_PLAIN) {
-							treeMap[i][j].type = TREE_PLAIN_HOUSE;  // plain house
-							treeMap[i][j].elevation -= mapInfo.yFactor * 2;
+							treeMap[i][j].isTree = false;
+							// treeMap[i][j].type = TREE_PLAIN_HOUSE;  // plain house
+							// treeMap[i][j].elevation -= mapInfo.yFactor * 2;
 						}
 						else if (biome == MAP_BIOME_DESERT) {
-							treeMap[i][j].isTree = false;
+							treeMap[i][j].type = TREE_DESERT_TOWER;
+							treeMap[i][j].elevation -= mapInfo.yFactor * 3;
 						}
 				}
 				// structure 2
 				else if (isTree(chunkPos.x + ix, chunkPos.z + iz, x * 9, z * 9, 0.6, 0.001)) {
 						treeMap[i][j].isTree = true;
+						treeMap[i][j].priorityLvl = 1;
 						float heightDiv;
 						float biome = getBiome(x, z, heightDiv);
 						treeMap[i][j].elevation = getMountainsElevation(x, z, heightDiv);
@@ -1092,7 +1287,8 @@ void		getChunkNormalPerlin(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_S
 							treeMap[i][j].elevation -= mapInfo.yFactor * 2;
 						}
 						else if (biome == MAP_BIOME_DESERT) {
-							treeMap[i][j].isTree = false;
+							treeMap[i][j].type = TREE_DESERT_TEMPLE;
+							treeMap[i][j].elevation -= mapInfo.yFactor * 2;
 						}
 				}
 				j++;
