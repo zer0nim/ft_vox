@@ -8,71 +8,84 @@ float			fseed;
 
 
 // tree description
-#define NB_TREE_MODELS	6
-#define TREE_CACTUS		0
-#define TREE_BASIC_1	1
-#define TREE_BASIC_2	2
-#define TREE_BASIC_3	3
-#define TREE_ROC		4
-#define TREE_PYRAMID	5
-uint8_t	ca = TextureManager::blocksNames["cactus"];  // cactus
-uint8_t	ow = TextureManager::blocksNames["oak-wood"];  // oak wood
-uint8_t	ol = TextureManager::blocksNames["oak-leaves"];  // oak leaves
-uint8_t	cb = TextureManager::blocksNames["cobblestone"];  // cobblestone
-uint8_t	ss = TextureManager::blocksNames["sandstone"];  // sand stone
-uint8_t	gl = TextureManager::blocksNames["glass"];  // glass
+enum TREE_TYPE {
+	TREE_CACTUS,
+	TREE_BASIC_1,
+	TREE_BASIC_2,
+	TREE_BASIC_3,
+	TREE_ROC_1,
+	TREE_PYRAMID,
+	TREE_ROC_2,
+	TREE_MUSHROOM,
+	TREE_MELON,
+	TREE_PUMPKIN,
+	NB_TREE_MODELS,
+};
+uint8_t	ca = TextureManager::blocksNames["cactus"];
+uint8_t	ow = TextureManager::blocksNames["oak-wood"];
+uint8_t	ol = TextureManager::blocksNames["oak-leaves"];
+uint8_t	cb = TextureManager::blocksNames["cobblestone"];
+uint8_t	gr = TextureManager::blocksNames["gravel"];
+uint8_t	ss = TextureManager::blocksNames["sandstone"];
+uint8_t	gl = TextureManager::blocksNames["glass"];
+uint8_t	mb = TextureManager::blocksNames["mushroom-body"];
+uint8_t	mt = TextureManager::blocksNames["mushroom-top"];
+uint8_t	di = TextureManager::blocksNames["dirt"];
+uint8_t	dp = TextureManager::blocksNames["dirt-podzol"];
+uint8_t	me = TextureManager::blocksNames["melon"];
+uint8_t	pk = TextureManager::blocksNames["pumpkin"];
 uint8_t	TREE_MODELS[NB_TREE_MODELS][TREE_HEIGHT][TREE_RADIUS * 2 + 1][TREE_RADIUS * 2 + 1] = {
 	{  // [0] cactus
-		{  // height 0
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0, ca,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 1
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0, ca,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 2
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0, ca,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 3
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 4
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 5
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 6
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 7
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
@@ -81,56 +94,56 @@ uint8_t	TREE_MODELS[NB_TREE_MODELS][TREE_HEIGHT][TREE_RADIUS * 2 + 1][TREE_RADIU
 		},
 	},
 	{  // [1] basic tree 1
-		{  // height 0
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0, ow,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 1
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0, ow,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 2
+		{
 			{ 0, ol, ol, ol,  0},
 			{ol, ol, ol, ol, ol},
 			{ol, ol, ow, ol, ol},
 			{ol, ol, ol, ol, ol},
 			{ 0, ol, ol, ol,  0},
 		},
-		{  // height 3
+		{
 			{ol, ol, ol, ol, ol},
 			{ol, ol, ol, ol, ol},
 			{ol, ol, ow, ol, ol},
 			{ol, ol, ol, ol, ol},
 			{ol, ol, ol, ol, ol},
 		},
-		{  // height 4
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0, ol, ol, ol,  0},
 			{ 0, ol, ow, ol,  0},
 			{ 0, ol, ol, ol,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 5
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0, ol,  0,  0},
 			{ 0, ol, ol, ol,  0},
 			{ 0,  0, ol,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 6
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 7
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
@@ -139,56 +152,56 @@ uint8_t	TREE_MODELS[NB_TREE_MODELS][TREE_HEIGHT][TREE_RADIUS * 2 + 1][TREE_RADIU
 		},
 	},
 	{  // [2] basic tree 2
-		{  // height 0
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0, ow,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 1
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0, ow,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 2
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0, ow,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 3
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0, ol,  0,  0},
 			{ 0, ol, ow, ol,  0},
 			{ 0,  0, ol,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 4
+		{
 			{ 0, ol, ol, ol,  0},
 			{ol, ol, ol, ol, ol},
 			{ol, ol, ow, ol, ol},
 			{ol, ol, ol, ol, ol},
 			{ 0, ol, ol, ol,  0},
 		},
-		{  // height 5
+		{
 			{ 0, ol, ol, ol,  0},
 			{ol, ol, ol, ol, ol},
 			{ol, ol, ow, ol, ol},
 			{ol, ol, ol, ol, ol},
 			{ 0, ol, ol, ol,  0},
 		},
-		{  // height 6
+		{
 			{ 0, ol, ol, ol,  0},
 			{ol, ol, ol, ol, ol},
 			{ol, ol, ow, ol, ol},
 			{ol, ol, ol, ol, ol},
 			{ 0, ol, ol, ol,  0},
 		},
-		{  // height 7
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0, ol,  0,  0},
 			{ 0, ol, ol, ol,  0},
@@ -197,56 +210,56 @@ uint8_t	TREE_MODELS[NB_TREE_MODELS][TREE_HEIGHT][TREE_RADIUS * 2 + 1][TREE_RADIU
 		},
 	},
 	{  // [3] basic tree 3
-		{  // height 0
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0, ow,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 1
+		{
 			{ 0, ol, ol, ol,  0},
 			{ol, ol, ol, ol, ol},
 			{ol, ol, ow, ol, ol},
 			{ol, ol, ol, ol, ol},
 			{ol, ol, ol, ol, ol},
 		},
-		{  // height 2
+		{
 			{ 0, ol, ol, ol, ol},
 			{ol, ol, ol, ol, ol},
 			{ol, ol, ow, ol, ol},
 			{ol, ol, ol, ol, ol},
 			{ol, ol, ol, ol, ol},
 		},
-		{  // height 3
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0, ol, ol,  0,  0},
 			{ 0, ol, ow, ol,  0},
 			{ 0, ol, ol,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 4
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0, ol,  0,  0},
 			{ 0, ol, ol, ol,  0},
 			{ 0,  0, ol,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 5
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 6
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 7
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
@@ -254,57 +267,57 @@ uint8_t	TREE_MODELS[NB_TREE_MODELS][TREE_HEIGHT][TREE_RADIUS * 2 + 1][TREE_RADIU
 			{ 0,  0,  0,  0,  0},
 		},
 	},
-	{  // [5] roc for mountains (print at -7 in height)
-		{  // height 0
+	{  // [4] roc 1 for mountains (print at -7 in height)
+		{
 			{cb, cb, cb, cb,  0},
 			{cb, cb, cb, cb, cb},
 			{cb, cb, cb, cb, cb},
 			{cb, cb, cb, cb, cb},
 			{ 0, cb, cb, cb,  0},
 		},
-		{  // height 1
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0, cb, cb, cb,  0},
 			{ 0, cb, cb, cb,  0},
 			{ 0,  0, cb, cb,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 2
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0, cb, cb, cb,  0},
 			{ 0, cb, cb, cb,  0},
 			{ 0,  0, cb,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 3
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0, cb,  0,  0},
 			{ 0, cb, cb, cb,  0},
 			{ 0,  0, cb,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 4
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0, cb,  0,  0},
 			{ 0, cb, cb, cb,  0},
 			{ 0,  0, cb,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 5
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0, cb,  0,  0},
 			{ 0, cb, cb, cb,  0},
 			{ 0,  0, cb,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 6
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0, cb, cb, cb,  0},
 			{ 0,  0, cb,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 7
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0, cb,  0,  0},
@@ -312,57 +325,289 @@ uint8_t	TREE_MODELS[NB_TREE_MODELS][TREE_HEIGHT][TREE_RADIUS * 2 + 1][TREE_RADIU
 			{ 0,  0,  0,  0,  0},
 		},
 	},
-	{  // [6] pyramid for desert (print at -1 in height)
-		{  // height 3
+	{  // [5] pyramid for desert (print at -1 in height)
+		{
 			{ss, ss, ss, ss, ss},
 			{ss, ss, ss, ss, ss},
 			{ss, ss, ss, ss, ss},
 			{ss, ss, ss, ss, ss},
 			{ss, ss, ss, ss, ss},
 		},
-		{  // height 3
+		{
 			{ss, ss, ss, ss, ss},
 			{ss, gl, gl, gl, ss},
 			{ss, gl, gl, gl, ss},
 			{ss, gl, gl, gl, ss},
 			{ss, ss, ss, ss, ss},
 		},
-		{  // height 0
+		{
 			{ss, ss, ss, ss, ss},
 			{ss, gl, gl, gl, ss},
 			{ss, gl, gl, gl, ss},
 			{ss, gl, gl, gl, ss},
 			{ss, ss, ss, ss, ss},
 		},
-		{  // height 1
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0, ss, ss, ss,  0},
 			{ 0, ss, gl, ss,  0},
 			{ 0, ss, ss, ss,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 2
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0, ss,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 3
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 4
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 		},
-		{  // height 5
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+	},
+	{  // [6] roc 2 for mountains (print at -7 in height)
+		{
+			{gr, gr, gr, gr,  0},
+			{gr, gr, gr, gr, gr},
+			{gr, gr, gr, gr, gr},
+			{gr, gr, gr, gr, gr},
+			{ 0, gr, gr, gr,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0, gr, gr, gr,  0},
+			{ 0, gr, gr, gr,  0},
+			{ 0,  0, gr, gr,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0, gr, gr, gr,  0},
+			{ 0, gr, gr, gr,  0},
+			{ 0,  0, gr,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0, gr,  0,  0},
+			{ 0, gr, gr, gr,  0},
+			{ 0,  0, gr,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0, gr,  0,  0},
+			{ 0, gr, gr, gr,  0},
+			{ 0,  0, gr,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0, gr,  0,  0},
+			{ 0, gr, gr, gr,  0},
+			{ 0,  0, gr,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0, gr, gr, gr,  0},
+			{ 0,  0, gr,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0, gr,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+	},
+	{  // [7] mushroom (print at -1 in height)
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0, dp, dp, dp,  0},
+			{ 0, dp, dp, dp,  0},
+			{ 0, dp, dp, dp,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0, mb,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0, mb,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0, mt, mt, mt,  0},
+			{mt,  0,  0,  0, mt},
+			{mt,  0, mb,  0, mt},
+			{mt,  0,  0,  0, mt},
+			{ 0, mt, mt, mt,  0},
+		},
+		{
+			{ 0, mt, mt, mt,  0},
+			{mt,  0,  0,  0, mt},
+			{mt,  0, mb,  0, mt},
+			{mt,  0,  0,  0, mt},
+			{ 0, mt, mt, mt,  0},
+		},
+		{
+			{ 0, mt, mt, mt,  0},
+			{mt,  0,  0,  0, mt},
+			{mt,  0, mb,  0, mt},
+			{mt,  0,  0,  0, mt},
+			{ 0, mt, mt, mt,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0, mt, mt, mt,  0},
+			{ 0, mt, mt, mt,  0},
+			{ 0, mt, mt, mt,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+	},
+	{  // [8] melon
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0, me,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+	},
+	{  // [9] pumpkin
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0, pk,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+			{ 0,  0,  0,  0,  0},
+		},
+		{
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
 			{ 0,  0,  0,  0,  0},
@@ -565,7 +810,7 @@ void		getChunkNormalPerlin(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_S
 
 						if (biome == MAP_BIOME_MOUNTAINS) {
 							if (treeMap[i][j].elevation < MAP_TOP_SNOW_HEIGHT * mapInfo.yFactor) {
-								treeMap[i][j].type = TREE_ROC;  // roc
+								treeMap[i][j].type = TREE_ROC_1;  // roc
 								treeMap[i][j].elevation -= mapInfo.yFactor * 7;
 							}
 							else {
@@ -588,7 +833,7 @@ void		getChunkNormalPerlin(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_S
 
 						if (biome == MAP_BIOME_MOUNTAINS) {
 							if (treeMap[i][j].elevation < MAP_TOP_SNOW_HEIGHT * mapInfo.yFactor) {
-								treeMap[i][j].type = TREE_ROC;  // roc
+								treeMap[i][j].type = TREE_ROC_2;  // roc
 								treeMap[i][j].elevation -= mapInfo.yFactor * 7;
 							}
 							else {
@@ -611,7 +856,7 @@ void		getChunkNormalPerlin(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_S
 
 						if (biome == MAP_BIOME_MOUNTAINS) {
 							if (treeMap[i][j].elevation < MAP_TOP_SNOW_HEIGHT * mapInfo.yFactor) {
-								treeMap[i][j].type = TREE_ROC;  // roc
+								treeMap[i][j].type = TREE_ROC_2;  // roc
 								treeMap[i][j].elevation -= mapInfo.yFactor * 7;
 							}
 							else {
@@ -625,8 +870,54 @@ void		getChunkNormalPerlin(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_S
 							treeMap[i][j].isTree = false;  // no tree in mountains
 						}
 				}
-				// structure (pyramid)
-				else if (isTree(chunkPos.x + ix, chunkPos.z + iz, x * 5, z * 5, 0.6, 0.001)) {
+				// tree 4
+				else if (isTree(chunkPos.x + ix, chunkPos.z + iz, x * 5, z * 5, 0.1, 0.001)) {
+						treeMap[i][j].isTree = true;
+						float heightDiv;
+						float biome = getBiome(x, z, heightDiv);
+						treeMap[i][j].elevation = getMountainsElevation(x, z, heightDiv);
+
+						if (biome == MAP_BIOME_MOUNTAINS) {
+							if (treeMap[i][j].elevation < MAP_TOP_SNOW_HEIGHT * mapInfo.yFactor) {
+								treeMap[i][j].type = TREE_ROC_1;  // roc
+								treeMap[i][j].elevation -= mapInfo.yFactor * 7;
+							}
+							else {
+								treeMap[i][j].isTree = false;  // no roc in snow
+							}
+						}
+						else if (biome == MAP_BIOME_PLAIN) {
+							treeMap[i][j].type = TREE_MELON;  // basic tree
+						}
+						else if (biome == MAP_BIOME_DESERT) {
+							treeMap[i][j].isTree = false;  // no tree in mountains
+						}
+				}
+				// tree 5
+				else if (isTree(chunkPos.x + ix, chunkPos.z + iz, x * 6, z * 6, 0.1, 0.001)) {
+						treeMap[i][j].isTree = true;
+						float heightDiv;
+						float biome = getBiome(x, z, heightDiv);
+						treeMap[i][j].elevation = getMountainsElevation(x, z, heightDiv);
+
+						if (biome == MAP_BIOME_MOUNTAINS) {
+							if (treeMap[i][j].elevation < MAP_TOP_SNOW_HEIGHT * mapInfo.yFactor) {
+								treeMap[i][j].type = TREE_ROC_2;  // roc
+								treeMap[i][j].elevation -= mapInfo.yFactor * 7;
+							}
+							else {
+								treeMap[i][j].isTree = false;  // no roc in snow
+							}
+						}
+						else if (biome == MAP_BIOME_PLAIN) {
+							treeMap[i][j].type = TREE_PUMPKIN;  // basic tree
+						}
+						else if (biome == MAP_BIOME_DESERT) {
+							treeMap[i][j].isTree = false;  // no tree in mountains
+						}
+				}
+				// structure 1
+				else if (isTree(chunkPos.x + ix, chunkPos.z + iz, x * 7, z * 7, 0.6, 0.001)) {
 						treeMap[i][j].isTree = true;
 						float heightDiv;
 						float biome = getBiome(x, z, heightDiv);
@@ -636,7 +927,8 @@ void		getChunkNormalPerlin(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_S
 							treeMap[i][j].isTree = false;  // no structure in mountains
 						}
 						else if (biome == MAP_BIOME_PLAIN) {
-							treeMap[i][j].isTree = false;  // no structure in plain
+							treeMap[i][j].type = TREE_MUSHROOM;  // mushroom
+							treeMap[i][j].elevation -= mapInfo.yFactor * 1;
 						}
 						else if (biome == MAP_BIOME_DESERT) {
 							treeMap[i][j].type = TREE_PYRAMID;  // pyramid
