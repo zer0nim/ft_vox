@@ -1,42 +1,59 @@
 {
 	"blocks": {
 		"bedrock": {
-			"default": "./assets/textures/block/bedrock.png"
+			"default": 0
 		},
 		"dirt": {
-			"default": "./assets/textures/block/dirt.png"
+			"default": 1
 		},
 		"stone": {
-			"default": "./assets/textures/block/stone.png"
+			"default": 8
 		},
 		"grass": {
-			"default": "./assets/textures/block/grass_side.png",
-			"top": "./assets/textures/block/grass_top.png",
-			"bottom": "./assets/textures/block/dirt.png"
+			"default": 2,
+			"top": 3,
+			"bottom": 1
 		},
 		"sand": {
-			"default": "./assets/textures/block/sand.png"
+			"default": 4
 		},
 		"snow": {
-			"default": "./assets/textures/block/snow.png"
+			"default": 7
 		},
 		"snow-stone": {
-			"default": "./assets/textures/block/snow-stone.png",
-			"top": "./assets/textures/block/snow.png",
-			"bottom": "./assets/textures/block/stone.png"
+			"default": 6,
+			"top": 7,
+			"bottom": 8
 		},
 		"snow-dirt": {
-			"default": "./assets/textures/block/snow-dirt.png",
-			"top": "./assets/textures/block/snow.png",
-			"bottom": "./assets/textures/block/dirt.png"
+			"default": 5,
+			"top": 7,
+			"bottom": 1
 		},
 		"oak-wood": {
-			"default": "./assets/textures/block/oak-wood-side.png",
-			"top": "./assets/textures/block/oak-wood-top.png",
-			"bottom": "./assets/textures/block/oak-wood-top.png"
+			"default": 10,
+			"top": 11,
+			"bottom": 11
 		},
 		"oak-leaves": {
-			"default": "./assets/textures/block/oak-leaves.png",
+			"default": 12,
+			"isTransparent": true
+		},
+		"cobblestone": {
+			"default": 9
+		},
+		"sandstone": {
+			"default": 13,
+			"top": 14,
+			"bottom": 15
+		},
+		"cactus": {
+			"default": 16,
+			"top": 17,
+			"bottom": 18
+		},
+		"glass": {
+			"default": 19,
 			"isTransparent": true
 		}
 	}

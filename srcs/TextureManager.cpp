@@ -17,10 +17,10 @@ std::map<std::string, uint8_t>	TextureManager::blocksNames = {
 	{"snow-dirt",	8},
 	{"oak-wood",	9},
 	{"oak-leaves",	10},
-	{"cobblestone",	5},  // TODO(tnicolas42) add block
-	{"sandstone",	5},  // TODO(tnicolas42) add block
-	{"cactus",		5},  // TODO(tnicolas42) add block
-	{"glass",		5},  // TODO(tnicolas42) add block
+	{"cobblestone",	11},
+	{"sandstone",	12},
+	{"cactus",		13},
+	{"glass",		14},
 };
 
 TextureManager::TextureManager(std::string const &texturesSettings) {
@@ -57,10 +57,8 @@ TextureManager::~TextureManager() {
 	}
 
 	// destroy _texturesLoaded
-	for (Texture *texture : _texturesLoaded) {
-		if (texture != nullptr) {
-			delete texture;
-		}
+	if (_textureAtlas != nullptr) {
+		delete _textureAtlas;
 	}
 }
 
@@ -79,49 +77,24 @@ TextureManager &TextureManager::operator=(TextureManager const &rhs) {
 		}
 
 		// clone _texturesLoaded
-		_texturesLoaded = std::vector<TextureManager::Texture *>(rhs.getTexturesLoaded());
-		for (auto it = _texturesLoaded.begin(); it != _texturesLoaded.end(); ++it) {
-			*it = new Texture((*it)->id, (*it)->path);
-		}
+		TextureManager::Texture const *	oldOne = rhs.getTextureAtlas();
+		_textureAtlas = new Texture(oldOne->id, oldOne->path);
 	}
 	return *this;
 }
 
-int8_t	TextureManager::loadTextures(std::string const &path) {
-	int8_t	res;
-	bool skip = false;
-
-	// verify if the texture has been loaded already
-	for (u_int32_t i = 0; i < _texturesLoaded.size(); ++i) {
-		if (path == _texturesLoaded[i]->path) {
-			res = i;
-			skip = true;
-			break;
-		}
-	}
-
-	// if not, load it
-	if (!skip) {
-		TextureManager::Texture	*texture = new TextureManager::Texture();
-		bool inSpaceSRGB = true;
-
-		try {
-			texture->id = textureFromFile(path, inSpaceSRGB);
-		}
-		catch(TextureFailToLoad const & e) {
-			throw TextureManager::failed2LoadTextureException();
-		}
-
-		texture->path = path;
-		// save to _texturesLoaded array to skip duplicate textures loading later
-		_texturesLoaded.push_back(texture);
-		res = _texturesLoaded.size() - 1;
-	}
-
-	return res;
-}
-
 void	TextureManager::loadBlocksTextures(nlohmann::json const &data) {
+	// load texture atlas
+	_textureAtlas = new TextureManager::Texture();
+	std::string path = "./assets/textures/blocs.png";
+	bool inSpaceSRGB = true;
+	try {
+		_textureAtlas->id = textureAtlasFromFile(path, inSpaceSRGB, 32, 256);
+	}
+	catch(TextureFailToLoad const & e) {
+		throw TextureManager::failed2LoadTextureException();
+	}
+
 	// read json data to fill blocks textures infos
 	if (data.find("blocks") != data.end()) {
 		for (auto &block : data["blocks"].items()) {
@@ -138,13 +111,13 @@ void	TextureManager::loadBlocksTextures(nlohmann::json const &data) {
 					for (auto &blockText : block.value().items()) {
 						std::string	key = blockText.key();
 						if (key == "default") {
-							blockTexture->side = loadTextures(blockText.value());
+							blockTexture->side = blockText.value();
 						}
 						else if (key == "top") {
-							blockTexture->top = loadTextures(blockText.value());
+							blockTexture->top = blockText.value();
 						}
 						else if (key == "bottom") {
-							blockTexture->bottom = loadTextures(blockText.value());
+							blockTexture->bottom = blockText.value();
 						}
 						else if (key == "isTransparent") {  // load transparency of the object
 							try {
@@ -190,11 +163,9 @@ void	TextureManager::loadBlocksTextures(nlohmann::json const &data) {
 
 void	TextureManager::setUniform(Shader &sh) const {
 	// activate textures
-	for (size_t i = 0; i < _texturesLoaded.size(); ++i) {
-		glActiveTexture(GL_TEXTURE0 + i);
-		sh.setInt("blockTextures[" + std::to_string(i) + "]", i);
-		glBindTexture(GL_TEXTURE_2D, _texturesLoaded[i]->id);
-	}
+	glActiveTexture(GL_TEXTURE0);
+	sh.setInt("textureAtlas", 0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, _textureAtlas->id);
 
 	// set uniforms textures
 	for (size_t i = 0; i < _blocks.size(); ++i) {
@@ -220,16 +191,14 @@ void	TextureManager::setUniform(Shader &sh) const {
 
 void	TextureManager::activateTextures() const {
 	// activate textures
-	for (size_t i = 0; i < _texturesLoaded.size(); ++i) {
-		glActiveTexture(GL_TEXTURE0 + i);
-		glBindTexture(GL_TEXTURE_2D, _texturesLoaded[i]->id);
-	}
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, _textureAtlas->id);
 }
 
-
-std::vector<TextureManager::Texture *> const &	TextureManager::getTexturesLoaded() const {
-	return _texturesLoaded;
+TextureManager::Texture const *	TextureManager::getTextureAtlas() const {
+	return _textureAtlas;
 }
+
 std::array<TextureManager::BlockTexture *, NB_TYPE_BLOCKS> const &	TextureManager::getBlocks() const {
 	return _blocks;
 }
@@ -240,20 +209,19 @@ std::ostream & operator << (std::ostream &out, const TextureManager::Texture &m)
 }
 
 std::ostream & operator << (std::ostream &out, const TextureManager &tm) {
-	std::vector<TextureManager::Texture *> const &texturesLoaded = tm.getTexturesLoaded();
 	std::array<TextureManager::BlockTexture *, NB_TYPE_BLOCKS> const &blocks = tm.getBlocks();
 
 	for (TextureManager::BlockTexture *b : blocks) {
 		if (b != nullptr) {
 			out << "{ " << std::endl;
 			if (b->side != -1) {
-				out << " side: " << b->side << ": " << *(texturesLoaded[b->side]) << std::endl;
+				out << " side: " << b->side << std::endl;
 			}
 			if (b->top != -1) {
-				out << " top: " << b->top << ": " << *(texturesLoaded[b->top]) << std::endl;
+				out << " top: " << b->top << std::endl;
 			}
 			if (b->bottom != -1) {
-				out << " bottom: " << b->bottom << ": " << *(texturesLoaded[b->bottom]) << std::endl;
+				out << " bottom: " << b->bottom << std::endl;
 			}
 			out << "}" << std::endl;
 		}

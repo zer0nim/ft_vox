@@ -1,6 +1,5 @@
 #version 410 core
 
-#define MAX_TEXTURES 12
 #define GAMMA 2.2
 
 out vec4	FragColor;
@@ -32,7 +31,7 @@ struct Fog {
 	vec4	color;
 };
 
-uniform sampler2D[MAX_TEXTURES] blockTextures;
+uniform sampler2DArray	textureAtlas;
 
 uniform bool		enableTransparency;
 uniform vec3		viewPos;
@@ -58,7 +57,7 @@ vec3 calcDirLight(DirLight light, vec3 norm, vec3 viewDir) {
 	vec3	ambient = light.ambient;
 	vec3	diffuse = light.diffuse;
 
-	vec3 tmp = vec3(texture(blockTextures[fs_in.TextureId], fs_in.TexCoords));
+	vec3 tmp = vec3(texture(textureAtlas, vec3(fs_in.TexCoords, fs_in.TextureId)));
 	ambient *= tmp;
 	diffuse *= diff * tmp;
 
@@ -71,16 +70,14 @@ vec3 calcDirLight(DirLight light, vec3 norm, vec3 viewDir) {
 
 void main() {
 	// discard if it's a transparent pixel
-	if (enableTransparency && texture(blockTextures[fs_in.TextureId], fs_in.TexCoords).a < 0.2) {
+	if (enableTransparency && texture(textureAtlas, vec3(fs_in.TexCoords, fs_in.TextureId)).a < 0.2) {
 		discard;
 	}
 	vec3 norm = normalize(fs_in.Normal);
 	vec3 viewDir = normalize(viewPos - fs_in.FragPos);
 
 	// Directional lighting
-	vec3 result = calcDirLight(dirLight, norm, viewDir);
-
-	FragColor = vec4(result, 1.0);
+	FragColor = vec4(calcDirLight(dirLight, norm, viewDir), 1.0);
 
 	// apply gamma correction
     FragColor.rgb = pow(FragColor.rgb, vec3(1.0 / GAMMA));

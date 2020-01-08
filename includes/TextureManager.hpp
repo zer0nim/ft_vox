@@ -8,7 +8,7 @@
 #include "utils/Shader.hpp"
 #include "commonInclude.hpp"
 
-#define NB_TYPE_BLOCKS 10  // number of blocks types
+#define NB_TYPE_BLOCKS 14  // number of blocks types
 
 class TextureManager {
 	public:
@@ -43,7 +43,7 @@ class TextureManager {
 
 		void									setUniform(Shader &sh) const;
 		void									activateTextures() const;
-		std::vector<Texture *> const &			getTexturesLoaded() const;
+		Texture const *							getTextureAtlas() const;
 		std::array<BlockTexture *, NB_TYPE_BLOCKS> const &	getBlocks() const;
 
 		// Exceptions _______________________________
@@ -59,8 +59,8 @@ class TextureManager {
 		};
 		class FailedToOpenException : public TextureManagerError {
 			public:
-				explicit FailedToOpenException(std::string const &msg) : _msg(msg) {
-					std::string s("Failed to open " + _msg);
+				explicit FailedToOpenException(std::string const &msg) {
+					std::string s("Failed to open " + msg);
 					s.resize(511);  // limit string size
 					s.copy(cstr, s.size() + 1);
 					cstr[s.size()] = '\0';
@@ -69,7 +69,6 @@ class TextureManager {
 					return cstr;
 				}
 			private:
-				std::string const _msg;
 				char	cstr[512];
 		};
 		class missingBlockException : public TextureManagerError {
@@ -86,12 +85,11 @@ class TextureManager {
 		};
 
 	private:
-		int8_t	loadTextures(std::string const &path);
 		void	loadBlocksTextures(nlohmann::json const &data);
 		void	drawBlocks() const;
 
 
-		std::vector<Texture *>					_texturesLoaded;
+		Texture *	_textureAtlas;
 		std::array<BlockTexture *, NB_TYPE_BLOCKS>			_blocks;
 };
 
