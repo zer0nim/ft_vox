@@ -3,10 +3,11 @@
 #include <algorithm>
 
 #include "GreedyChunk3.hpp"
+#include "ChunkManager.hpp"
 #include "utils/Material.hpp"
 
-GreedyChunk3::GreedyChunk3(TextureManager const &textureManager)
-: AChunk(textureManager) {
+GreedyChunk3::GreedyChunk3(TextureManager const &textureManager, ChunkManager &chunkManager)
+: AChunk(textureManager, chunkManager) {
 	_nbVertices = 0;
 	_needInitVao = true;
 	_meshUpdated = false;
@@ -43,10 +44,45 @@ void	GreedyChunk3::initShader(glm::mat4 &projection, TextureManager const &textu
 	}
 }
 
+uint8_t	GreedyChunk3::getBlockOutside(wordIVec3 voxPos, std::array<AChunk*, 2> &nearbyChunks, int d, int sz) {
+	uint8_t		val = UNKNOW_BLOCK;
+
+	// chunk before
+	if (voxPos[d] < 0) {  // chunk not loaded
+		if (nearbyChunks[0] == nullptr) {
+			val = UNKNOW_BLOCK;
+		}
+		else {  // chunk loaded
+			voxPos[d] += sz;
+		    { std::lock_guard<std::mutex>	guard(nearbyChunks[0]->mutexChunk);
+				val = nearbyChunks[0]->getData().data[voxPos.x][voxPos.y][voxPos.z];
+			}
+		}
+	}
+	// chunk after
+	else if (voxPos[d] >= sz) {
+		if (nearbyChunks[1] == nullptr) {  // chunk not loaded
+			val = UNKNOW_BLOCK;
+		}
+		else {  // chunk loaded
+			voxPos[d] -= sz;
+		    { std::lock_guard<std::mutex>	guard(nearbyChunks[1]->mutexChunk);
+				val = nearbyChunks[1]->getData().data[voxPos.x][voxPos.y][voxPos.z];
+			}
+		}
+	}
+	// current chunk
+	else {
+		val = _data.data[voxPos.x][voxPos.y][voxPos.z];
+	}
+
+	return val;
+}
+
 /*
 	generate faces by merging consecutive identicals blocks
 */
-void	GreedyChunk3::calcGreedyChunk() {
+void	GreedyChunk3::calcGreedyChunk(bool firstUpdate) {
 	chunkVec3 chunkSz = {CHUNK_SZ_X, CHUNK_SZ_Y, CHUNK_SZ_Z};
 
 	_faces.clear();
@@ -120,21 +156,53 @@ void	GreedyChunk3::calcGreedyChunk() {
 			// iterate through the dimension from front to back
 			for (it[d] = -1; it[d] < chunkSz[d]; ++(it[d])) {
 				// compute the mask ___________________________
+
+				std::array<AChunk*, 2>	nearbyChunks = {nullptr};  // contains the chunk before and the chunk after (if exists)
+				wordIVec3 nearbyPos = _chunkPos;
+				// chunk before
+				nearbyPos[d] -= chunkSz[d];
+			    {
+					if (firstUpdate)
+						std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
+					if (_chunkManager.isChunkExist(nearbyPos)) {
+						nearbyChunks[0] = _chunkManager.getChunkMap()[nearbyPos];
+					}
+				}
+				// chunk after
+				nearbyPos[d] += chunkSz[d] * 2;
+			    {
+					if (firstUpdate)
+						std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
+					if (_chunkManager.isChunkExist(nearbyPos)) {
+						nearbyChunks[1] = _chunkManager.getChunkMap()[nearbyPos];
+					}
+				}
+
 				int n = 0;  // mask iterator
 				for (it[v] = 0; it[v] < chunkSz[v]; ++it[v]) {
 					for (it[u] = 0; it[u] < chunkSz[u]; ++it[u], ++n) {
-						chunkVec3 voxPos = {it[0], it[1], it[2]};
+						wordIVec3 voxPos = {it[0], it[1], it[2]};
 
 						// get curent block
-						uint8_t a = (it[d] >= 0)
-							? _data.data[voxPos.x][voxPos.y][voxPos.z] : 0;
+						uint8_t a;
+						if (voxPos[d] >= 0) {
+							a = _data.data[voxPos.x][voxPos.y][voxPos.z];
+						}
+						else {
+							a = getBlockOutside(voxPos, nearbyChunks, d, chunkSz[d]);
+						}
 						// get next block
 						voxPos[d] += 1;  // next block
-						uint8_t b = (it[d] < chunkSz[d] - 1)
-							? _data.data[voxPos.x][voxPos.y][voxPos.z] : 0;
+						uint8_t b;
+						if (voxPos[d] < chunkSz[d]) {
+							b = _data.data[voxPos.x][voxPos.y][voxPos.z];
+						}
+						else {
+							b = getBlockOutside(voxPos, nearbyChunks, d, chunkSz[d]);
+						}
 
 						// fill the mask
-						if (a != 0 && b != 0
+						if (a != 0 && b != 0 && a != UNKNOW_BLOCK && b != UNKNOW_BLOCK
 						&& _textureManager.getBlocks()[a - 1]->isTransparent == _textureManager.getBlocks()[b - 1]->isTransparent) {
 							mask[n] = 0;
 						}
@@ -143,6 +211,9 @@ void	GreedyChunk3::calcGreedyChunk() {
 						}
 						else {
 							mask[n] = a;
+						}
+						if (mask[n] == UNKNOW_BLOCK) {
+							mask[n] = 0;
 						}
 					}
 				}
@@ -264,13 +335,13 @@ void	GreedyChunk3::calcGreedyChunk() {
 	}
 }
 
-void	GreedyChunk3::update() {
+void	GreedyChunk3::update(bool firstUpdate) {
 	if (_data.isModified == false)
 		return;  // GreedyChunk3 not modified -> don't update it
 	_data.isModified = false;
 
 	// update mesh
-	calcGreedyChunk();
+	calcGreedyChunk(firstUpdate);
 	_meshUpdated = true;
 }
 

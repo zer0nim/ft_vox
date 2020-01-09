@@ -3,9 +3,6 @@
 #include <limits>
 #include <boost/filesystem.hpp>
 #include "AChunk.hpp"
-#include "Chunk.hpp"
-#include "GreedyChunk.hpp"
-#include "GreedyChunk2.hpp"
 #include "GreedyChunk3.hpp"
 #include "ChunkManager.hpp"
 #include "MapGenerator.hpp"
@@ -13,19 +10,21 @@
 std::unique_ptr<AChunk::ShaderData>	AChunk::_shaderData = \
 	std::unique_ptr<AChunk::ShaderData>();
 
-AChunk * instanciateNewChunk(TextureManager const &textureManager) {
-	AChunk * newChunk = new CHUNK_OBJECT(textureManager);
+AChunk * instanciateNewChunk(TextureManager const &textureManager, ChunkManager &chunkManager) {
+	AChunk * newChunk = new CHUNK_OBJECT(textureManager, chunkManager);
 	return newChunk;
 }
 
-AChunk::AChunk(TextureManager const &textureManager)
+AChunk::AChunk(TextureManager const &textureManager, ChunkManager &chunkManager)
 : _data(),
   _filename(""),
   _isModifiedFromBegining(false),
-  _textureManager(textureManager) {}
+  _textureManager(textureManager),
+  _chunkManager(chunkManager) {}
 
 AChunk::AChunk(AChunk const &src)
-: _textureManager(src.getTextureManager()) {
+: _textureManager(src.getTextureManager()),
+  _chunkManager(src.getChunkManager()) {
 	*this = src;
 }
 
@@ -152,4 +151,5 @@ void AChunk::save() {
 Shader					&AChunk::getShader() { return *(_shaderData->shader); }
 AChunk::ChunkData const	&AChunk::getData() const { return _data; }
 TextureManager const	&AChunk::getTextureManager() const { return _textureManager; }
+ChunkManager			&AChunk::getChunkManager() const { return _chunkManager; }
 bool					AChunk::isModifiedFromBegining() const { return _isModifiedFromBegining; }

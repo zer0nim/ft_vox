@@ -141,7 +141,7 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 					wordIVec3 chunkPos(x, y, z);  // this is the position of the chunk
 					bool exist;
 				    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
-						exist = _isChunkExist(chunkPos);
+						exist = isChunkExist(chunkPos);
 					}
 					if (exist == false) {  // if the chunk doesnt exist (for now)
 						std::lock_guard<std::mutex>	guard(s.mutexToCreate);
@@ -188,16 +188,17 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 		}
 		bool exist;
 	    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
-			exist = _isChunkExist(chunkPos);
+			exist = isChunkExist(chunkPos);
 			if (_isInChunkLoaded(chunkPos) == false) {
 				exist = true;
 			}
 		}
 		if (exist == false) {  // if the chunk doesnt exist (for now)
 			// create a chunk with the rihgt type
-			newChunk = instanciateNewChunk(_textureManager);
+			newChunk = instanciateNewChunk(_textureManager, *this);
 			newChunk->createChunk(chunkPos);  // init the chunk with the right values
-			newChunk->update();
+			// /!\ WARNING /!\ this update will call mutexChunkMap
+			newChunk->update(true);
 		    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
 				_chunkMap[chunkPos] = newChunk;
 			}
@@ -240,7 +241,7 @@ void ChunkManager::draw(glm::mat4 view, Camera *cam) {
 				wordIVec3 chunkPos(x, y, z);  // this is the position of the chunk
 				bool exist;
 			    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
-					exist = _isChunkExist(chunkPos);
+					exist = isChunkExist(chunkPos);
 				}
 				if (exist) {  // if the chunk exist
 					// if inside the camera
@@ -414,7 +415,7 @@ bool	ChunkManager::_isInChunkLoaded(wordIVec3 const &chunkPos) const {
 	return true;
 }
 
-bool	ChunkManager::_isChunkExist(wordIVec3 const &chunkPos) const {
+bool	ChunkManager::isChunkExist(wordIVec3 const &chunkPos) const {
 	return _chunkMap.find(chunkPos) != _chunkMap.end();
 }
 uint8_t	ChunkManager::_getID(wordIVec3 const &chunkPos) const {
@@ -448,7 +449,7 @@ uint8_t		ChunkManager::getBlock(wordIVec3 pos) const {
 	chunkPos.y = pos.y - pos.y % CHUNK_SZ_Y + ((pos.y < 0 && pos.y % CHUNK_SZ_Y != 0) ? -CHUNK_SZ_Y : 0);
 	chunkPos.z = pos.z - pos.z % CHUNK_SZ_Z + ((pos.z < 0 && pos.z % CHUNK_SZ_Z != 0) ? -CHUNK_SZ_Z : 0);
 
-	if (_isChunkExist(chunkPos)) {
+	if (isChunkExist(chunkPos)) {
 		AChunk * chunk = _chunkMap.at(chunkPos);
 	    { std::lock_guard<std::mutex>	guard(chunk->mutexChunk);
 			ret = chunk->getData().data[std::abs(pos.x - chunkPos.x)]
@@ -470,7 +471,7 @@ void	ChunkManager::updateBlock(wordIVec3 pos, uint8_t value) const {
 	chunkPos.y = pos.y - pos.y % CHUNK_SZ_Y + ((pos.y < 0 && pos.y % CHUNK_SZ_Y != 0) ? -CHUNK_SZ_Y : 0);
 	chunkPos.z = pos.z - pos.z % CHUNK_SZ_Z + ((pos.z < 0 && pos.z % CHUNK_SZ_Z != 0) ? -CHUNK_SZ_Z : 0);
 
-	if (_isChunkExist(chunkPos)) {
+	if (isChunkExist(chunkPos)) {
 		AChunk * chunk = _chunkMap.at(chunkPos);
 		chunkVec3	blockPos = chunkVec3(std::abs(pos.x - chunkPos.x),
 										 std::abs(pos.y - chunkPos.y),

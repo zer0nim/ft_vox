@@ -36,6 +36,7 @@ class ChunkManager {
 		uint32_t								getNbSquareRendered() const;
 		uint8_t									getBlock(wordIVec3 pos) const;
 		uint8_t									getBlock(wordFVec3 pos) const;
+		bool									isChunkExist(wordIVec3 const &chunkPos) const;
 
 		std::deque<wordFVec3>				toDelete;  // list of chunks to delete
 		struct Raycast {
@@ -55,7 +56,6 @@ class ChunkManager {
 		void	_updateChunkPos(wordFVec3 const &pos);  // update the chunk pos (call each frame)
 		void	_updateChunkPos(wordIVec3 const &pos);  // update the chunk pos (call each frame)
 		bool	_isInChunkLoaded(wordIVec3 const &chunkPos) const;  // return true if the chunk is loaded
-		bool	_isChunkExist(wordIVec3 const &chunkPos) const;
 		uint8_t	_getID(wordIVec3 const &chunkPos) const;
 		uint8_t	_getID(int32_t const x) const;
 
