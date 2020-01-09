@@ -118,6 +118,52 @@ void AChunk::updateBlock(chunkVec3 pos, uint8_t value) {
 	if (_data.data[pos.x][pos.y][pos.z] == value)
 		return;  // unchanged chunk
 	_data.data[pos.x][pos.y][pos.z] = value;
+
+	// update chunk around if needed
+	wordIVec3 tmpChunkPos;
+	if (pos.x == 0) {
+		tmpChunkPos = _chunkPos;
+		tmpChunkPos.x -= CHUNK_SZ_X;
+		if (_chunkManager.isChunkExist(tmpChunkPos)) {
+			_chunkManager.getChunkMap()[tmpChunkPos]->getData().isModified = true;
+		}
+	}
+	else if (pos.x == CHUNK_SZ_X - 1) {
+		tmpChunkPos = _chunkPos;
+		tmpChunkPos.x += CHUNK_SZ_X;
+		if (_chunkManager.isChunkExist(tmpChunkPos)) {
+			_chunkManager.getChunkMap()[tmpChunkPos]->getData().isModified = true;
+		}
+	}
+	if (pos.y == 0) {
+		tmpChunkPos = _chunkPos;
+		tmpChunkPos.y -= CHUNK_SZ_Y;
+		if (_chunkManager.isChunkExist(tmpChunkPos)) {
+			_chunkManager.getChunkMap()[tmpChunkPos]->getData().isModified = true;
+		}
+	}
+	else if (pos.y == CHUNK_SZ_Y - 1) {
+		tmpChunkPos = _chunkPos;
+		tmpChunkPos.y += CHUNK_SZ_Y;
+		if (_chunkManager.isChunkExist(tmpChunkPos)) {
+			_chunkManager.getChunkMap()[tmpChunkPos]->getData().isModified = true;
+		}
+	}
+	if (pos.z == 0) {
+		tmpChunkPos = _chunkPos;
+		tmpChunkPos.z -= CHUNK_SZ_Z;
+		if (_chunkManager.isChunkExist(tmpChunkPos)) {
+			_chunkManager.getChunkMap()[tmpChunkPos]->getData().isModified = true;
+		}
+	}
+	else if (pos.z == CHUNK_SZ_Z - 1) {
+		tmpChunkPos = _chunkPos;
+		tmpChunkPos.z += CHUNK_SZ_Z;
+		if (_chunkManager.isChunkExist(tmpChunkPos)) {
+			_chunkManager.getChunkMap()[tmpChunkPos]->getData().isModified = true;
+		}
+	}
+
 	_data.isModified = true;
 	_isModifiedFromBegining = true;
 }
@@ -150,6 +196,7 @@ void AChunk::save() {
 
 Shader					&AChunk::getShader() { return *(_shaderData->shader); }
 AChunk::ChunkData const	&AChunk::getData() const { return _data; }
+AChunk::ChunkData		&AChunk::getData() { return _data; }
 TextureManager const	&AChunk::getTextureManager() const { return _textureManager; }
 ChunkManager			&AChunk::getChunkManager() const { return _chunkManager; }
 bool					AChunk::isModifiedFromBegining() const { return _isModifiedFromBegining; }

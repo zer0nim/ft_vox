@@ -30,6 +30,7 @@ class AChunk {
 
 		static Shader			&getShader();
 		AChunk::ChunkData const	&getData() const;
+		AChunk::ChunkData		&getData();
 		TextureManager const	&getTextureManager() const;
 		ChunkManager			&getChunkManager() const;
 		bool					isModifiedFromBegining() const;
