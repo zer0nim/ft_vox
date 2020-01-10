@@ -19,7 +19,7 @@ AChunk::AChunk(TextureManager const &textureManager, ChunkManager &chunkManager)
 :  _data(),
   _filename(""),
   _isModifiedFromBegining(false),
-  _needRenderUpdate(false),
+  _needRenderUpdate(0),
   _textureManager(textureManager),
   _chunkManager(chunkManager) {}
 

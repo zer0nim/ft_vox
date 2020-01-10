@@ -22,7 +22,7 @@ class GreedyChunk3 : public AChunk {
 
 		static void			initShader(glm::mat4 &projection, TextureManager const &textureManager);
 		virtual void		update(bool isChunkMapMutexed = true);
-		virtual bool		renderUpdate();  // return true if updated
+		virtual bool		renderUpdate(int32_t startX, int32_t startZ);  // return true if updated
 		virtual uint32_t	getNbSquareRendered() const;
 
 	protected:

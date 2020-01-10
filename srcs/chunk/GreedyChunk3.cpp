@@ -86,7 +86,7 @@ void	GreedyChunk3::calcGreedyChunk(bool isChunkMapMutexed) {
 	chunkVec3 chunkSz = {CHUNK_SZ_X, CHUNK_SZ_Y, CHUNK_SZ_Z};
 
 	_faces.clear();
-	_needRenderUpdate = false;
+	_needRenderUpdate = 0;
 
 	std::array<uint8_t, CHUNK_SZ_Y * CHUNK_SZ_X>	mask = { 0 };
 	/*
@@ -151,6 +151,48 @@ void	GreedyChunk3::calcGreedyChunk(bool isChunkMapMutexed) {
 				side = backFace ? Direction::BACK : Direction::FRONT;
 			}
 
+			std::array<AChunk*, 2>	nearbyChunks = {nullptr};  // contains the chunk before and the chunk after (if exists)
+			#if REMOVE_CHUNKS_BORDERS
+				wordIVec3 nearbyPos = _chunkPos;
+				bool exist;
+
+				// chunk before
+				nearbyPos[d] -= chunkSz[d];
+				if (isChunkMapMutexed == false) {
+					std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
+					exist = _chunkManager.isChunkExist(nearbyPos);
+				}
+				else {
+					exist = _chunkManager.isChunkExist(nearbyPos);
+				}
+				if (exist) {
+					nearbyChunks[0] = _chunkManager.getChunkMap()[nearbyPos];
+				}
+				else if (backFace && (d == 0 || d == 2)) {  // if x or z -> need refresh when nearby chunks will exist
+					_needRenderUpdate++;
+				}
+
+				// chunk after
+				nearbyPos[d] += chunkSz[d] * 2;
+				if (isChunkMapMutexed == false) {
+					std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
+					exist = _chunkManager.isChunkExist(nearbyPos);
+				}
+				else {
+					exist = _chunkManager.isChunkExist(nearbyPos);
+				}
+				if (exist) {
+					nearbyChunks[1] = _chunkManager.getChunkMap()[nearbyPos];
+				}
+				else if (backFace && (d == 0 || d == 2)) {  // if x or z -> need refresh when nearby chunks will exist
+					_needRenderUpdate++;
+				}
+			#else
+				(void)isChunkMapMutexed;
+				nearbyChunks[0] = nullptr;
+				nearbyChunks[1] = nullptr;
+			#endif
+
 			// one iterator per dimension
 			std::array<int16_t, 3> it = {0, 0, 0};
 
@@ -158,47 +200,6 @@ void	GreedyChunk3::calcGreedyChunk(bool isChunkMapMutexed) {
 			for (it[d] = -1; it[d] < chunkSz[d]; ++(it[d])) {
 				// compute the mask ___________________________
 
-				std::array<AChunk*, 2>	nearbyChunks = {nullptr};  // contains the chunk before and the chunk after (if exists)
-				#if REMOVE_CHUNKS_BORDERS
-					wordIVec3 nearbyPos = _chunkPos;
-					bool exist;
-
-					// chunk before
-					nearbyPos[d] -= chunkSz[d];
-					if (isChunkMapMutexed == false) {
-						std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
-						exist = _chunkManager.isChunkExist(nearbyPos);
-					}
-					else {
-						exist = _chunkManager.isChunkExist(nearbyPos);
-					}
-					if (exist) {
-						nearbyChunks[0] = _chunkManager.getChunkMap()[nearbyPos];
-					}
-					else if (d == 0 || d == 2) {  // if x or z -> need refresh when nearby chunks exist
-						_needRenderUpdate = true;
-					}
-
-					// chunk after
-					nearbyPos[d] += chunkSz[d] * 2;
-					if (isChunkMapMutexed == false) {
-						std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
-						exist = _chunkManager.isChunkExist(nearbyPos);
-					}
-					else {
-						exist = _chunkManager.isChunkExist(nearbyPos);
-					}
-					if (exist) {
-						nearbyChunks[1] = _chunkManager.getChunkMap()[nearbyPos];
-					}
-					else if (d == 0 || d == 2) {  // if x or z -> need refresh when nearby chunks exist
-						_needRenderUpdate = true;
-					}
-				#else
-					(void)isChunkMapMutexed;
-					nearbyChunks[0] = nullptr;
-					nearbyChunks[1] = nullptr;
-				#endif
 
 				int n = 0;  // mask iterator
 				for (it[v] = 0; it[v] < chunkSz[v]; ++it[v]) {
@@ -367,9 +368,19 @@ void	GreedyChunk3::update(bool isChunkMapMutexed) {
 	_meshUpdated = true;
 }
 
-bool	GreedyChunk3::renderUpdate() {
-	_data.isModified |= _needRenderUpdate;  // true if need render update
-	return _needRenderUpdate;
+bool	GreedyChunk3::renderUpdate(int32_t startX, int32_t startZ) {
+	int minRenderUpdate = 0;  // the minimum of border to ignore update (default 0, 1 or 2 if the chunk is on map border)
+	if (_chunkPos.x <= startX || _chunkPos.x >= startX + ((s.g.renderDist - 1) * 2) * CHUNK_SZ_X) {
+		minRenderUpdate++;
+	}
+	if (_chunkPos.z <= startZ || _chunkPos.z >= startZ + ((s.g.renderDist - 1) * 2) * CHUNK_SZ_Z) {
+		minRenderUpdate++;
+	}
+
+	if (_needRenderUpdate > minRenderUpdate)
+		_data.isModified = true;
+
+	return _data.isModified;
 }
 
 void	GreedyChunk3::sendMeshData() {

@@ -121,22 +121,31 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 		}
 	}
 
+	uint32_t startX;  // pos of first chunk (in all thread)
+	uint32_t startXthread;  // pos of first chunk (in this thread only)
+	uint32_t startZ;  // pos of first chunk (in all thread)
+
+	// startX
+	startX = _chunkActPos.x - CHUNK_SZ_X * (s.g.renderDist - 1);
+	// startXthread
+	startXthread = startX;
+	uint8_t	startID = _getID(startXthread);
+	if (startID > threadID) {
+		startXthread += CHUNK_SZ_X * NB_UPDATE_THREADS;
+		startXthread -= (startID - threadID) * CHUNK_SZ_X;
+	}
+	else if (startID < threadID) {
+		startXthread += (threadID - startID) * CHUNK_SZ_X;
+	}
+	// startZ
+	startZ = _chunkActPos.z - CHUNK_SZ_Z * (s.g.renderDist - 1);
+
 	// add new chunks if needed
 	if (_lastChunkPos[threadID] != _chunkActPos) {  // if we change the actual chunk
 		_lastChunkPos[threadID] = _chunkActPos;
-		int32_t startX = _chunkActPos.x - CHUNK_SZ_X * (s.g.renderDist - 1);
-		uint8_t	startID = _getID(startX);
-		if (startID > threadID) {
-			startX += CHUNK_SZ_X * NB_UPDATE_THREADS;
-			startX -= (startID - threadID) * CHUNK_SZ_X;
-		}
-		else if (startID < threadID) {
-			startX += (threadID - startID) * CHUNK_SZ_X;
-		}
-		for (int32_t x = startX;
-		x < _chunkActPos.x + CHUNK_SZ_X * s.g.renderDist; x += CHUNK_SZ_X * NB_UPDATE_THREADS) {
-			for (int32_t z = _chunkActPos.z - CHUNK_SZ_Z * (s.g.renderDist - 1);
-			z < _chunkActPos.z + CHUNK_SZ_Z * s.g.renderDist; z += CHUNK_SZ_Z) {
+		for (int32_t x = startXthread; x < _chunkActPos.x + CHUNK_SZ_X * s.g.renderDist;
+		x += CHUNK_SZ_X * NB_UPDATE_THREADS) {
+			for (int32_t z = startZ; z < _chunkActPos.z + CHUNK_SZ_Z * s.g.renderDist; z += CHUNK_SZ_Z) {
 				for (int32_t y = 0; y < CHUNK_SZ_Y * MAX_Y_CHUNK; y += CHUNK_SZ_Y) {
 					wordIVec3 chunkPos(x, y, z);  // this is the position of the chunk
 					bool exist;
@@ -163,19 +172,9 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 		}
 		if (nbLoaded >= (s.g.renderDist * 2 - 1) * (s.g.renderDist * 2 - 1) * 2) {  // if all chunks are created
 			uint8_t	nbUpdated = 0;
-			int32_t startX = _chunkActPos.x - CHUNK_SZ_X * (s.g.renderDist - 1) + CHUNK_SZ_X;
-			uint8_t	startID = _getID(startX);
-			if (startID > threadID) {
-				startX += CHUNK_SZ_X * NB_UPDATE_THREADS;
-				startX -= (startID - threadID) * CHUNK_SZ_X;
-			}
-			else if (startID < threadID) {
-				startX += (threadID - startID) * CHUNK_SZ_X;
-			}
-			for (int32_t x = startX;
-			x < _chunkActPos.x + CHUNK_SZ_X * s.g.renderDist - CHUNK_SZ_X; x += CHUNK_SZ_X * NB_UPDATE_THREADS) {
-				for (int32_t z = _chunkActPos.z - CHUNK_SZ_Z * (s.g.renderDist - 1) + CHUNK_SZ_Z;
-				z < _chunkActPos.z + CHUNK_SZ_Z * s.g.renderDist - CHUNK_SZ_Z; z += CHUNK_SZ_Z) {
+			for (int32_t x = startXthread; x < _chunkActPos.x + CHUNK_SZ_X * s.g.renderDist;
+			x += CHUNK_SZ_X * NB_UPDATE_THREADS) {
+				for (int32_t z = startZ; z < _chunkActPos.z + CHUNK_SZ_Z * s.g.renderDist; z += CHUNK_SZ_Z) {
 					for (int32_t y = 0; y < CHUNK_SZ_Y * MAX_Y_CHUNK; y += CHUNK_SZ_Y) {
 						wordIVec3 chunkPos(x, y, z);  // this is the position of the chunk
 						bool exist;
@@ -185,7 +184,7 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 						if (exist) {
 							std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
 							std::lock_guard<std::mutex>	guard2(_chunkMap[chunkPos]->mutexChunk);
-							if (_chunkMap[chunkPos]->renderUpdate()) {
+							if (_chunkMap[chunkPos]->renderUpdate(startX, startZ)) {
 								nbUpdated++;
 							}
 						}
