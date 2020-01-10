@@ -82,10 +82,11 @@ uint8_t	GreedyChunk3::getBlockOutside(wordIVec3 voxPos, std::array<AChunk*, 2> &
 /*
 	generate faces by merging consecutive identicals blocks
 */
-void	GreedyChunk3::calcGreedyChunk(bool firstUpdate) {
+void	GreedyChunk3::calcGreedyChunk(bool isChunkMapMutexed) {
 	chunkVec3 chunkSz = {CHUNK_SZ_X, CHUNK_SZ_Y, CHUNK_SZ_Z};
 
 	_faces.clear();
+	_needRenderUpdate = false;
 
 	std::array<uint8_t, CHUNK_SZ_Y * CHUNK_SZ_X>	mask = { 0 };
 	/*
@@ -158,25 +159,46 @@ void	GreedyChunk3::calcGreedyChunk(bool firstUpdate) {
 				// compute the mask ___________________________
 
 				std::array<AChunk*, 2>	nearbyChunks = {nullptr};  // contains the chunk before and the chunk after (if exists)
-				wordIVec3 nearbyPos = _chunkPos;
-				// chunk before
-				nearbyPos[d] -= chunkSz[d];
-			    {
-					if (firstUpdate)
+				#if REMOVE_CHUNKS_BORDERS
+					wordIVec3 nearbyPos = _chunkPos;
+					bool exist;
+
+					// chunk before
+					nearbyPos[d] -= chunkSz[d];
+					if (isChunkMapMutexed == false) {
 						std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
-					if (_chunkManager.isChunkExist(nearbyPos)) {
+						exist = _chunkManager.isChunkExist(nearbyPos);
+					}
+					else {
+						exist = _chunkManager.isChunkExist(nearbyPos);
+					}
+					if (exist) {
 						nearbyChunks[0] = _chunkManager.getChunkMap()[nearbyPos];
 					}
-				}
-				// chunk after
-				nearbyPos[d] += chunkSz[d] * 2;
-			    {
-					if (firstUpdate)
+					else if (d == 0 || d == 2) {  // if x or z -> need refresh when nearby chunks exist
+						_needRenderUpdate = true;
+					}
+
+					// chunk after
+					nearbyPos[d] += chunkSz[d] * 2;
+					if (isChunkMapMutexed == false) {
 						std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
-					if (_chunkManager.isChunkExist(nearbyPos)) {
+						exist = _chunkManager.isChunkExist(nearbyPos);
+					}
+					else {
+						exist = _chunkManager.isChunkExist(nearbyPos);
+					}
+					if (exist) {
 						nearbyChunks[1] = _chunkManager.getChunkMap()[nearbyPos];
 					}
-				}
+					else if (d == 0 || d == 2) {  // if x or z -> need refresh when nearby chunks exist
+						_needRenderUpdate = true;
+					}
+				#else
+					(void)isChunkMapMutexed;
+					nearbyChunks[0] = nullptr;
+					nearbyChunks[1] = nullptr;
+				#endif
 
 				int n = 0;  // mask iterator
 				for (it[v] = 0; it[v] < chunkSz[v]; ++it[v]) {
@@ -335,14 +357,19 @@ void	GreedyChunk3::calcGreedyChunk(bool firstUpdate) {
 	}
 }
 
-void	GreedyChunk3::update(bool firstUpdate) {
+void	GreedyChunk3::update(bool isChunkMapMutexed) {
 	if (_data.isModified == false)
 		return;  // GreedyChunk3 not modified -> don't update it
 	_data.isModified = false;
 
 	// update mesh
-	calcGreedyChunk(firstUpdate);
+	calcGreedyChunk(isChunkMapMutexed);
 	_meshUpdated = true;
+}
+
+bool	GreedyChunk3::renderUpdate() {
+	_data.isModified |= _needRenderUpdate;  // true if need render update
+	return _needRenderUpdate;
 }
 
 void	GreedyChunk3::sendMeshData() {

@@ -16,9 +16,10 @@ AChunk * instanciateNewChunk(TextureManager const &textureManager, ChunkManager 
 }
 
 AChunk::AChunk(TextureManager const &textureManager, ChunkManager &chunkManager)
-: _data(),
+:  _data(),
   _filename(""),
   _isModifiedFromBegining(false),
+  _needRenderUpdate(false),
   _textureManager(textureManager),
   _chunkManager(chunkManager) {}
 

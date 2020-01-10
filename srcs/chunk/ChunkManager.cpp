@@ -113,7 +113,7 @@ void ChunkManager::init(wordFVec3 camPos, glm::mat4 &projection) {
 void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 	AChunk *	newChunk;
 	if (threadID == 0) {
-		{ std::lock_guard<std::mutex>	guard(s.mutexOthers), guard2(s.mutexCamera);
+	    { std::lock_guard<std::mutex>	guard(s.mutexOthers), guard2(s.mutexCamera);
 			_updateChunkPos(camPos);  // update once only
 		}
 	    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
@@ -155,6 +155,56 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 		}
 	}
 
+	// update render
+	#if REMOVE_CHUNKS_BORDERS
+		int32_t	nbLoaded;
+	    { std::lock_guard<std::mutex>	guard(s.mutexOthers);
+			nbLoaded = getNbChunkLoaded();
+		}
+		if (nbLoaded >= (s.g.renderDist * 2 - 1) * (s.g.renderDist * 2 - 1) * 2) {  // if all chunks are created
+			uint8_t	nbUpdated = 0;
+			int32_t startX = _chunkActPos.x - CHUNK_SZ_X * (s.g.renderDist - 1) + CHUNK_SZ_X;
+			uint8_t	startID = _getID(startX);
+			if (startID > threadID) {
+				startX += CHUNK_SZ_X * NB_UPDATE_THREADS;
+				startX -= (startID - threadID) * CHUNK_SZ_X;
+			}
+			else if (startID < threadID) {
+				startX += (threadID - startID) * CHUNK_SZ_X;
+			}
+			for (int32_t x = startX;
+			x < _chunkActPos.x + CHUNK_SZ_X * s.g.renderDist - CHUNK_SZ_X; x += CHUNK_SZ_X * NB_UPDATE_THREADS) {
+				for (int32_t z = _chunkActPos.z - CHUNK_SZ_Z * (s.g.renderDist - 1) + CHUNK_SZ_Z;
+				z < _chunkActPos.z + CHUNK_SZ_Z * s.g.renderDist - CHUNK_SZ_Z; z += CHUNK_SZ_Z) {
+					for (int32_t y = 0; y < CHUNK_SZ_Y * MAX_Y_CHUNK; y += CHUNK_SZ_Y) {
+						wordIVec3 chunkPos(x, y, z);  // this is the position of the chunk
+						bool exist;
+					    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
+							exist = isChunkExist(chunkPos);
+						}
+						if (exist) {
+							std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
+							std::lock_guard<std::mutex>	guard2(_chunkMap[chunkPos]->mutexChunk);
+							if (_chunkMap[chunkPos]->renderUpdate()) {
+								nbUpdated++;
+							}
+						}
+						if (nbUpdated >= MAX_RENDER_CHUNK_UPDATE_COUNT) {
+							break;
+						}
+					}
+					if (nbUpdated >= MAX_RENDER_CHUNK_UPDATE_COUNT) {
+						break;
+					}
+				}
+				if (nbUpdated >= MAX_RENDER_CHUNK_UPDATE_COUNT) {
+					break;
+				}
+			}
+		}
+	#endif
+
+	// create chunks
 	int			i = 0;
 	wordIVec3	chunkPos;
 	while (i < MAX_CREATED_CHUNK_UPDATE_COUNT) {
@@ -198,7 +248,7 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 			newChunk = instanciateNewChunk(_textureManager, *this);
 			newChunk->createChunk(chunkPos);  // init the chunk with the right values
 			// /!\ WARNING /!\ this update will call mutexChunkMap
-			newChunk->update(true);
+			newChunk->update(false);
 		    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
 				_chunkMap[chunkPos] = newChunk;
 			}
@@ -208,22 +258,38 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 	}
 
 	// update all chunks
+	std::map<wordIVec3, AChunk*>::iterator it;
+	std::map<wordIVec3, AChunk*>::iterator end;
     { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
-		for (auto it = _chunkMap.begin(); it != _chunkMap.end(); it++) {
-			if (_getID(it->first) == threadID) {
-				if (_isInChunkLoaded(it->first)) {
-				    { std::lock_guard<std::mutex>	guard(it->second->mutexChunk);
-						it->second->update();
-					}
-				}
-				else {  // we need to remove the chunk
-				    { std::lock_guard<std::mutex>	guard(s.mutexToDelete);
-						toDelete.push_back(it->first);
-					}
-					if (s.g.files.saveAllChunks || it->second->isModifiedFromBegining())  // save (if needed)
-						it->second->save();
+		it = _chunkMap.begin();
+		end = _chunkMap.end();
+	}
+	wordIVec3	actChunkPos;
+	AChunk		*actChunk;
+	while (it != end) {
+	    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
+			actChunkPos = it->first;
+			actChunk = it->second;
+		}
+		if (_getID(actChunkPos) == threadID) {
+			if (_isInChunkLoaded(actChunkPos)) {
+			    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap), guard2(actChunk->mutexChunk);
+					// /!\ WARNING /!\ this update will call mutexChunkMap
+					actChunk->update();
 				}
 			}
+			else {  // we need to remove the chunk
+			    { std::lock_guard<std::mutex>	guard(s.mutexToDelete);
+					toDelete.push_back(actChunkPos);
+				}
+				if (s.g.files.saveAllChunks || actChunk->isModifiedFromBegining())  // save (if needed)
+				    { std::lock_guard<std::mutex>	guard(actChunk->mutexChunk);
+						actChunk->save();
+					}
+			}
+		}
+	    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
+			it++;
 		}
 	}
 }
@@ -232,6 +298,7 @@ void ChunkManager::draw(glm::mat4 view, Camera *cam) {
 	glm::vec3	chunkSize(CHUNK_SZ_X, CHUNK_SZ_Y, CHUNK_SZ_Z);
 	uint32_t	chunkRendered = 0;
 	uint32_t	squareRendered = 0;
+	AChunk		*chunk;
 
 	for (int32_t x = _chunkActPos.x - CHUNK_SZ_X * (s.g.renderDist - 1);
 	x < _chunkActPos.x + CHUNK_SZ_X * s.g.renderDist; x += CHUNK_SZ_X) {
@@ -251,9 +318,11 @@ void ChunkManager::draw(glm::mat4 view, Camera *cam) {
 					}
 					if (frclInside) {
 						++chunkRendered;
-						std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
-						squareRendered += _chunkMap[chunkPos]->getNbSquareRendered();
-						_chunkMap[chunkPos]->draw(view, cam->pos);
+					    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
+							chunk = _chunkMap[chunkPos];
+						}
+						squareRendered += chunk->getNbSquareRendered();
+						chunk->draw(view, cam->pos);
 					}
 				}
 			}

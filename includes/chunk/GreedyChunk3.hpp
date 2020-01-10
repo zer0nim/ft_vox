@@ -21,7 +21,8 @@ class GreedyChunk3 : public AChunk {
 		GreedyChunk3 &operator=(GreedyChunk3 const &rhs);
 
 		static void			initShader(glm::mat4 &projection, TextureManager const &textureManager);
-		virtual void		update(bool firstUpdate = false);
+		virtual void		update(bool isChunkMapMutexed = true);
+		virtual bool		renderUpdate();  // return true if updated
 		virtual uint32_t	getNbSquareRendered() const;
 
 	protected:
@@ -30,7 +31,7 @@ class GreedyChunk3 : public AChunk {
 	private:
 		void	sendMeshData();
 		static void	sendConstUniforms(TextureManager const &textureManager);
-		void	calcGreedyChunk(bool firstUpdate);
+		void	calcGreedyChunk(bool isChunkMapMutexed);
 		uint8_t	getBlockOutside(wordIVec3 voxPos, std::array<AChunk*, 2> &nearbyChunks, int d, int sz);
 
 		bool					_meshUpdated;

@@ -23,7 +23,8 @@ class AChunk {
 		AChunk &operator=(AChunk const &rhs);
 
 		virtual void	draw(glm::mat4 &view, glm::vec3 &pos);
-		virtual void	update(bool firstUpdate = false) = 0;
+		virtual void	update(bool isChunkMapMutexed = true) = 0;
+		virtual bool	renderUpdate() = 0;  // return true if updated
 		void			createChunk(wordIVec3 const &chunkPos);
 		void			updateBlock(chunkVec3 pos, uint8_t value);
 		void			save();
@@ -72,6 +73,7 @@ class AChunk {
 		wordIVec3		_chunkPos;  // position of the chunk
 		std::string		_filename;
 		bool			_isModifiedFromBegining;  // true if the chunk was modified
+		bool			_needRenderUpdate;
 		TextureManager const &_textureManager;
 		ChunkManager	&_chunkManager;
 };

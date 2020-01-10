@@ -47,6 +47,7 @@ uint8_t	pk = TextureManager::blocksNames["pumpkin"];
 uint8_t	sb = TextureManager::blocksNames["stonebrick"];
 uint8_t	br = TextureManager::blocksNames["brick"];
 uint8_t	op = TextureManager::blocksNames["oak-planks"];
+uint8_t	sp = TextureManager::blocksNames["spruce-planks"];
 uint8_t	sc = TextureManager::blocksNames["stonebrick-cracked"];
 uint8_t	sm = TextureManager::blocksNames["stonebrick-mossy"];
 uint8_t	dl = TextureManager::blocksNames["spruce-door-lower"];
@@ -889,7 +890,7 @@ uint8_t	TREE_MODELS[NB_TREE_MODELS][TREE_HEIGHT][TREE_RADIUS * 2 + 1][TREE_RADIU
 		{
 			{ 0,  0,  0,  0,  0},
 			{ 0, sc, sc, sb,  0},
-			{ 0, sc, sb, sb,  0},
+			{ 0, sc, sp, sb,  0},
 			{ 0, sb, sb, sc,  0},
 			{ 0,  0,  0,  0,  0},
 		},
