@@ -81,7 +81,7 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 	}
 
 	// enable / disable fog
-	if (key == GLFW_KEY_F && action == GLFW_PRESS) {
+	if (key == GLFW_KEY_F && action == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_F3) == GLFW_RELEASE) {
 		s.g.fog.enabled = !s.g.fog.enabled;
 		AChunk::getShader().use();
 		AChunk::getShader().setBool("fog.enabled", s.g.fog.enabled);
