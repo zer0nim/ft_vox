@@ -5,7 +5,7 @@
 #include "ft_vox.hpp"
 #include "TextureManager.hpp"
 #include "AChunk.hpp"
-#include "GreedyChunk3.hpp"
+#include "Chunk.hpp"
 #include "ChunkManager.hpp"
 #include "MapGenerator.hpp"
 #include "utils/Shader.hpp"

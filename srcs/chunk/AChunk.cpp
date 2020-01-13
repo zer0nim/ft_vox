@@ -3,7 +3,7 @@
 #include <limits>
 #include <boost/filesystem.hpp>
 #include "AChunk.hpp"
-#include "GreedyChunk3.hpp"
+#include "Chunk.hpp"
 #include "ChunkManager.hpp"
 #include "MapGenerator.hpp"
 
