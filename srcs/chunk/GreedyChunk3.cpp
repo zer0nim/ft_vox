@@ -466,6 +466,6 @@ void	GreedyChunk3::sendConstUniforms(TextureManager const &textureManager) {
 
 uint32_t	GreedyChunk3::getNbSquareRendered() const {
     { std::lock_guard<std::mutex>	guard(mutexChunk);
-		return _faces.size();
+		return _nbVertices;
 	}
 }
