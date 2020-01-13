@@ -143,7 +143,7 @@ TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textur
 		skybox.getShader().setMat4("view", skyView);
 
 		// draw here
-		chunkManager.draw(view, winU->cam);
+		chunkManager.draw(winU->cam);
 
 		// draw skybox
 		skybox.draw();

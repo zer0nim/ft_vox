@@ -207,13 +207,13 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 	// map
 	/// camera
 	else if (element.is_number() && key == ".map.cameraStartPos.pos.x"
-	&& checkFloat(element, -18446744073709551616.0f, 18446744073709551615.0f))
+	&& checkFloat(element, -10000000.0f, 10000000.0f))
 		s.m.cameraStartPos.pos.x = element.get<float>();
 	else if (element.is_number() && key == ".map.cameraStartPos.pos.y"
-	&& checkFloat(element, -18446744073709551616.0f, 18446744073709551615.0f))
+	&& checkFloat(element, -10000000.0f, 10000000.0f))
 		s.m.cameraStartPos.pos.y = element.get<float>();
 	else if (element.is_number() && key == ".map.cameraStartPos.pos.z"
-	&& checkFloat(element, -18446744073709551616.0f, 18446744073709551615.0f))
+	&& checkFloat(element, -10000000.0f, 10000000.0f))
 		s.m.cameraStartPos.pos.z = element.get<float>();
 	else if (element.is_number() && key == ".map.cameraStartPos.yaw")
 		s.m.cameraStartPos.yaw = element.get<float>();

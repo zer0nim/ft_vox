@@ -293,21 +293,26 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 	}
 }
 
-void ChunkManager::draw(CAMERA_MAT4 view, Camera *cam) {
+void ChunkManager::draw(Camera *cam) {
 	CAMERA_VEC3	chunkSize(CHUNK_SZ_X, CHUNK_SZ_Y, CHUNK_SZ_Z);
 	uint32_t	chunkRendered = 0;
 	uint32_t	squareRendered = 0;
 	AChunk		*chunk;
-	wordIVec3	chunkOffset(0, 0, 0);  // an offset to avoid precision pbs
 
-	// if (view[3][0] < -1000 || view[3][0] > 1000) {
-	// 	chunkOffset.x = static_cast<int32_t>(view[3][0]) / 1000;
-	// 	view[3][0] = std::fmod(view[3][0], 1000);
-	// }
-	// if (view[3][2] < -1000 || view[3][2] > 1000) {
-	// 	chunkOffset.x = static_cast<int32_t>(view[3][2]) / 1000;
-	// 	view[3][2] = std::fmod(view[3][2], 1000);
-	// }
+	wordIVec3	chunkOffset(0, 0, 0);  // an offset to avoid precision pbs
+	CAMERA_MAT4	tmpView;
+	CAMERA_VEC3	tmpCamPos;
+
+	tmpCamPos = cam->pos;
+	if (tmpCamPos.x < -1000 || tmpCamPos.x > 1000) {
+		chunkOffset.x = static_cast<int32_t>(tmpCamPos.x) / 1000 * 1000;
+		tmpCamPos.x = std::fmod(tmpCamPos.x, 1000);
+	}
+	if (tmpCamPos.z < -1000 || tmpCamPos.z > 1000) {
+		chunkOffset.z = static_cast<int32_t>(tmpCamPos.z) / 1000 * 1000;
+		tmpCamPos.z = std::fmod(tmpCamPos.z, 1000);
+	}
+	tmpView = glm::lookAt(tmpCamPos, tmpCamPos + cam->front, cam->up);
 
 	for (int32_t x = _chunkActPos.x - CHUNK_SZ_X * (s.g.renderDist - 1);
 	x < _chunkActPos.x + CHUNK_SZ_X * s.g.renderDist; x += CHUNK_SZ_X) {
@@ -331,7 +336,7 @@ void ChunkManager::draw(CAMERA_MAT4 view, Camera *cam) {
 							chunk = _chunkMap[chunkPos];
 						}
 						squareRendered += chunk->getNbSquareRendered();
-						chunk->draw(view, chunkOffset, cam->pos);
+						chunk->draw(tmpView, chunkOffset, tmpCamPos);
 					}
 				}
 			}
@@ -347,7 +352,7 @@ void ChunkManager::draw(CAMERA_MAT4 view, Camera *cam) {
 			model = glm::translate(glm::mat4(1.0f), glm::vec3(raycast.selectedBlock));
 		}
 		_borderShader->use();
-		_borderShader->setMat4("view", view);
+		_borderShader->setMat4("view", tmpView);
 		_borderShader->setMat4("model", model);
 		glBindVertexArray(_borderShaderVAO);
 		glDrawArrays(GL_LINES, 0, 24);
