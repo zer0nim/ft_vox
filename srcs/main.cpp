@@ -119,7 +119,7 @@ TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textur
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// view matrix
-		glm::mat4	view;
+		CAMERA_MAT4	view;
 	    { std::lock_guard<std::mutex>	guard(s.mutexCamera);
 			view = winU->cam->getViewMatrix();
 		}
@@ -135,7 +135,7 @@ TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textur
 		// update raycast
 		chunkManager.updateRaycast();
 
-		glm::mat4	skyView = view;
+		CAMERA_MAT4	skyView = view;
 		skyView[3][0] = 0;  // remove translation for the skybox
 		skyView[3][1] = 0;
 		skyView[3][2] = 0;
@@ -143,7 +143,7 @@ TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textur
 		skybox.getShader().setMat4("view", skyView);
 
 		// draw here
-		chunkManager.draw(view, winU->cam);
+		chunkManager.draw(winU->cam);
 
 		// draw skybox
 		skybox.draw();

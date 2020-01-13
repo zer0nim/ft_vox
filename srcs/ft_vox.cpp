@@ -207,13 +207,13 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 	// map
 	/// camera
 	else if (element.is_number() && key == ".map.cameraStartPos.pos.x"
-	&& checkFloat(element, -18446744073709551616.0f, 18446744073709551615.0f))
+	&& checkFloat(element, -10000000.0f, 10000000.0f))
 		s.m.cameraStartPos.pos.x = element.get<float>();
 	else if (element.is_number() && key == ".map.cameraStartPos.pos.y"
-	&& checkFloat(element, -18446744073709551616.0f, 18446744073709551615.0f))
+	&& checkFloat(element, -10000000.0f, 10000000.0f))
 		s.m.cameraStartPos.pos.y = element.get<float>();
 	else if (element.is_number() && key == ".map.cameraStartPos.pos.z"
-	&& checkFloat(element, -18446744073709551616.0f, 18446744073709551615.0f))
+	&& checkFloat(element, -10000000.0f, 10000000.0f))
 		s.m.cameraStartPos.pos.z = element.get<float>();
 	else if (element.is_number() && key == ".map.cameraStartPos.yaw")
 		s.m.cameraStartPos.yaw = element.get<float>();
@@ -348,6 +348,7 @@ bool	createDir(std::string const &dirNames) {
 bool	createDir(char const *dirNames) { return createDir(std::string(dirNames)); }
 
 bool	createMapFiles() {
+	bool	isNewMap = false;
 	// create the maps directory
 	if (createDir(s.g.files.mapsPath) == false) {
 		return false;
@@ -356,6 +357,7 @@ bool	createMapFiles() {
 	s.m.fullMapName = std::string(s.g.files.mapsPath) + s.m.mapName;
 	if (boost::filesystem::is_directory(s.m.fullMapName) == false) {
 		logInfo("create " << s.m.mapName);
+		isNewMap = true;
 	}
 	else {
 		logInfo("load " << s.m.mapName);
@@ -383,7 +385,8 @@ bool	createMapFiles() {
 		}
 	}
 	else if (boost::filesystem::is_directory(s.m.fullMapName) == true) {
-		logWarn("unable to load settings from map");
+		if (!isNewMap)
+			logWarn("unable to load settings from map");
 	}
 	return true;
 }
