@@ -1400,6 +1400,26 @@ void		getChunkNormal(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_SZ_Y][C
 	getChunkNormalPerlin(chunkPos, data);
 }
 
+uint8_t		getDefaultElevation(int32_t x, int32_t z) {
+	uint8_t		data[CHUNK_SZ_X][CHUNK_SZ_Y][CHUNK_SZ_Z];
+	wordIVec3	pos(x, 0, z);
+	wordIVec3	chunkPos;
+
+	chunkPos.x = pos.x - pos.x % CHUNK_SZ_X + ((pos.x < 0 && pos.x % CHUNK_SZ_X != 0) ? -CHUNK_SZ_X : 0);
+	chunkPos.y = pos.y - pos.y % CHUNK_SZ_Y + ((pos.y < 0 && pos.y % CHUNK_SZ_Y != 0) ? -CHUNK_SZ_Y : 0);
+	chunkPos.z = pos.z - pos.z % CHUNK_SZ_Z + ((pos.z < 0 && pos.z % CHUNK_SZ_Z != 0) ? -CHUNK_SZ_Z : 0);
+	getChunk(chunkPos, data);
+
+	wordIVec3	posInChunk = pos - chunkPos;
+
+	for (int i = CHUNK_SZ_Y - 1; i >= 0; i--) {
+		if (data[posInChunk.x][i][posInChunk.z] > 0) {
+			return i + 4;
+		}
+	}
+	return 64;
+}
+
 void		getChunk(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_SZ_Y][CHUNK_SZ_Z]) {
 	if (s.m.generationType == GENERATION_VOID)
 		getChunkVoid(chunkPos, data);

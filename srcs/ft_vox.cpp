@@ -8,6 +8,7 @@
 #include "ft_vox.hpp"
 #include "ChunkManager.hpp"
 #include "TextRender.hpp"
+#include "MapGenerator.hpp"
 
 Settings s;
 
@@ -54,7 +55,7 @@ void	setDefaultSettings() {
 	s.m.generateTree = true;
 	s.m.generateOre = true;
 	s.m.cameraStartPos.pos.x = 0;
-	s.m.cameraStartPos.pos.y = 64;
+	s.m.cameraStartPos.pos.y = -1;
 	s.m.cameraStartPos.pos.z = 0;
 	s.m.cameraStartPos.yaw = -90;
 	s.m.cameraStartPos.pitch = 0;
@@ -385,8 +386,17 @@ bool	createMapFiles() {
 		}
 	}
 	else if (boost::filesystem::is_directory(s.m.fullMapName) == true) {
-		if (!isNewMap)
+		if (isNewMap) {
+			if (s.m.cameraStartPos.pos.y < 0) {
+				setSeed(s.m.seed);
+				s.m.cameraStartPos.pos.x += 0.5;
+				s.m.cameraStartPos.pos.z += 0.5;
+				s.m.cameraStartPos.pos.y = getDefaultElevation(s.m.cameraStartPos.pos.x, s.m.cameraStartPos.pos.z);
+			}
+		}
+		else {
 			logWarn("unable to load settings from map");
+		}
 	}
 	return true;
 }

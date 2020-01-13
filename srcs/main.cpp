@@ -279,6 +279,12 @@ int		main(int ac, char const **av) {
 
 	if (s.m.mapName == "") {  // load without mapName
 		logWarn("no mapname -> you can't save the map");
+		if (s.m.cameraStartPos.pos.y < 0) {
+			setSeed(s.m.seed);
+			s.m.cameraStartPos.pos.x += 0.5;
+			s.m.cameraStartPos.pos.z += 0.5;
+			s.m.cameraStartPos.pos.y = getDefaultElevation(s.m.cameraStartPos.pos.x, s.m.cameraStartPos.pos.z);
+		}
 	}
 	else {
 		if (createMapFiles() == false) {
