@@ -348,6 +348,7 @@ bool	createDir(std::string const &dirNames) {
 bool	createDir(char const *dirNames) { return createDir(std::string(dirNames)); }
 
 bool	createMapFiles() {
+	bool	isNewMap = false;
 	// create the maps directory
 	if (createDir(s.g.files.mapsPath) == false) {
 		return false;
@@ -356,6 +357,7 @@ bool	createMapFiles() {
 	s.m.fullMapName = std::string(s.g.files.mapsPath) + s.m.mapName;
 	if (boost::filesystem::is_directory(s.m.fullMapName) == false) {
 		logInfo("create " << s.m.mapName);
+		isNewMap = true;
 	}
 	else {
 		logInfo("load " << s.m.mapName);
@@ -383,7 +385,8 @@ bool	createMapFiles() {
 		}
 	}
 	else if (boost::filesystem::is_directory(s.m.fullMapName) == true) {
-		logWarn("unable to load settings from map");
+		if (!isNewMap)
+			logWarn("unable to load settings from map");
 	}
 	return true;
 }
