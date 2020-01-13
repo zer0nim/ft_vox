@@ -824,9 +824,9 @@ uint8_t	TREE_MODELS[NB_TREE_MODELS][TREE_HEIGHT][TREE_RADIUS * 2 + 1][TREE_RADIU
 		},
 		{
 			{ss, ss,  0, ss, ss},
-			{ss,  0,  0,  0, ss},
+			{ss, s1,  0, s1, ss},
 			{ 0,  0,  0,  0,  0},
-			{ss,  0,  0,  0, ss},
+			{ss, s1,  0, s1, ss},
 			{ss, ss,  0, ss, ss},
 		},
 		{

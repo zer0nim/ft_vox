@@ -349,7 +349,7 @@ void ChunkManager::draw(Camera *cam) {
 	if (blockSelected) {
 		glm::mat4 model;
 	    { std::lock_guard<std::mutex>	guard(s.mutexOthers);
-			model = glm::translate(glm::mat4(1.0f), glm::vec3(raycast.selectedBlock));
+			model = glm::translate(glm::mat4(1.0f), glm::vec3(raycast.selectedBlock - chunkOffset));
 		}
 		_borderShader->use();
 		_borderShader->setMat4("view", tmpView);
@@ -425,29 +425,40 @@ void ChunkManager::updateRaycast() {
 	wordIVec3	point;
 	wordIVec3	pointLastBlock;
 	bool		isBeforeBlock = false;
-	glm::mat4	view;
 	float		start = 0.6;
 	float		end = 0.99;
 	float		stepDivVal = 0.97;
 	float		step = 0.0005;
 	uint8_t		block = 0;
 
-    { std::lock_guard<std::mutex>	guard(s.mutexCamera);
-		view = _winU->cam->getViewMatrix();
+	wordIVec3	chunkOffset(0, 0, 0);  // an offset to avoid precision pbs
+	glm::mat4	tmpViewf;
+	CAMERA_VEC3	tmpCamPos;
+
+	tmpCamPos = _winU->cam->pos;
+	if (tmpCamPos.x < -1000 || tmpCamPos.x > 1000) {
+		chunkOffset.x = static_cast<int32_t>(tmpCamPos.x) / 1000 * 1000;
+		tmpCamPos.x = std::fmod(tmpCamPos.x, 1000);
 	}
+	if (tmpCamPos.z < -1000 || tmpCamPos.z > 1000) {
+		chunkOffset.z = static_cast<int32_t>(tmpCamPos.z) / 1000 * 1000;
+		tmpCamPos.z = std::fmod(tmpCamPos.z, 1000);
+	}
+	tmpViewf = glm::lookAt(tmpCamPos, tmpCamPos + _winU->cam->front, _winU->cam->up);
+
 	for (float dist = start; dist <= end; dist += step) {
 		if (dist >= stepDivVal) {
 			stepDivVal = 2;  // to enter in this condition only once
 			step /= 5;
 		}
 		glm::vec3 tmpPoint = glm::unProject(glm::vec3(s.g.screen.width / 2, s.g.screen.height / 2, dist),
-							   view,
+							   tmpViewf,
 							   _projection,
 							   glm::vec4(0, 0, s.g.screen.width, s.g.screen.height));
 		if (tmpPoint.x < 0) tmpPoint.x -= 1;
 		if (tmpPoint.y < 0) tmpPoint.y -= 1;
 		if (tmpPoint.z < 0) tmpPoint.z -= 1;
-		point = wordIVec3(tmpPoint);
+		point = wordIVec3(tmpPoint) + chunkOffset;
 	    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
 			block = getBlock(point);
 		}
