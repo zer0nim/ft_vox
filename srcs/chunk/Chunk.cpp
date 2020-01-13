@@ -414,7 +414,7 @@ void	Chunk::sendMeshData() {
 	}
 }
 
-void	Chunk::_draw(glm::mat4 &view, glm::vec3 &pos) {
+void	Chunk::_draw(CAMERA_MAT4 &view, wordIVec3 &chunkOffset, CAMERA_VEC3 &pos) {
 	if (_meshUpdated) {
 		_meshUpdated = false;
 		_nbVertices = 0;
@@ -428,7 +428,7 @@ void	Chunk::_draw(glm::mat4 &view, glm::vec3 &pos) {
 		_shaderData->shader->setVec3("viewPos", pos);
 		_shaderData->shader->setMat4("view", view);
 
-		glm::mat4 model = glm::translate(glm::mat4(1.0), glm::vec3(_chunkPos));
+		glm::mat4 model = glm::translate(glm::mat4(1.0), glm::vec3(_chunkPos - chunkOffset));
 		_shaderData->shader->setMat4("model", model);
 
 		glBindVertexArray(_vao);

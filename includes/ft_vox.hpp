@@ -63,7 +63,7 @@ filesystem
 
 typedef glm::tvec3<uint8_t>	chunkVec3;  // used for chunk coordinate
 typedef glm::tvec3<int32_t>	wordIVec3;  // used for word coordinate in int (bloc)
-typedef glm::tvec3<float>	wordFVec3;  // user for word coordinate in float (camera)
+typedef CAMERA_VEC3			wordFVec3;  // user for word coordinate in float (camera)
 
 enum class Direction {
 	FRONT,

@@ -5,8 +5,8 @@
 
 class CameraCreative : public Camera {
 	public:
-		CameraCreative(glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = \
-		glm::vec3(0.0f, 1.0f, 0.0f), float yaw = -90.0f, float pitch = 0.0f);
+		CameraCreative(CAMERA_VEC3 pos = CAMERA_VEC3(0.0f, 0.0f, 0.0f), CAMERA_VEC3 up = \
+		CAMERA_VEC3(0.0f, 1.0f, 0.0f), CAMERA_FLOAT yaw = -90.0f, CAMERA_FLOAT pitch = 0.0f);
 		CameraCreative(CameraCreative const &src);
 		virtual ~CameraCreative();
 

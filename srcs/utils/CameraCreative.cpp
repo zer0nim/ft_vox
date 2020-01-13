@@ -1,6 +1,6 @@
 #include "CameraCreative.hpp"
 
-CameraCreative::CameraCreative(glm::vec3 pos, glm::vec3 up, float yaw, float pitch)
+CameraCreative::CameraCreative(CAMERA_VEC3 pos, CAMERA_VEC3 up, CAMERA_FLOAT yaw, CAMERA_FLOAT pitch)
 : Camera(pos, up, yaw, pitch) {
 }
 

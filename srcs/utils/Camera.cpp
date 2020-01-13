@@ -1,9 +1,9 @@
 #include "Camera.hpp"
 #include "Logging.hpp"
 
-Camera::Camera(glm::vec3 pos, glm::vec3 up, float yaw, float pitch)
+Camera::Camera(CAMERA_VEC3 pos, CAMERA_VEC3 up, CAMERA_FLOAT yaw, CAMERA_FLOAT pitch)
 : pos(pos),
-  front(glm::vec3(0.0f, 0.0f, -1.0f)),
+  front(CAMERA_VEC3(0.0f, 0.0f, -1.0f)),
   worldUp(up),
   yaw(yaw),
   pitch(pitch),
@@ -40,22 +40,22 @@ Camera &Camera::operator=(Camera const &rhs) {
 	return *this;
 }
 
-void Camera::run(float dtTime) {
+void Camera::run(CAMERA_FLOAT dtTime) {
 	// process for each frame (gravity)
 	(void)dtTime;
 }
 
-glm::mat4 Camera::getViewMatrix() const {
+CAMERA_MAT4 Camera::getViewMatrix() const {
 	return glm::lookAt(pos, pos + front, up);
 }
 
-void Camera::processKeyboard(CamMovement direction, float dtTime, bool isRun) {
-	float	velocity;
+void Camera::processKeyboard(CamMovement direction, CAMERA_FLOAT dtTime, bool isRun) {
+	CAMERA_FLOAT	velocity;
 
 	velocity = movementSpeed * dtTime * ((isRun) ? runFactor : 1);
 	if (direction == CamMovement::Forward) {
 		#if CONSTRAINT_Y == true
-			glm::vec3 tmpFront = front;
+			CAMERA_VEC3 tmpFront = front;
 			tmpFront.y = 0;
 			tmpFront = glm::normalize(tmpFront);
 			pos = pos + tmpFront * velocity;
@@ -65,7 +65,7 @@ void Camera::processKeyboard(CamMovement direction, float dtTime, bool isRun) {
 	}
 	if (direction == CamMovement::Backward) {
 		#if CONSTRAINT_Y == true
-			glm::vec3 tmpFront = front;
+			CAMERA_VEC3 tmpFront = front;
 			tmpFront.y = 0;
 			tmpFront = glm::normalize(tmpFront);
 			pos = pos - tmpFront * velocity;
@@ -87,7 +87,7 @@ void Camera::processKeyboard(CamMovement direction, float dtTime, bool isRun) {
 	}
 }
 
-void Camera::processMouseMovement(float xOffset, float yOffset, bool constrainPitch) {
+void Camera::processMouseMovement(CAMERA_FLOAT xOffset, CAMERA_FLOAT yOffset, bool constrainPitch) {
 	xOffset *= mouseSensitivity;
 	yOffset *= mouseSensitivity;
 
@@ -105,7 +105,7 @@ void Camera::processMouseMovement(float xOffset, float yOffset, bool constrainPi
 	updateCameraVectors();
 }
 
-void Camera::processMouseScroll(float yOffset) {
+void Camera::processMouseScroll(CAMERA_FLOAT yOffset) {
 	if (zoom >= 1.0f && zoom <= 45.0f)
 		zoom -= yOffset;
 	if (zoom <= 1.0f)
@@ -115,7 +115,7 @@ void Camera::processMouseScroll(float yOffset) {
 }
 
 void Camera::updateCameraVectors() {
-	glm::vec3 nFront;
+	CAMERA_VEC3 nFront;
 
 	nFront.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 	nFront.y = sin(glm::radians(pitch));
@@ -138,8 +138,8 @@ void Camera::resetPosition() {
 /*
 init the frustum culling (take the same args as projection matrix)
 */
-void Camera::frustumCullingInit(float angleDeg, float ratio, float nearD, float farD) {
-	_frustumCulling.tang = static_cast<float>(glm::tan(glm::radians(angleDeg * 0.5)));
+void Camera::frustumCullingInit(CAMERA_FLOAT angleDeg, CAMERA_FLOAT ratio, CAMERA_FLOAT nearD, CAMERA_FLOAT farD) {
+	_frustumCulling.tang = static_cast<CAMERA_FLOAT>(glm::tan(glm::radians(angleDeg * 0.5)));
 
 	_frustumCulling.ratio = ratio;
 	_frustumCulling.nearD = nearD;
@@ -154,8 +154,8 @@ void Camera::frustumCullingInit(float angleDeg, float ratio, float nearD, float 
 /*
 check if a point is inside or outside the camera
 */
-int		Camera::frustumCullingCheckPoint(glm::vec3 const &point) {
-	float	pcz, pcx, pcy, aux;
+int		Camera::frustumCullingCheckPoint(CAMERA_VEC3 const &point) {
+	CAMERA_FLOAT	pcz, pcx, pcy, aux;
 	int		res = FRCL_INSIDE;
 
 	if (!_frustumCulling.enabled) {
@@ -164,7 +164,7 @@ int		Camera::frustumCullingCheckPoint(glm::vec3 const &point) {
 	}
 
 	// compute vector from camera position to p
-	glm::vec3 point2pos = point - pos;
+	CAMERA_VEC3 point2pos = point - pos;
 
 	// compute and test the Z coordinate to get distance from camera
 	pcz = glm::dot(point2pos, front);
@@ -197,10 +197,10 @@ check if a cube is inside or outside of the camera
 startPoint is the 0|0|0 coordinate of the cube
 size if the scale in X Y and Z
 */
-int		Camera::frustumCullingCheckCube(glm::vec3 const &startPoint, glm::vec3 &size) {
+int		Camera::frustumCullingCheckCube(CAMERA_VEC3 const &startPoint, CAMERA_VEC3 &size) {
 	int			res;  // point1 & point2 & point3 ...
 	int			tmpRes;
-	glm::vec3	pos;
+	CAMERA_VEC3	pos;
 
 	// compute on all positions
 	pos = startPoint;

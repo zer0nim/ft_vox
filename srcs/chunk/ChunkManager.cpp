@@ -293,11 +293,21 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 	}
 }
 
-void ChunkManager::draw(glm::mat4 view, Camera *cam) {
-	glm::vec3	chunkSize(CHUNK_SZ_X, CHUNK_SZ_Y, CHUNK_SZ_Z);
+void ChunkManager::draw(CAMERA_MAT4 view, Camera *cam) {
+	CAMERA_VEC3	chunkSize(CHUNK_SZ_X, CHUNK_SZ_Y, CHUNK_SZ_Z);
 	uint32_t	chunkRendered = 0;
 	uint32_t	squareRendered = 0;
 	AChunk		*chunk;
+	wordIVec3	chunkOffset(0, 0, 0);  // an offset to avoid precision pbs
+
+	// if (view[3][0] < -1000 || view[3][0] > 1000) {
+	// 	chunkOffset.x = static_cast<int32_t>(view[3][0]) / 1000;
+	// 	view[3][0] = std::fmod(view[3][0], 1000);
+	// }
+	// if (view[3][2] < -1000 || view[3][2] > 1000) {
+	// 	chunkOffset.x = static_cast<int32_t>(view[3][2]) / 1000;
+	// 	view[3][2] = std::fmod(view[3][2], 1000);
+	// }
 
 	for (int32_t x = _chunkActPos.x - CHUNK_SZ_X * (s.g.renderDist - 1);
 	x < _chunkActPos.x + CHUNK_SZ_X * s.g.renderDist; x += CHUNK_SZ_X) {
@@ -321,7 +331,7 @@ void ChunkManager::draw(glm::mat4 view, Camera *cam) {
 							chunk = _chunkMap[chunkPos];
 						}
 						squareRendered += chunk->getNbSquareRendered();
-						chunk->draw(view, cam->pos);
+						chunk->draw(view, chunkOffset, cam->pos);
 					}
 				}
 			}

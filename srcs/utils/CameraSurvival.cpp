@@ -1,7 +1,7 @@
 #include "CameraSurvival.hpp"
 #include "ChunkManager.hpp"
 
-CameraSurvival::CameraSurvival(tWinUser * winU, glm::vec3 pos, glm::vec3 up, float yaw, float pitch)
+CameraSurvival::CameraSurvival(tWinUser * winU, CAMERA_VEC3 pos, CAMERA_VEC3 up, CAMERA_FLOAT yaw, CAMERA_FLOAT pitch)
 : Camera(pos, up, yaw, pitch),
   gravity(SURV_GRAVITY),
   jumpHeight(SURV_JUMP_HEIGHT),
@@ -28,10 +28,10 @@ CameraSurvival &CameraSurvival::operator=(CameraSurvival const &rhs) {
 	return *this;
 }
 
-void CameraSurvival::run(float dtTime) {
+void CameraSurvival::run(CAMERA_FLOAT dtTime) {
 	if (_curJumping >= 0 && _curJumping <= jumpHeight) {
 		_curJumping += jumpSpeed * dtTime;
-		glm::vec3 tmpPos = pos;
+		CAMERA_VEC3 tmpPos = pos;
 		// move up
 		_move(pos + worldUp * jumpSpeed * dtTime);
 		if (tmpPos.y == pos.y) {
@@ -50,18 +50,18 @@ void CameraSurvival::run(float dtTime) {
 	}
 }
 
-void CameraSurvival::processKeyboard(CamMovement direction, float dtTime, bool isRun) {
-	float	velocity;
+void CameraSurvival::processKeyboard(CamMovement direction, CAMERA_FLOAT dtTime, bool isRun) {
+	CAMERA_FLOAT	velocity;
 
 	velocity = movementSpeed * dtTime * ((isRun) ? runFactor : 1);
 	if (direction == CamMovement::Forward) {
-		glm::vec3 tmpFront = front;
+		CAMERA_VEC3 tmpFront = front;
 		tmpFront.y = 0;
 		tmpFront = glm::normalize(tmpFront);
 		_move(pos + tmpFront * velocity);
 	}
 	if (direction == CamMovement::Backward) {
-		glm::vec3 tmpFront = front;
+		CAMERA_VEC3 tmpFront = front;
 		tmpFront.y = 0;
 		tmpFront = glm::normalize(tmpFront);
 		_move(pos - tmpFront * velocity);
@@ -87,8 +87,8 @@ void CameraSurvival::processKeyboard(CamMovement direction, float dtTime, bool i
 void CameraSurvival::resetPosition() {}
 
 bool CameraSurvival::isOnBlock(wordIVec3 blockPos) const {
-	glm::vec3 posBottom = pos + (worldUp * -eyeHeight);
-	glm::vec3 posUp = pos + (worldUp * (height - eyeHeight));
+	CAMERA_VEC3 posBottom = pos + (worldUp * -eyeHeight);
+	CAMERA_VEC3 posUp = pos + (worldUp * (height - eyeHeight));
 
 	// check out of X
 	if (blockPos.x + 1 < posBottom.x - radius || blockPos.x > posBottom.x + radius)
@@ -105,18 +105,18 @@ bool CameraSurvival::isOnBlock(wordIVec3 blockPos) const {
 	return true;
 }
 
-void CameraSurvival::_move(glm::vec3 dest, bool _underMove) {
+void CameraSurvival::_move(CAMERA_VEC3 dest, bool _underMove) {
 	Constraints	tmpCons;
-	float		moveLength = glm::length(dest - pos);
+	CAMERA_FLOAT		moveLength = glm::length(dest - pos);
 
 	if (_underMove == false && moveLength > MOVING_COLISION_PRECISION) {  // split into multiple move
 		// call move multiple times
-		glm::vec3	moveDir = glm::normalize(dest - pos);
-		glm::vec3	startPos = pos;
-		glm::vec3	tmpPos = pos;
+		CAMERA_VEC3	moveDir = glm::normalize(dest - pos);
+		CAMERA_VEC3	startPos = pos;
+		CAMERA_VEC3	tmpPos = pos;
 		bool		stopMoving = false;
 
-		for (float i = MOVING_COLISION_PRECISION; i < moveLength; i += MOVING_COLISION_PRECISION) {
+		for (CAMERA_FLOAT i = MOVING_COLISION_PRECISION; i < moveLength; i += MOVING_COLISION_PRECISION) {
 			_move(startPos + moveDir * i, true);
 			if (tmpPos == pos) {  // if the "move" call doesn't move the player
 				stopMoving = true;
@@ -152,11 +152,11 @@ void CameraSurvival::_move(glm::vec3 dest, bool _underMove) {
 		pos.z = dest.z;
 }
 
-CameraSurvival::Constraints CameraSurvival::_getConstraints(glm::vec3 dest) {
+CameraSurvival::Constraints CameraSurvival::_getConstraints(CAMERA_VEC3 dest) {
 	Constraints constraints = Constraints();
-	glm::vec3 posBottom = dest + (worldUp * -eyeHeight);
-	glm::vec3 posUp = dest + (worldUp * (height - eyeHeight));
-	glm::vec3 tmpPos;
+	CAMERA_VEC3 posBottom = dest + (worldUp * -eyeHeight);
+	CAMERA_VEC3 posUp = dest + (worldUp * (height - eyeHeight));
+	CAMERA_VEC3 tmpPos;
 
 	// Y constraints
 	tmpPos = posBottom; tmpPos.x += radius; tmpPos.z += radius;
@@ -184,8 +184,8 @@ CameraSurvival::Constraints CameraSurvival::_getConstraints(glm::vec3 dest) {
 	if (_winU->chunkManager->getBlock(tmpPos) > 0) constraints.positiveY = true;
 
 	// test at a few height
-	for (float yAdd = 0.1; yAdd <= height; yAdd += 0.5) {
-		glm::vec3 posY = posBottom + (worldUp * yAdd);
+	for (CAMERA_FLOAT yAdd = 0.1; yAdd <= height; yAdd += 0.5) {
+		CAMERA_VEC3 posY = posBottom + (worldUp * yAdd);
 
 		// X constraints
 		tmpPos = posY; tmpPos.x -= radius;

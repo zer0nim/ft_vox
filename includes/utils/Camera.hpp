@@ -30,59 +30,63 @@ enum class CamMovement {
 #define FRCL_IS_INSIDE(frustumRes) (frustumRes == FRCL_INSIDE)
 #define FRCL_IS_OUTSIDE(frustumRes) (frustumRes > FRCL_INSIDE)
 
+#define CAMERA_VEC3		glm::tvec3<double>
+#define CAMERA_MAT4		glm::dmat4
+#define CAMERA_FLOAT	double
+
 class Camera {
 	public:
-		Camera(glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = \
-		glm::vec3(0.0f, 1.0f, 0.0f), float yaw = -90.0f, float pitch = 0.0f);
+		Camera(CAMERA_VEC3 pos = CAMERA_VEC3(0.0f, 0.0f, 0.0f), CAMERA_VEC3 up = \
+		CAMERA_VEC3(0.0f, 1.0f, 0.0f), CAMERA_FLOAT yaw = -90.0f, CAMERA_FLOAT pitch = 0.0f);
 		Camera(Camera const &src);
 		virtual ~Camera();
 
 		Camera &operator=(Camera const &rhs);
 
-		virtual void run(float dtTime);  // call this function each frame
-		glm::mat4 getViewMatrix() const;
-		virtual void processKeyboard(CamMovement direction, float dtTime, bool isRun = false);
-		virtual void processMouseMovement(float xOffset, float yOffset, bool constrainPitch = true);
-		virtual void processMouseScroll(float yOffset);
+		virtual void run(CAMERA_FLOAT dtTime);  // call this function each frame
+		CAMERA_MAT4 getViewMatrix() const;
+		virtual void processKeyboard(CamMovement direction, CAMERA_FLOAT dtTime, bool isRun = false);
+		virtual void processMouseMovement(CAMERA_FLOAT xOffset, CAMERA_FLOAT yOffset, bool constrainPitch = true);
+		virtual void processMouseScroll(CAMERA_FLOAT yOffset);
 		virtual void resetPosition();
 
 		/*
 		check if objects are inside or outside of the camera
 		*/
-		void	frustumCullingInit(float angleDeg, float ratio, float nearD, float farD);
-		int		frustumCullingCheckPoint(glm::vec3 const &point);  // check if a point is inside the camera
-		int		frustumCullingCheckCube(glm::vec3 const &startPoint, glm::vec3 &size);  // check for a cube
+		void	frustumCullingInit(CAMERA_FLOAT angleDeg, CAMERA_FLOAT ratio, CAMERA_FLOAT nearD, CAMERA_FLOAT farD);
+		int		frustumCullingCheckPoint(CAMERA_VEC3 const &point);  // check if a point is inside the camera
+		int		frustumCullingCheckCube(CAMERA_VEC3 const &startPoint, CAMERA_VEC3 &size);  // check for a cube
 
-		glm::vec3	pos;
-		glm::vec3	front;
-		glm::vec3	up;
-		glm::vec3	right;
-		glm::vec3	worldUp;
+		CAMERA_VEC3	pos;
+		CAMERA_VEC3	front;
+		CAMERA_VEC3	up;
+		CAMERA_VEC3	right;
+		CAMERA_VEC3	worldUp;
 
-		float		yaw;
-		float		pitch;
+		CAMERA_FLOAT		yaw;
+		CAMERA_FLOAT		pitch;
 
-		float		movementSpeed;
-		float		mouseSensitivity;
-		float		runFactor;
-		float		zoom;
+		CAMERA_FLOAT		movementSpeed;
+		CAMERA_FLOAT		mouseSensitivity;
+		CAMERA_FLOAT		runFactor;
+		CAMERA_FLOAT		zoom;
 
 	private:
 		void updateCameraVectors();
 
 		/* used to reset position and rotation */
-		glm::vec3	_startPos;
-		float		_startYaw;
-		float		_startPitch;
+		CAMERA_VEC3	_startPos;
+		CAMERA_FLOAT		_startYaw;
+		CAMERA_FLOAT		_startPitch;
 
 		struct FrustumCulling {  // frustum culling parameters
 			bool	enabled;
-			float	nearD;
-			float	farD;
-			float	width;
-			float	height;
-			float	tang;
-			float	ratio;
+			CAMERA_FLOAT	nearD;
+			CAMERA_FLOAT	farD;
+			CAMERA_FLOAT	width;
+			CAMERA_FLOAT	height;
+			CAMERA_FLOAT	tang;
+			CAMERA_FLOAT	ratio;
 
 			FrustumCulling() : enabled(false) {}
 		};

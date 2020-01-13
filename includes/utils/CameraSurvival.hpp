@@ -17,25 +17,25 @@
 
 class CameraSurvival : public Camera {
 	public:
-		CameraSurvival(tWinUser * winU, glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = \
-		glm::vec3(0.0f, 1.0f, 0.0f), float yaw = -90.0f, float pitch = 0.0f);
+		CameraSurvival(tWinUser * winU, CAMERA_VEC3 pos = CAMERA_VEC3(0.0f, 0.0f, 0.0f), CAMERA_VEC3 up = \
+		CAMERA_VEC3(0.0f, 1.0f, 0.0f), CAMERA_FLOAT yaw = -90.0f, CAMERA_FLOAT pitch = 0.0f);
 		CameraSurvival(CameraSurvival const &src);
 		virtual ~CameraSurvival();
 
 		CameraSurvival &operator=(CameraSurvival const &rhs);
 
-		virtual void run(float dtTime);  // call  this function each frame
-		virtual void processKeyboard(CamMovement direction, float dtTime, bool isRun = false);
+		virtual void run(CAMERA_FLOAT dtTime);  // call  this function each frame
+		virtual void processKeyboard(CamMovement direction, CAMERA_FLOAT dtTime, bool isRun = false);
 		virtual void resetPosition();  // this function does nothing
 
 		bool isOnBlock(wordIVec3 blockPos) const;
 
-		float		gravity;
-		float		jumpHeight;
-		float		jumpSpeed;
-		float		height;
-		float		eyeHeight;
-		float		radius;
+		CAMERA_FLOAT	gravity;
+		CAMERA_FLOAT	jumpHeight;
+		CAMERA_FLOAT	jumpSpeed;
+		CAMERA_FLOAT	height;
+		CAMERA_FLOAT	eyeHeight;
+		CAMERA_FLOAT	radius;
 
 	private:
 		struct Constraints {  // true == unable to move
@@ -51,10 +51,10 @@ class CameraSurvival : public Camera {
 		};
 
 		CameraSurvival();
-		void _move(glm::vec3 dest, bool _underMove = false);
-		Constraints _getConstraints(glm::vec3 dest);
+		void _move(CAMERA_VEC3 dest, bool _underMove = false);
+		Constraints _getConstraints(CAMERA_VEC3 dest);
 
 		tWinUser *	_winU;
 
-		float		_curJumping;  // current jumping height -> if _curJumping < 0: no jump
+		CAMERA_FLOAT		_curJumping;  // current jumping height -> if _curJumping < 0: no jump
 };
