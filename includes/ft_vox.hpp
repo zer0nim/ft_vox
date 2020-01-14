@@ -26,7 +26,7 @@
 
 #define ENABLE_MAX_CREATED_CHUNK_UPDATE	true  // enable / disable option
 #define LOAD_ALL_BEFORE_OPEN_WINDOW		false
-#define MAX_CREATED_CHUNK_UPDATE_COUNT	2  // create max # chunks each update call (don't create all at the same update)
+#define MAX_CREATED_CHUNK_UPDATE_COUNT	1  // create max # chunks each update call (don't create all at the same update)
 #define REMOVE_CHUNKS_BORDERS			true
 #define MAX_RENDER_CHUNK_UPDATE_COUNT	1  // update render of # chunks (if there are all created)
 
