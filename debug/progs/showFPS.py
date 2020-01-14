@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 
+NB_SMOOTH_VAL = 10
+
 fpsHeader = "FPS: "
 threadNamesep = "|"
 fpsEnd = "ENDFPS"
@@ -52,12 +54,29 @@ color = [
 	'black',
 ]
 i = 1
+plt.title("FPS")
+plt.xlabel("time (sec)")
+plt.ylabel("FPS")
 for name in allFps:
 	arr = np.array(allFps[name])
-	plt.title("FPS")
-	plt.xlabel("time (sec)")
-	plt.ylabel("FPS")
 	plt.plot(arr[:,0], arr[:,1], label=name, color=color[i % len(color)])
-	i += 1
+
+	arrSmooth = []
+	i = 0
+	while i < len(arr):
+		tmpVal = 0
+		j = 0
+		while i + j < len(arr) and j < NB_SMOOTH_VAL:
+			tmpVal += arr[i + j][1]
+			j += 1
+		tmpVal /= j
+		try:
+			time_s = arr[i][0] + (arr[i + j][0] - arr[i][0]) / 2
+		except IndexError:
+			time_s = arr[-1][0]
+		arrSmooth.append([arr[i][0], tmpVal])
+		i += j
+	arrSmooth = np.array(arrSmooth)
+	plt.plot(arrSmooth[:,0], arrSmooth[:,1], label=name + ' smooth', color='red')
 plt.legend()
 plt.show()
