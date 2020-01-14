@@ -14,6 +14,7 @@ fpsHeader = "FPS: "
 threadNamesep = "|"
 fpsEnd = "ENDFPS"
 allFps = {}
+firstMillis = -1
 while 1:
 	try:
 		try:
@@ -26,12 +27,14 @@ while 1:
 			curMillis = int(round(time.time() * 1000))
 			if ms < curMillis - 1000 or ms > curMillis + 1000:
 				continue
+			if (firstMillis == -1):
+				firstMillis = ms
 			count = int(a.split(threadNamesep)[3].strip())
 			if count <= 0 or count > 10000:
 				continue
 			if name not in allFps:
 				allFps[name] = []
-			allFps[name].append([ms, 1000 / count])
+			allFps[name].append([(ms - firstMillis) / 1000, 1000 / count])
 		elif a == fpsEnd:
 			break
 		else:
@@ -51,6 +54,9 @@ color = [
 i = 1
 for name in allFps:
 	arr = np.array(allFps[name])
+	plt.title("FPS")
+	plt.xlabel("time (sec)")
+	plt.ylabel("FPS")
 	plt.plot(arr[:,0], arr[:,1], label=name, color=color[i % len(color)])
 	i += 1
 plt.legend()
