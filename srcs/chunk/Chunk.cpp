@@ -161,14 +161,17 @@ void	Chunk::calcGreedyChunk(bool isChunkMapMutexed) {
 				if (isChunkMapMutexed == false) {
 					std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
 					exist = _chunkManager.isChunkExist(nearbyPos);
+					if (exist) {
+						nearbyChunks[0] = _chunkManager.getChunkMap()[nearbyPos];
+					}
 				}
 				else {
 					exist = _chunkManager.isChunkExist(nearbyPos);
+					if (exist) {
+						nearbyChunks[0] = _chunkManager.getChunkMap()[nearbyPos];
+					}
 				}
-				if (exist) {
-					nearbyChunks[0] = _chunkManager.getChunkMap()[nearbyPos];
-				}
-				else if (backFace && (d == 0 || d == 2)) {  // if x or z -> need refresh when nearby chunks will exist
+				if (exist == false && backFace && (d == 0 || d == 2)) {  // if x or z -> need refresh when nearby chunks will exist
 					_needRenderUpdate++;
 				}
 
@@ -177,14 +180,17 @@ void	Chunk::calcGreedyChunk(bool isChunkMapMutexed) {
 				if (isChunkMapMutexed == false) {
 					std::lock_guard<std::mutex>	guard(s.mutexChunkMap);
 					exist = _chunkManager.isChunkExist(nearbyPos);
+					if (exist) {
+						nearbyChunks[1] = _chunkManager.getChunkMap()[nearbyPos];
+					}
 				}
 				else {
 					exist = _chunkManager.isChunkExist(nearbyPos);
+					if (exist) {
+						nearbyChunks[1] = _chunkManager.getChunkMap()[nearbyPos];
+					}
 				}
-				if (exist) {
-					nearbyChunks[1] = _chunkManager.getChunkMap()[nearbyPos];
-				}
-				else if (backFace && (d == 0 || d == 2)) {  // if x or z -> need refresh when nearby chunks will exist
+				if (exist == false && backFace && (d == 0 || d == 2)) {  // if x or z -> need refresh when nearby chunks will exist
 					_needRenderUpdate++;
 				}
 			#else
