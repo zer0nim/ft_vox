@@ -230,10 +230,17 @@ void	Chunk::calcGreedyChunk(bool isChunkMapMutexed) {
 							b = getBlockOutside(voxPos, nearbyChunks, d, chunkSz[d]);
 						}
 
+						bool	transparentCond =	(a != 0 && b != 0 && a != UNKNOW_BLOCK && b != UNKNOW_BLOCK && \
+													_textureManager.getBlocks()[a - 1]->isTransparent && \
+													_textureManager.getBlocks()[b - 1]->isTransparent);
+						if (transparentCond) {
+							transparentCond = (a == b);
+						}
 						// fill the mask
-						if ((a != 0 && b != 0 && a != UNKNOW_BLOCK && b != UNKNOW_BLOCK
-						&& _textureManager.getBlocks()[a - 1]->isTransparent == \
-						_textureManager.getBlocks()[b - 1]->isTransparent) || \
+						if ((a != 0 && b != 0 && a != UNKNOW_BLOCK && b != UNKNOW_BLOCK &&
+						_textureManager.getBlocks()[a - 1]->isTransparent == false && \
+						_textureManager.getBlocks()[a - 1]->isTransparent == _textureManager.getBlocks()[b - 1]->isTransparent) || \
+						transparentCond || \
 						(backFace && voxPos[d] == chunkSz[d]) || (!backFace && voxPos[d] == 0)) {
 							mask[n] = 0;
 						}
