@@ -388,6 +388,9 @@ void	Chunk::update(bool isChunkMapMutexed) {
 }
 
 bool	Chunk::renderUpdate(int32_t startX, int32_t startZ) {
+	if (_data.nbBlocks == 0)
+		return _data.isModified;
+
 	int minRenderUpdate = 0;  // the minimum of border to ignore update (default 0, 1 or 2 if the chunk is on map border)
 	if (_chunkPos.x <= startX || _chunkPos.x >= startX + ((s.g.perf.renderDist - 1) * 2) * CHUNK_SZ_X) {
 		minRenderUpdate++;

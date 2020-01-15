@@ -19,7 +19,7 @@
 			"width": 1200,
 			"height": 800,
 			"inventorySzPercent": 5,
-			"inventoryPreviewSize": 15,
+			"inventoryPreviewSize": 4,
 			"text": {
 				"normal": {
 					"path": "assets/fonts/minecraft_normal.ttf",
@@ -72,8 +72,8 @@
 		"generateOre": true,
 		"cameraStartPos": {
 			"pos": {
-				"x": 0,
-				"z": 0
+				"x": 8,
+				"z": 8
 			},
 			"yaw": -90,
 			"pitch": 0
