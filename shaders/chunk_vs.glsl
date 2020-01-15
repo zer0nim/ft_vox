@@ -26,8 +26,7 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-// TODO(zer0nim): need to compare speed with uniform
-const vec3 normals[6] = vec3[6](
+uniform vec3 normals[6] = vec3[6](
 	vec3(0.0f, 0.0f, 1.0f),
 	vec3(1.0f, 0.0f, 0.0f),
 	vec3(0.0f, 0.0f, -1.0f),
