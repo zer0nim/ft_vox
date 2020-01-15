@@ -1348,6 +1348,9 @@ uint32_t		getChunkNormalPerlin(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHU
 							treeMap[i][j].elevation -= mapInfo.yFactor * 2;
 						}
 				}
+				if (treeMap[i][j].isTree && treeMap[i][j].elevation >= mapInfo.yFactor * MAP_TOP_SNOW_HEIGHT) {
+					treeMap[i][j].isTree = false;  // remove tree in snow
+				}
 				j++;
 			}
 			i++;
