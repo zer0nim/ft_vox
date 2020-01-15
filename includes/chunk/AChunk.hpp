@@ -12,8 +12,9 @@ class AChunk {
 		struct ChunkData {
 			uint8_t		data[CHUNK_SZ_X][CHUNK_SZ_Y][CHUNK_SZ_Z];
 			bool		isModified;
+			uint32_t	nbBlocks;
 
-			ChunkData() : isModified(true) {}
+			ChunkData() : isModified(true), nbBlocks(0) {}
 		};
 
 		explicit AChunk(TextureManager const &textureManager, ChunkManager &chunkManager);

@@ -39,11 +39,14 @@ AChunk &AChunk::operator=(AChunk const &rhs) {
 
 void	AChunk::draw(CAMERA_MAT4 &view, wordIVec3 &chunkOffset, CAMERA_VEC3 &pos) {
     { std::lock_guard<std::mutex>	guard(mutexChunk);
-		_draw(view, chunkOffset, pos);
+		if (_data.nbBlocks > 0) {
+			_draw(view, chunkOffset, pos);
+		}
 	}
 }
 
 bool	AChunk::_createChunkFromFile() {
+	_data.nbBlocks = 0;
 	std::ifstream chunkFile(_filename);
 	if (chunkFile.fail()) {
 		logErr("failed to open file " << _filename << " " << strerror(errno));
@@ -85,6 +88,8 @@ bool	AChunk::_createChunkFromFile() {
 				}
 				else {
 					_data.data[x][y][z] = number;
+					if (number > 0)
+						_data.nbBlocks++;
 				}
 			}
 		}
@@ -93,7 +98,7 @@ bool	AChunk::_createChunkFromFile() {
 }
 
 void	AChunk::_createChunk() {
-	getChunk(_chunkPos, _data.data);
+	_data.nbBlocks = getChunk(_chunkPos, _data.data);
 }
 
 void	AChunk::createChunk(wordIVec3 const &chunkPos) {
@@ -118,6 +123,13 @@ void	AChunk::createChunk(wordIVec3 const &chunkPos) {
 void AChunk::updateBlock(chunkVec3 pos, uint8_t value) {
 	if (_data.data[pos.x][pos.y][pos.z] == value)
 		return;  // unchanged chunk
+
+	if (value == 0) {
+		_data.nbBlocks--;
+	}
+	else if (_data.data[pos.x][pos.y][pos.z] == 0) {
+		_data.nbBlocks++;
+	}
 	_data.data[pos.x][pos.y][pos.z] = value;
 
 	// update chunk around if needed

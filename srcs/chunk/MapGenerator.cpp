@@ -1021,20 +1021,26 @@ bool &isTreeXZ) {
 	return 0;
 }
 
-void		getChunkVoid(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_SZ_Y][CHUNK_SZ_Z]) {
+uint32_t	getChunkVoid(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_SZ_Y][CHUNK_SZ_Z]) {
+	uint32_t	nbBlocks = 0;
 	for (uint8_t ix = 0; ix < CHUNK_SZ_X; ix++) {
 		for (uint8_t iy = 0; iy < CHUNK_SZ_Y; iy++) {
 			for (uint8_t iz = 0; iz < CHUNK_SZ_Z; iz++) {
-				if (chunkPos.x == 0 && chunkPos.y + iy == 0 && chunkPos.z  == 0)
+				if (chunkPos.x == 0 && chunkPos.y + iy == 0 && chunkPos.z  == 0) {
 					data[ix][iy][iz] = TextureManager::blocksNames["stone"];
-				else
+					nbBlocks++;
+				}
+				else {
 					data[ix][iy][iz] = 0;
+				}
 			}
 		}
 	}
+	return nbBlocks;
 }
 
-void		getChunkFlatMap(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_SZ_Y][CHUNK_SZ_Z]) {
+uint32_t	getChunkFlatMap(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_SZ_Y][CHUNK_SZ_Z]) {
+	uint32_t	nbBlocks = 0;
 	for (uint8_t iy = 0; iy < CHUNK_SZ_Y; iy++) {
 		uint32_t	y = chunkPos.y + iy;
 		uint8_t		type = 0;
@@ -1047,9 +1053,12 @@ void		getChunkFlatMap(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_SZ_Y][
 		for (uint8_t ix = 0; ix < CHUNK_SZ_X; ix++) {
 			for (uint8_t iz = 0; iz < CHUNK_SZ_Z; iz++) {
 				data[ix][iy][iz] = type;
+				if (type > 0)
+					nbBlocks++;
 			}
 		}
 	}
+	return nbBlocks;
 }
 
 static uint8_t	getBiome(float x, float z, float &heightDiv) {
@@ -1145,11 +1154,12 @@ static uint8_t	getStoneOrOre(float x, float y, float z, float realY) {
 	return TextureManager::blocksNames["stone"];
 }
 
-void		getChunkNormalPerlin(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_SZ_Y][CHUNK_SZ_Z]) {
+uint32_t		getChunkNormalPerlin(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_SZ_Y][CHUNK_SZ_Z]) {
 	float	x;
 	float	y;
 	float	z;
 	uint8_t	biome;
+	uint32_t	nbBlocks = 0;
 
 	TreeInfo	treeMap[CHUNK_SZ_X + TREE_RADIUS * 2][CHUNK_SZ_Z + TREE_RADIUS * 2];
 
@@ -1391,13 +1401,16 @@ void		getChunkNormalPerlin(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_S
 
 				data[ix][iy][iz] = _getBlockElevation(chunkPos.y + iy, y, biome, montainsElevation, cavernY1, cavernY2,
 					bedrockElevation, stoneOrOre, treeMap, ix + TREE_RADIUS, iz + TREE_RADIUS, isTreeXZ);
+				if (data[ix][iy][iz] > 0)
+					nbBlocks++;
 			}
 		}
 	}
+	return nbBlocks;
 }
 
-void		getChunkNormal(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_SZ_Y][CHUNK_SZ_Z]) {
-	getChunkNormalPerlin(chunkPos, data);
+uint32_t	getChunkNormal(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_SZ_Y][CHUNK_SZ_Z]) {
+	return getChunkNormalPerlin(chunkPos, data);
 }
 
 uint8_t		getDefaultElevation(int32_t x, int32_t z) {
@@ -1420,11 +1433,10 @@ uint8_t		getDefaultElevation(int32_t x, int32_t z) {
 	return 64;
 }
 
-void		getChunk(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_SZ_Y][CHUNK_SZ_Z]) {
+uint32_t	getChunk(wordIVec3 &chunkPos, uint8_t data[CHUNK_SZ_X][CHUNK_SZ_Y][CHUNK_SZ_Z]) {
 	if (s.m.generationType == GENERATION_VOID)
-		getChunkVoid(chunkPos, data);
-	else if (s.m.generationType == GENERATION_FLAT_MAP)
-		getChunkFlatMap(chunkPos, data);
-	else
-		getChunkNormal(chunkPos, data);
+		return getChunkVoid(chunkPos, data);
+	if (s.m.generationType == GENERATION_FLAT_MAP)
+		return getChunkFlatMap(chunkPos, data);
+	return getChunkNormal(chunkPos, data);
 }

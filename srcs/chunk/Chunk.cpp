@@ -88,6 +88,9 @@ void	Chunk::calcGreedyChunk(bool isChunkMapMutexed) {
 	_faces.clear();
 	_needRenderUpdate = 0;
 
+	if (_data.nbBlocks == 0)
+		return;
+
 	std::array<uint8_t, CHUNK_SZ_Y * CHUNK_SZ_X>	mask = { 0 };
 	/*
 		the greedy chunk algorithm work with a mask.
