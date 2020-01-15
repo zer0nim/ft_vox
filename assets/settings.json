@@ -19,6 +19,7 @@
 			"width": 1200,
 			"height": 800,
 			"inventorySzPercent": 5,
+			"inventoryPreviewSize": 15,
 			"text": {
 				"normal": {
 					"path": "assets/fonts/minecraft_normal.ttf",

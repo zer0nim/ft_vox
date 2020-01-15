@@ -30,6 +30,7 @@ void	setDefaultSettings() {
 	s.g.screen.width = 1200;
 	s.g.screen.height = 800;
 	s.g.screen.inventorySzPercent = 5;
+	s.g.screen.inventoryPreviewSize = 5;
 	s.g.screen.text.insert(std::pair<std::string, Settings::Global::Screen::Text>(
 		"normal", {"assets/fonts/minecraft_normal.ttf", 20}));
 	s.g.screen.text.insert(std::pair<std::string, Settings::Global::Screen::Text>(
@@ -167,6 +168,8 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		s.g.screen.height = element.get<uint32_t>();
 	else if (element.is_number() && key == ".global.screen.inventorySzPercent" && checkUint32(element, 0, 20))
 		s.g.screen.inventorySzPercent = element.get<uint8_t>();
+	else if (element.is_number() && key == ".global.screen.inventoryPreviewSize" && checkUint32(element, 0, 50))
+		s.g.screen.inventoryPreviewSize = element.get<uint8_t>();
 	else if (boost::starts_with(key, ".global.screen.text."))
 		loadSettingElementFont(element, key);
 	/// player
@@ -696,10 +699,9 @@ void	drawInventory(GLFWwindow *window, ImageRender &imageRender, TextureManager 
 
 	sz *= 0.5;
 	pos.y -= sz.y * -0.5;
-	int	nbItem = 5;
 	int step = sz.x * 1.5;
-	pos.x = s.g.screen.width / 2 - sz.x - (nbItem + 1) * step;
-	for (int i = -nbItem; i < 0; i++) {
+	pos.x = s.g.screen.width / 2 - sz.x - (s.g.screen.inventoryPreviewSize + 1) * step;
+	for (int i = -s.g.screen.inventoryPreviewSize; i < 0; i++) {
 		int ID = s.m.handBlockID - 1 + i;
 		if (ID < 0)
 			ID += NB_TYPE_BLOCKS;
@@ -710,7 +712,7 @@ void	drawInventory(GLFWwindow *window, ImageRender &imageRender, TextureManager 
 		imageRender.draw(pos, sz, texID, color);
 	}
 	pos.x = s.g.screen.width / 2;
-	for (int i = 1; i <= nbItem; i++) {
+	for (int i = 1; i <= s.g.screen.inventoryPreviewSize; i++) {
 		int ID = s.m.handBlockID - 1 + i;
 		if (ID < 0)
 			ID += NB_TYPE_BLOCKS;

@@ -166,6 +166,7 @@ struct Settings {
 			uint32_t	width;
 			uint32_t	height;
 			uint8_t		inventorySzPercent;
+			uint8_t		inventoryPreviewSize;
 			struct Text {
 				std::string	path;
 				uint32_t	size;
