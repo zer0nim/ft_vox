@@ -165,7 +165,7 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		s.g.screen.width = element.get<uint32_t>();
 	else if (element.is_number() && key == ".global.screen.height" && checkUint32(element, 400, 3000))
 		s.g.screen.height = element.get<uint32_t>();
-	else if (element.is_number() && key == ".global.screen.inventorySzPercent" && checkUint32(element, 0, 100))
+	else if (element.is_number() && key == ".global.screen.inventorySzPercent" && checkUint32(element, 0, 20))
 		s.g.screen.inventorySzPercent = element.get<uint8_t>();
 	else if (boost::starts_with(key, ".global.screen.text."))
 		loadSettingElementFont(element, key);
@@ -547,7 +547,7 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 
 	// object in hand
 	textY -= lineSz;
-	std::string sInHand = "In hand: ";
+	std::string sInHand = "Item in hand: ";
 	for (auto it = TextureManager::blocksNames.begin(); it != TextureManager::blocksNames.end(); it++) {
 		if (it->second == s.m.handBlockID) {
 			sInHand += it->first;
@@ -583,6 +583,9 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 		else
 			sHelp = "Help:";
 		textRender.write("normal", sHelp, textX, textY);
+		textY -= lineSz;
+		sHelp = "F3 + I: toggle inventory";
+		textRender.write("normal", sHelp, textX + 20, textY);
 		textY -= lineSz;
 		sHelp = "F3 + F: freeze chunk update";
 		textRender.write("normal", sHelp, textX + 20, textY);
@@ -673,7 +676,7 @@ void	drawInventory(GLFWwindow *window, ImageRender &imageRender, TextureManager 
 	tWinUser	*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
 	(void)winU;
 
-	if (s.g.screen.inventorySzPercent == 0)
+	if (winU->showInventory || s.g.screen.inventorySzPercent == 0)
 		return;
 
 	glm::vec2	pos;

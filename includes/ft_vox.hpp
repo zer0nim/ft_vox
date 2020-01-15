@@ -80,6 +80,7 @@ typedef struct		sWinUser {
 	float			dtTime;
 	float			lastFrame;
 
+	bool			showInventory;  // show inventory (F3 + I)
 	bool			showInfo;  // show info module (F3)
 	bool			showHelp;  // show help module (F3 + H)
 	bool			showObjList;  // show objects list (F3 + L)

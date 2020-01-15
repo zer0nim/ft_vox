@@ -147,6 +147,12 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 		launchF3Cmd = false;
 	}
 
+	// F3 + I -> toogle inventory
+	if (key == GLFW_KEY_I && action == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
+		winU->showInventory = !winU->showInventory;
+		launchF3Cmd = true;
+	}
+
 	// F3 + F -> freeze chunk update
 	if (key == GLFW_KEY_F && action == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
 		winU->freezeChunkUpdate = !winU->freezeChunkUpdate;
@@ -234,14 +240,18 @@ void	mouseClick(GLFWwindow *window, int button, int action, int mods) {
 
 void scrolling(GLFWwindow* window, double xoffset, double yoffset) {
 	(void)window;
-	(void)xoffset;
-	if (yoffset > 0) {
+
+	double offset = yoffset;
+	if (offset == 0) {
+		offset = xoffset;
+	}
+	if (offset > 0) {
 		s.m.handBlockID++;
 		if (s.m.handBlockID > NB_TYPE_BLOCKS) {
 			s.m.handBlockID = 1;
 		}
 	}
-	else if (yoffset < 0) {
+	else if (offset < 0) {
 		s.m.handBlockID--;
 		if (s.m.handBlockID <= 0) {
 			s.m.handBlockID = NB_TYPE_BLOCKS;
