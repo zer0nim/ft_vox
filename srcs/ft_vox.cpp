@@ -682,7 +682,7 @@ void	drawInventory(GLFWwindow *window, ImageRender &imageRender, TextureManager 
 	glm::vec2	pos;
 	glm::vec2	sz;
 	int			texID;
-	glm::vec4	color(1, 1, 1, 1);
+	glm::vec4	color(0.7, 0.7, 0.7, 0.85);
 
 	sz.x = s.g.screen.width * (s.g.screen.inventorySzPercent / 100.0);
 	sz.y = sz.x;

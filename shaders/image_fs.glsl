@@ -10,5 +10,5 @@ uniform vec4			color;
 
 void main()
 {
-	FragColor = texture(textureAtlas, vec3(TexCoords, TexID)) * color;
+	FragColor = mix(vec4(color.rgb, 1), texture(textureAtlas, vec3(TexCoords, TexID)), color.a);
 }
