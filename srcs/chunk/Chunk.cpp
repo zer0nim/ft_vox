@@ -379,10 +379,10 @@ void	Chunk::update(bool isChunkMapMutexed) {
 
 bool	Chunk::renderUpdate(int32_t startX, int32_t startZ) {
 	int minRenderUpdate = 0;  // the minimum of border to ignore update (default 0, 1 or 2 if the chunk is on map border)
-	if (_chunkPos.x <= startX || _chunkPos.x >= startX + ((s.g.renderDist - 1) * 2) * CHUNK_SZ_X) {
+	if (_chunkPos.x <= startX || _chunkPos.x >= startX + ((s.g.perf.renderDist - 1) * 2) * CHUNK_SZ_X) {
 		minRenderUpdate++;
 	}
-	if (_chunkPos.z <= startZ || _chunkPos.z >= startZ + ((s.g.renderDist - 1) * 2) * CHUNK_SZ_Z) {
+	if (_chunkPos.z <= startZ || _chunkPos.z >= startZ + ((s.g.perf.renderDist - 1) * 2) * CHUNK_SZ_Z) {
 		minRenderUpdate++;
 	}
 
@@ -462,10 +462,10 @@ void	Chunk::sendConstUniforms(TextureManager const &textureManager) {
 	// send textures
 	textureManager.setUniform(*_shaderData->shader);
 
-	_shaderData->shader->setBool("enableTransparency", s.g.screen.enableTransparency);
+	_shaderData->shader->setBool("enableTransparency", s.g.perf.enableTransparency);
 
 	// set fog settings
-	int dist = s.g.renderDist * std::min(CHUNK_SZ_X, CHUNK_SZ_Z);
+	int dist = s.g.perf.renderDist * std::min(CHUNK_SZ_X, CHUNK_SZ_Z);
 
 	_shaderData->shader->setBool("fog.enabled", s.g.fog.enabled);
 	_shaderData->shader->setInt("fog.maxDist", dist);

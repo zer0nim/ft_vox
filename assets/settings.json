@@ -1,6 +1,13 @@
 {
 	"global": {
-		"renderDist": 16,
+		"perf": {
+			"fps": 120,
+			"renderDist": 16,
+			"enableFacesOptimizer": true,
+			"speedFacesOptimizer": 1,
+			"speedCreationChunk": 1,
+			"enableTransparency": true
+		},
 		"files": {
 			"mapsPath": "/tmp/ft_vox/maps/",
 			"chunkPath": "chunks/",
@@ -11,8 +18,6 @@
 			"fullscreen": false,
 			"width": 1200,
 			"height": 800,
-			"fps": 120,
-			"enableTransparency": true,
 			"text": {
 				"normal": {
 					"path": "assets/fonts/minecraft_normal.ttf",

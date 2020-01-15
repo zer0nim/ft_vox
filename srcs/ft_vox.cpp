@@ -13,7 +13,12 @@
 Settings s;
 
 void	setDefaultSettings() {
-	s.g.renderDist = 8;
+	s.g.perf.fps = 120;
+	s.g.perf.renderDist = 8;
+	s.g.perf.enableFacesOptimizer = true;
+	s.g.perf.speedFacesOptimizer = 1;
+	s.g.perf.speedCreationChunk = 1;
+	s.g.perf.enableTransparency = true;
 	s.g.files.settingsFile = DEF_SETTINGS_FILE;
 	s.g.files.mapsPath = "/tmp/ft_vox/maps/";
 	s.g.files.chunkPath = "chunks/";
@@ -22,8 +27,6 @@ void	setDefaultSettings() {
 	s.g.screen.fullscreen = true;
 	s.g.screen.width = 1200;
 	s.g.screen.height = 800;
-	s.g.screen.fps = 120;
-	s.g.screen.enableTransparency = true;
 	s.g.screen.text.insert(std::pair<std::string, Settings::Global::Screen::Text>(
 		"normal", {"assets/fonts/minecraft_normal.ttf", 20}));
 	s.g.screen.text.insert(std::pair<std::string, Settings::Global::Screen::Text>(
@@ -129,8 +132,18 @@ static void	loadFlatMap(nlohmann::json &element) {
 static void	loadSettingElement(nlohmann::json &element, std::string key) {
 	// global
 	/// render distance
-	if (element.is_number() && key == ".global.renderDist" && checkUint32(element, 1, 128))
-		s.g.renderDist = element.get<uint32_t>();
+	if (element.is_number() && key == ".global.perf.fps" && checkUint32(element, 1, 1024))
+		s.g.perf.fps = element.get<uint32_t>();
+	else if (element.is_number() && key == ".global.perf.renderDist" && checkUint32(element, 1, 128))
+		s.g.perf.renderDist = element.get<uint32_t>();
+	else if (element.is_boolean() && key == ".global.perf.enableTransparency")
+		s.g.perf.enableTransparency = element.get<bool>();
+	else if (element.is_number() && key == ".global.perf.speedFacesOptimizer" && checkUint32(element, 1, 1024))
+		s.g.perf.speedFacesOptimizer = element.get<uint8_t>();
+	else if (element.is_number() && key == ".global.perf.speedCreationChunk" && checkUint32(element, 1, 1024))
+		s.g.perf.speedCreationChunk = element.get<uint8_t>();
+	else if (element.is_boolean() && key == ".global.perf.enableFacesOptimizer")
+		s.g.perf.enableFacesOptimizer = element.get<bool>();
 	/// files
 	else if (element.is_string() && key == ".global.files.settingsFile")
 		s.g.files.settingsFile = element.get<std::string>();
@@ -149,10 +162,6 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		s.g.screen.width = element.get<uint32_t>();
 	else if (element.is_number() && key == ".global.screen.height" && checkUint32(element, 400, 3000))
 		s.g.screen.height = element.get<uint32_t>();
-	else if (element.is_number() && key == ".global.screen.fps" && checkUint32(element, 1, 1024))
-		s.g.screen.fps = element.get<uint32_t>();
-	else if (element.is_boolean() && key == ".global.screen.enableTransparency")
-		s.g.screen.enableTransparency = element.get<bool>();
 	else if (boost::starts_with(key, ".global.screen.text."))
 		loadSettingElementFont(element, key);
 	/// player
@@ -472,8 +481,6 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 	GLfloat textY = s.g.screen.height - lineSz;
 
 	if (winU->showInfo == false) {
-		std::string sBaseHelp = "F3 to show debug module";
-		textRender.write("normal", sBaseHelp, textX, textY);
 		return;
 	}
 
@@ -513,6 +520,12 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 	std::string sFAceRendered;
     { std::lock_guard<std::mutex>	guard(s.mutexOthers);
 		sFAceRendered = std::string("Faces rendered: ") + std::to_string(chunkManager.getNbSquareRendered());
+	}
+	if (s.g.perf.enableFacesOptimizer) {
+		sFAceRendered += " (optimizer enabled)";
+	}
+	else {
+		sFAceRendered += " (optimizer disabled)";
 	}
 	textRender.write("normal", sFAceRendered, textX, textY);
 

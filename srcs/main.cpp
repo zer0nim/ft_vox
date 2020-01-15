@@ -16,7 +16,7 @@
 #include "utils/CameraSurvival.hpp"
 
 void	*threadUpdateFunction(void *args_) {
-	float						loopTime = 1000 / s.g.screen.fps;
+	float						loopTime = 1000 / s.g.perf.fps;
 	ThreadupdateArgs			*args = reinterpret_cast<ThreadupdateArgs*>(args_);
 	std::chrono::milliseconds	time_start;
 	tWinUser					*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(args->window));
@@ -64,7 +64,7 @@ void	*threadUpdateFunction(void *args_) {
 
 void	gameLoop(GLFWwindow *window, Skybox &skybox, \
 TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textureManager) {
-	float						loopTime = 1000 / s.g.screen.fps;
+	float						loopTime = 1000 / s.g.perf.fps;
 	std::chrono::milliseconds	time_start;
 	int							lastFps = 0;
 	tWinUser					*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
@@ -84,8 +84,8 @@ TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textur
 	float angle = winU->cam->zoom;
 	float ratio = static_cast<float>(s.g.screen.width) / s.g.screen.height;
 	float nearD = 0.1f;
-	float farD = 200 + static_cast<int>(std::sqrt(std::pow(CHUNK_SZ_X * s.g.renderDist, 2)
-		+ std::pow(CHUNK_SZ_Z * s.g.renderDist, 2)));
+	float farD = 200 + static_cast<int>(std::sqrt(std::pow(CHUNK_SZ_X * s.g.perf.renderDist, 2)
+		+ std::pow(CHUNK_SZ_Z * s.g.perf.renderDist, 2)));
 	glm::mat4	projection = glm::perspective(glm::radians(angle), ratio, nearD, farD);
 
     { std::lock_guard<std::mutex>	guard(s.mutexCamera);
@@ -198,7 +198,7 @@ TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textur
 			#endif
 		}
 		else {
-			lastFps = s.g.screen.fps;
+			lastFps = s.g.perf.fps;
 			usleep((loopTime - time_loop.count()) * 1000);
 		}
 		#if DEBUG_SHOW_FPS
@@ -314,9 +314,9 @@ int		main(int ac, char const **av) {
 	TextureManager	*textureManager = nullptr;
 
 	logInfo("chunk size " << CHUNK_SZ_X << " " << CHUNK_SZ_Y << " " << CHUNK_SZ_Z
-		<< " -> render distance " << s.g.renderDist << " chunks");
+		<< " -> render distance " << s.g.perf.renderDist << " chunks");
 
-	if (!init(&window, "ft_vox", &winU, camCrea, camSurv))
+	if (!init(&window, "ft_vox (F3 to show debug module)", &winU, camCrea, camSurv))
 		return (1);
 	logInfo("window size " << s.g.screen.width << " * " << s.g.screen.height);
 

@@ -126,7 +126,7 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 	uint32_t startZ;  // pos of first chunk (in all thread)
 
 	// startX
-	startX = _chunkActPos.x - CHUNK_SZ_X * (s.g.renderDist - 1);
+	startX = _chunkActPos.x - CHUNK_SZ_X * (s.g.perf.renderDist - 1);
 	// startXthread
 	startXthread = startX;
 	uint8_t	startID = _getID(startXthread);
@@ -138,14 +138,14 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 		startXthread += (threadID - startID) * CHUNK_SZ_X;
 	}
 	// startZ
-	startZ = _chunkActPos.z - CHUNK_SZ_Z * (s.g.renderDist - 1);
+	startZ = _chunkActPos.z - CHUNK_SZ_Z * (s.g.perf.renderDist - 1);
 
 	// add new chunks if needed
 	if (_lastChunkPos[threadID] != _chunkActPos) {  // if we change the actual chunk
 		_lastChunkPos[threadID] = _chunkActPos;
-		for (int32_t x = startXthread; x < _chunkActPos.x + CHUNK_SZ_X * s.g.renderDist;
+		for (int32_t x = startXthread; x < _chunkActPos.x + CHUNK_SZ_X * s.g.perf.renderDist;
 		x += CHUNK_SZ_X * NB_UPDATE_THREADS) {
-			for (int32_t z = startZ; z < _chunkActPos.z + CHUNK_SZ_Z * s.g.renderDist; z += CHUNK_SZ_Z) {
+			for (int32_t z = startZ; z < _chunkActPos.z + CHUNK_SZ_Z * s.g.perf.renderDist; z += CHUNK_SZ_Z) {
 				for (int32_t y = 0; y < CHUNK_SZ_Y * MAX_Y_CHUNK; y += CHUNK_SZ_Y) {
 					wordIVec3 chunkPos(x, y, z);  // this is the position of the chunk
 					bool exist;
@@ -170,11 +170,12 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 	    { std::lock_guard<std::mutex>	guard(s.mutexOthers);
 			nbLoaded = getNbChunkLoaded();
 		}
-		if (nbLoaded >= (s.g.renderDist * 2 - 1) * (s.g.renderDist * 2 - 1) * 2) {  // if all chunks are created
+		// if all chunks are created and option is enabled
+		if (s.g.perf.enableFacesOptimizer && nbLoaded >= (s.g.perf.renderDist * 2 - 1) * (s.g.perf.renderDist * 2 - 1) * 2) {
 			uint8_t	nbUpdated = 0;
-			for (int32_t x = startXthread; x < _chunkActPos.x + CHUNK_SZ_X * s.g.renderDist;
+			for (int32_t x = startXthread; x < _chunkActPos.x + CHUNK_SZ_X * s.g.perf.renderDist;
 			x += CHUNK_SZ_X * NB_UPDATE_THREADS) {
-				for (int32_t z = startZ; z < _chunkActPos.z + CHUNK_SZ_Z * s.g.renderDist; z += CHUNK_SZ_Z) {
+				for (int32_t z = startZ; z < _chunkActPos.z + CHUNK_SZ_Z * s.g.perf.renderDist; z += CHUNK_SZ_Z) {
 					for (int32_t y = 0; y < CHUNK_SZ_Y * MAX_Y_CHUNK; y += CHUNK_SZ_Y) {
 						wordIVec3 chunkPos(x, y, z);  // this is the position of the chunk
 						bool exist;
@@ -188,15 +189,15 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 								nbUpdated++;
 							}
 						}
-						if (nbUpdated >= MAX_RENDER_CHUNK_UPDATE_COUNT) {
+						if (nbUpdated >= s.g.perf.speedFacesOptimizer) {
 							break;
 						}
 					}
-					if (nbUpdated >= MAX_RENDER_CHUNK_UPDATE_COUNT) {
+					if (nbUpdated >= s.g.perf.speedFacesOptimizer) {
 						break;
 					}
 				}
-				if (nbUpdated >= MAX_RENDER_CHUNK_UPDATE_COUNT) {
+				if (nbUpdated >= s.g.perf.speedFacesOptimizer) {
 					break;
 				}
 			}
@@ -206,7 +207,7 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 	// create chunks
 	int			i = 0;
 	wordIVec3	chunkPos;
-	while (i < MAX_CREATED_CHUNK_UPDATE_COUNT) {
+	while (i < s.g.perf.speedCreationChunk) {
 	    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap), guard2(s.mutexToCreate);
 			#if SMART_LOAD_ORDER
 				if (_toCreate[threadID].size() == 0)
@@ -314,10 +315,10 @@ void ChunkManager::draw(Camera *cam) {
 	}
 	tmpView = glm::lookAt(tmpCamPos, tmpCamPos + cam->front, cam->up);
 
-	for (int32_t x = _chunkActPos.x - CHUNK_SZ_X * (s.g.renderDist - 1);
-	x < _chunkActPos.x + CHUNK_SZ_X * s.g.renderDist; x += CHUNK_SZ_X) {
-		for (int32_t z = _chunkActPos.z - CHUNK_SZ_Z * (s.g.renderDist - 1);
-		z < _chunkActPos.z + CHUNK_SZ_Z * s.g.renderDist; z += CHUNK_SZ_Z) {
+	for (int32_t x = _chunkActPos.x - CHUNK_SZ_X * (s.g.perf.renderDist - 1);
+	x < _chunkActPos.x + CHUNK_SZ_X * s.g.perf.renderDist; x += CHUNK_SZ_X) {
+		for (int32_t z = _chunkActPos.z - CHUNK_SZ_Z * (s.g.perf.renderDist - 1);
+		z < _chunkActPos.z + CHUNK_SZ_Z * s.g.perf.renderDist; z += CHUNK_SZ_Z) {
 			for (int32_t y = 0; y < CHUNK_SZ_Y * MAX_Y_CHUNK; y += CHUNK_SZ_Y) {
 				wordIVec3 chunkPos(x, y, z);  // this is the position of the chunk
 				bool exist;
@@ -501,10 +502,10 @@ void ChunkManager::_updateChunkPos(wordIVec3 const &pos) {
 }
 
 bool	ChunkManager::_isInChunkLoaded(wordIVec3 const &chunkPos) const {
-	if (chunkPos.x <= _chunkActPos.x - s.g.renderDist * CHUNK_SZ_X
-	|| chunkPos.x >= _chunkActPos.x + s.g.renderDist * CHUNK_SZ_X
-	|| chunkPos.z <= _chunkActPos.z - s.g.renderDist * CHUNK_SZ_Z
-	|| chunkPos.z >= _chunkActPos.z + s.g.renderDist * CHUNK_SZ_Z)
+	if (chunkPos.x <= _chunkActPos.x - s.g.perf.renderDist * CHUNK_SZ_X
+	|| chunkPos.x >= _chunkActPos.x + s.g.perf.renderDist * CHUNK_SZ_X
+	|| chunkPos.z <= _chunkActPos.z - s.g.perf.renderDist * CHUNK_SZ_Z
+	|| chunkPos.z >= _chunkActPos.z + s.g.perf.renderDist * CHUNK_SZ_Z)
 		return false;
 	return true;
 }

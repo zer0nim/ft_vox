@@ -26,9 +26,7 @@
 
 #define ENABLE_MAX_CREATED_CHUNK_UPDATE	true  // enable / disable option
 #define LOAD_ALL_BEFORE_OPEN_WINDOW		false
-#define MAX_CREATED_CHUNK_UPDATE_COUNT	1  // create max # chunks each update call (don't create all at the same update)
 #define REMOVE_CHUNKS_BORDERS			true
-#define MAX_RENDER_CHUNK_UPDATE_COUNT	1  // update render of # chunks (if there are all created)
 
 #define NB_UPDATE_THREADS				4
 
@@ -41,7 +39,6 @@ Chunk
 	#define CHUNK		Chunk
 #endif
 #define CHUNK_OBJECT	CHUNK  // the chunk object used
-
 
 /*
 generation type
@@ -143,7 +140,15 @@ bool	saveMap(Camera *cam);
 
 struct Settings {
 	struct Global {
-		int32_t	renderDist;
+		struct Perf {
+			uint32_t	fps;
+			int32_t		renderDist;
+			bool		enableFacesOptimizer;
+			uint8_t		speedFacesOptimizer;
+			uint8_t		speedCreationChunk;
+			bool		enableTransparency;
+		};
+		Perf	perf;
 		struct Files {
 			std::string settingsFile;
 			std::string	mapsPath;
@@ -156,8 +161,6 @@ struct Settings {
 			bool		fullscreen;
 			uint32_t	width;
 			uint32_t	height;
-			uint32_t	fps;
-			bool		enableTransparency;
 			struct Text {
 				std::string	path;
 				uint32_t	size;
