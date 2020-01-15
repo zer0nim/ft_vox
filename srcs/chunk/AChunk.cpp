@@ -32,8 +32,13 @@ AChunk::AChunk(AChunk const &src)
 AChunk::~AChunk() {}
 
 AChunk &AChunk::operator=(AChunk const &rhs) {
-	(void)rhs;
-	// if (this != &rhs) {}
+	if (this != &rhs) {
+		_data = rhs._data;
+		_chunkPos = rhs._chunkPos;
+		_filename = rhs._filename;
+		_isModifiedFromBegining = rhs._isModifiedFromBegining;
+		_needRenderUpdate = 0;
+	}
 	return *this;
 }
 

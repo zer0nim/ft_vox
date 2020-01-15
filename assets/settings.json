@@ -5,7 +5,7 @@
 			"renderDist": 16,
 			"enableFacesOptimizer": true,
 			"speedFacesOptimizer": 1,
-			"speedCreationChunk": 2,
+			"speedCreationChunk": 1,
 			"enableTransparency": true
 		},
 		"files": {

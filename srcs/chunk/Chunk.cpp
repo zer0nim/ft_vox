@@ -27,9 +27,15 @@ Chunk::~Chunk() {
 }
 
 Chunk &Chunk::operator=(Chunk const &rhs) {
-	// TODO(zer0nim): need to fill the copy operator
-	(void)rhs;
-	// if (this != &rhs) {}
+	if (this != &rhs) {
+		AChunk::operator=(rhs);
+		_meshUpdated = rhs._meshUpdated;
+		_needInitVao = rhs._needInitVao;
+		_vbo = rhs._vbo;
+		_vao = rhs._vao;
+		_faces = rhs._faces;
+		_nbVertices = rhs._nbVertices;
+	}
 	return *this;
 }
 
