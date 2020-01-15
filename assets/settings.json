@@ -3,7 +3,7 @@
 		"perf": {
 			"fps": 120,
 			"renderDist": 16,
-			"enableFacesOptimizer": true,
+			"enableFacesOptimizer": false,
 			"speedFacesOptimizer": 1,
 			"speedCreationChunk": 1,
 			"enableTransparency": true

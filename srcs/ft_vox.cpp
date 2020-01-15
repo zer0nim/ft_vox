@@ -176,7 +176,7 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 	//// survival
 	else if (element.is_number() && key == ".global.player.survival.movementSpeed" && checkFloat(element, 0.5, 50.0))
 		s.g.player.survival.movementSpeed = element.get<float>();
-	else if (element.is_number() && key == ".global.player.survival.runFactor" && checkFloat(element, 1.0, 10.0))
+	else if (element.is_number() && key == ".global.player.survival.runFactor" && checkFloat(element, 1.0, 20.0))
 		s.g.player.survival.runFactor = element.get<float>();
 	else if (element.is_number() && key == ".global.player.survival.gravity" && checkFloat(element, 0.0, 50.0))
 		s.g.player.survival.gravity = element.get<float>();
@@ -193,7 +193,7 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 	//// creative
 	else if (element.is_number() && key == ".global.player.creative.movementSpeed" && checkFloat(element, 0.5, 50.0))
 		s.g.player.creative.movementSpeed = element.get<float>();
-	else if (element.is_number() && key == ".global.player.creative.runFactor" && checkFloat(element, 1.0, 10.0))
+	else if (element.is_number() && key == ".global.player.creative.runFactor" && checkFloat(element, 1.0, 20.0))
 		s.g.player.creative.runFactor = element.get<float>();
 	//// others
 	else if (element.is_number() && key == ".global.player.mouseSensitivity" && checkFloat(element, 0.001, 10.0))
@@ -576,6 +576,12 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 		std::string sFreeze = "Chunk update: freeze (unfreeze with F3 + F)";
 		textRender.write("normal", sFreeze, textX, textY, 1, glm::vec4(1, 0, 0, 1));
 	}
+	if (winU->runMode) {
+		// freeze chunk update
+		textY -= lineSz;
+		std::string sFreeze = "Auto run mode enabled (disable with F3 + W)";
+		textRender.write("normal", sFreeze, textX, textY, 1, glm::vec4(1, 0, 0, 1));
+	}
 
 	if (winU->showHelp || winU->showCommands) {
 		// show help
@@ -597,6 +603,9 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 		textRender.write("normal", sHelp, textX + 20, textY);
 		textY -= lineSz;
 		sHelp = "F3 + P: toggle polygon render mode";
+		textRender.write("normal", sHelp, textX + 20, textY);
+		textY -= lineSz;
+		sHelp = "F3 + W: toggle auto run mode";
 		textRender.write("normal", sHelp, textX + 20, textY);
 		textY -= lineSz;
 		sHelp = "F3 + C: show commands list";

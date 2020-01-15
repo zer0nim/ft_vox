@@ -33,10 +33,10 @@ void	processInput(GLFWwindow *window) {
 
 	// wasd qe shift fps camera input
 	bool isRun = false;
-	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS ||
+	if (winU->runMode || glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS ||
 	glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS)
 		isRun = true;
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ||
+	if (winU->runMode || glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ||
 	glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
         winU->cam->processKeyboard(CamMovement::Forward, winU->dtTime, isRun);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS ||
@@ -145,6 +145,12 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 		if (launchF3Cmd == false)
 			winU->showInfo = !winU->showInfo;
 		launchF3Cmd = false;
+	}
+
+	// F3 + W -> toogle runMode
+	if (key == GLFW_KEY_W && action == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
+		winU->runMode = !winU->runMode;
+		launchF3Cmd = true;
 	}
 
 	// F3 + I -> toogle inventory
