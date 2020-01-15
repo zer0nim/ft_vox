@@ -7,9 +7,13 @@
 #include "commonInclude.hpp"
 #include "Shader.hpp"
 
+#define SHADER_TEXT_VS "./shaders/text_vs.glsl"
+#define SHADER_TEXT_FS "./shaders/text_fs.glsl"
+#define SHADER_TEXT_ROW_SIZE 4
+
 class TextRender {
 	public:
-		explicit TextRender(Shader &sh, uint32_t width, uint32_t height);
+		explicit TextRender(uint32_t width, uint32_t height);
 		TextRender(TextRender const &src);
 		virtual ~TextRender();
 
@@ -19,10 +23,10 @@ class TextRender {
 			glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f));
 
 
-		Shader		&getShader();
-		Shader		&getShader() const;
-		uint32_t	getVao() const;
-		uint32_t	getVbo() const;
+		Shader			&getShader();
+		Shader const	&getShader() const;
+		uint32_t		getVao() const;
+		uint32_t		getVbo() const;
 
 		class TextRenderError : public std::exception {
 			public:
@@ -45,7 +49,7 @@ class TextRender {
 	private:
 		TextRender();
 
-		Shader		&_shader;
+		Shader		_shader;
 		glm::mat4	_projection;
 		GLuint		_vao;
 		GLuint		_vbo;

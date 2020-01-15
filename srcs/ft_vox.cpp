@@ -6,8 +6,10 @@
 #include <boost/algorithm/string/predicate.hpp>
 
 #include "ft_vox.hpp"
+#include "TextureManager.hpp"
 #include "ChunkManager.hpp"
 #include "TextRender.hpp"
+#include "ImageRender.hpp"
 #include "MapGenerator.hpp"
 
 Settings s;
@@ -27,6 +29,7 @@ void	setDefaultSettings() {
 	s.g.screen.fullscreen = true;
 	s.g.screen.width = 1200;
 	s.g.screen.height = 800;
+	s.g.screen.inventorySzPercent = 5;
 	s.g.screen.text.insert(std::pair<std::string, Settings::Global::Screen::Text>(
 		"normal", {"assets/fonts/minecraft_normal.ttf", 20}));
 	s.g.screen.text.insert(std::pair<std::string, Settings::Global::Screen::Text>(
@@ -162,6 +165,8 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		s.g.screen.width = element.get<uint32_t>();
 	else if (element.is_number() && key == ".global.screen.height" && checkUint32(element, 400, 3000))
 		s.g.screen.height = element.get<uint32_t>();
+	else if (element.is_number() && key == ".global.screen.inventorySzPercent" && checkUint32(element, 0, 100))
+		s.g.screen.inventorySzPercent = element.get<uint8_t>();
 	else if (boost::starts_with(key, ".global.screen.text."))
 		loadSettingElementFont(element, key);
 	/// player
@@ -661,5 +666,55 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 				}
 			}
 		}
+	}
+}
+
+void	drawInventory(GLFWwindow *window, ImageRender &imageRender, TextureManager const &textureManager) {
+	tWinUser	*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
+	(void)winU;
+
+	if (s.g.screen.inventorySzPercent == 0)
+		return;
+
+	glm::vec2	pos;
+	glm::vec2	sz;
+	int			texID;
+	glm::vec4	color(1, 1, 1, 1);
+
+	sz.x = s.g.screen.width * (s.g.screen.inventorySzPercent / 100.0);
+	sz.y = sz.x;
+
+	pos.x = s.g.screen.width / 2 - sz.x / 2;
+	pos.y = sz.y * 0.2;
+
+	texID = textureManager.getBlocks()[s.m.handBlockID - 1]->side;
+
+	imageRender.draw(pos, sz, texID, color);
+
+	sz *= 0.5;
+	pos.y -= sz.y * -0.5;
+	int	nbItem = 5;
+	int step = sz.x * 1.5;
+	pos.x = s.g.screen.width / 2 - sz.x - (nbItem + 1) * step;
+	for (int i = -nbItem; i < 0; i++) {
+		int ID = s.m.handBlockID - 1 + i;
+		if (ID < 0)
+			ID += NB_TYPE_BLOCKS;
+		if (ID >= NB_TYPE_BLOCKS)
+			ID -= NB_TYPE_BLOCKS;
+		pos.x += step;
+		texID = textureManager.getBlocks()[ID]->side;
+		imageRender.draw(pos, sz, texID, color);
+	}
+	pos.x = s.g.screen.width / 2;
+	for (int i = 1; i <= nbItem; i++) {
+		int ID = s.m.handBlockID - 1 + i;
+		if (ID < 0)
+			ID += NB_TYPE_BLOCKS;
+		if (ID >= NB_TYPE_BLOCKS)
+			ID -= NB_TYPE_BLOCKS;
+		pos.x += step;
+		texID = textureManager.getBlocks()[ID]->side;
+		imageRender.draw(pos, sz, texID, color);
 	}
 }

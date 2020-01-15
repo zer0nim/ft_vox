@@ -5,6 +5,9 @@
 #include "ft_vox.hpp"
 #include "Shader.hpp"
 
+#define SHADER_SKYBOX_VS "./shaders/skybox_vs.glsl"
+#define SHADER_SKYBOX_FS "./shaders/skybox_fs.glsl"
+
 #define SKYBOX_USING 2
 #if SKYBOX_USING == 0
 	#define SKYBOX_START	"./assets/skybox/skybox0/"
@@ -45,7 +48,7 @@
 
 class Skybox {
 	public:
-		explicit Skybox(Shader &sh);
+		Skybox();
 		Skybox(Skybox const &src);
 		virtual ~Skybox();
 
@@ -54,14 +57,14 @@ class Skybox {
 		void load(std::vector<std::string> &faces);
 		void draw();
 
-		Shader		&getShader();
-		Shader		&getShader() const;
-		uint32_t	getTextureID() const;
-		uint32_t	getVao() const;
-		uint32_t	getVbo() const;
+		Shader			&getShader();
+		Shader const	&getShader() const;
+		uint32_t		getTextureID() const;
+		uint32_t		getVao() const;
+		uint32_t		getVbo() const;
 	protected:
 	private:
-		Shader		&_shader;
+		Shader		_shader;
 		uint32_t	_textureID;
 		uint32_t	_vao;
 		uint32_t	_vbo;

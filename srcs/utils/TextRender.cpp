@@ -2,17 +2,17 @@
 #include "debug.hpp"
 #include "Logging.hpp"
 
-TextRender::TextRender(Shader &sh, uint32_t width, uint32_t height) :
-_shader(sh),
+TextRender::TextRender(uint32_t width, uint32_t height) :
+_shader(SHADER_TEXT_VS, SHADER_TEXT_FS),
 _projection(glm::ortho(0.0f, static_cast<GLfloat>(width), 0.0f, static_cast<GLfloat>(height))) {
 	// create VAO & VBO
 	glGenVertexArrays(1, &_vao);
 	glGenBuffers(1, &_vbo);
 	glBindVertexArray(_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * SHADER_TEXT_ROW_SIZE, NULL, GL_DYNAMIC_DRAW);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, SHADER_TEXT_ROW_SIZE * sizeof(GLfloat), 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
@@ -104,7 +104,7 @@ GLfloat scale, glm::vec3 color) {
         GLfloat w = ch.size.x * scale;
         GLfloat h = ch.size.y * scale;
         // set VBO values
-        GLfloat vertices[6][4] = {
+        GLfloat vertices[6][SHADER_TEXT_ROW_SIZE] = {
             {xpos,     ypos + h,   0.0, 0.0},
             {xpos,     ypos,       0.0, 1.0},
             {xpos + w, ypos,       1.0, 1.0},
@@ -127,7 +127,7 @@ GLfloat scale, glm::vec3 color) {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-Shader		&TextRender::getShader() { return _shader; }
-Shader		&TextRender::getShader() const { return _shader; }
-uint32_t	TextRender::getVao() const { return _vao; }
-uint32_t	TextRender::getVbo() const { return _vbo; }
+Shader			&TextRender::getShader() { return _shader; }
+Shader const	&TextRender::getShader() const { return _shader; }
+uint32_t		TextRender::getVao() const { return _vao; }
+uint32_t		TextRender::getVbo() const { return _vbo; }

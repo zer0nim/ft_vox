@@ -52,6 +52,7 @@ SRC =	main.cpp \
 		utils/CameraSurvival.cpp \
 		utils/debug.cpp \
 		utils/TextRender.cpp \
+		utils/ImageRender.cpp \
 		utils/Material.cpp \
 		utils/Stats.cpp \
 		utils/Logging.cpp \
@@ -73,6 +74,7 @@ HEAD =	commonInclude.hpp \
 		utils/CameraSurvival.hpp \
 		utils/debug.hpp \
 		utils/TextRender.hpp \
+		utils/ImageRender.hpp \
 		utils/Material.hpp \
 		utils/Stats.hpp \
 		utils/Logging.hpp \

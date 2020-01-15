@@ -45,8 +45,8 @@ const float Skybox::_vertices[] = {
 	1.0f, -1.0f,  1.0f
 };
 
-Skybox::Skybox(Shader &sh) :
-_shader(sh) {
+Skybox::Skybox() :
+_shader(SHADER_SKYBOX_VS, SHADER_SKYBOX_FS) {
 	std::vector<std::string> skyboxFaces = {
 		std::string(SKYBOX_START) + SKYBOX_NAME_RIGHT + SKYBOX_EXT,  // right
 		std::string(SKYBOX_START) + SKYBOX_NAME_LEFT + SKYBOX_EXT,  // left
@@ -143,8 +143,8 @@ void Skybox::draw() {
 	glBindVertexArray(0);
 }
 
-Shader		&Skybox::getShader() { return _shader; }
-Shader		&Skybox::getShader() const { return _shader; }
-uint32_t	Skybox::getTextureID() const { return _textureID; }
-uint32_t	Skybox::getVao() const { return _vao; }
-uint32_t	Skybox::getVbo() const { return _vbo; }
+Shader			&Skybox::getShader() { return _shader; }
+Shader const	&Skybox::getShader() const { return _shader; }
+uint32_t		Skybox::getTextureID() const { return _textureID; }
+uint32_t		Skybox::getVao() const { return _vao; }
+uint32_t		Skybox::getVbo() const { return _vbo; }

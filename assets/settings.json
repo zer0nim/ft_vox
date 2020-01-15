@@ -18,6 +18,7 @@
 			"fullscreen": false,
 			"width": 1200,
 			"height": 800,
+			"inventorySzPercent": 5,
 			"text": {
 				"normal": {
 					"path": "assets/fonts/minecraft_normal.ttf",

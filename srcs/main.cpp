@@ -11,6 +11,7 @@
 #include "utils/Shader.hpp"
 #include "utils/Skybox.hpp"
 #include "utils/TextRender.hpp"
+#include "utils/ImageRender.hpp"
 #include "utils/Stats.hpp"
 #include "utils/CameraCreative.hpp"
 #include "utils/CameraSurvival.hpp"
@@ -62,8 +63,8 @@ void	*threadUpdateFunction(void *args_) {
 	return nullptr;
 }
 
-void	gameLoop(GLFWwindow *window, Skybox &skybox, \
-TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textureManager) {
+void	gameLoop(GLFWwindow *window, Skybox &skybox, TextRender &textRender, ChunkManager &chunkManager, \
+ImageRender &imageRender, TextureManager const &textureManager) {
 	float						loopTime = 1000 / s.g.perf.fps;
 	std::chrono::milliseconds	time_start;
 	int							lastFps = 0;
@@ -153,6 +154,9 @@ TextRender &textRender, ChunkManager &chunkManager, TextureManager const &textur
 
 		// drawCursor
 		textRender.write("courrier_new", "+", cursorX, cursorY, 1, glm::vec3(127, 127, 127));
+
+		// draw image
+		drawInventory(window, imageRender, textureManager);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -324,25 +328,25 @@ int		main(int ac, char const **av) {
 		// load textures
 		textureManager = new TextureManager("./assets/textures.json");
 
-		// load all shaders
-		Shader textShader("./shaders/text_vs.glsl", "./shaders/text_fs.glsl");
-		Shader skyboxShader("./shaders/skybox_vs.glsl", "./shaders/skybox_fs.glsl");
-
 		// load all fonts
-		TextRender textRender(textShader, s.g.screen.width, s.g.screen.height);
+		TextRender textRender(s.g.screen.width, s.g.screen.height);
 		textRender.loadFont("title", s.g.screen.text["title"].path, s.g.screen.text["title"].size);
 		textRender.loadFont("normal", s.g.screen.text["normal"].path, s.g.screen.text["normal"].size);
 		textRender.loadFont("courrier_new", s.g.screen.text["courrier_new"].path, s.g.screen.text["courrier_new"].size);
 
+		// load image render
+		ImageRender imageRender(s.g.screen.width, s.g.screen.height);
+		textureManager->setUniform(imageRender.getShader());
+
 		// load skybox
-		Skybox skybox(skyboxShader);
+		Skybox skybox;
 
 		// create chunkManager
 		ChunkManager chunkManager(*textureManager, &winU);
 		winU.chunkManager = &chunkManager;
 
 		// run the game
-		gameLoop(window, skybox, textRender, chunkManager, *textureManager);
+		gameLoop(window, skybox, textRender, chunkManager, imageRender, *textureManager);
 		Stats::printStats();
 
 		// save and quit all chunks

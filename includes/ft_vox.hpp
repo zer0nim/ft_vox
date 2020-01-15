@@ -128,9 +128,12 @@ void	processInput(GLFWwindow *window);
 std::chrono::milliseconds getMs();
 bool	usage();
 class TextRender;
+class ImageRender;
 class ChunkManager;
+class TextureManager;
 bool	argparse(int nbArgs, char const **args, bool isBeforeSettings = false);
 void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManager &chunkManager);
+void	drawInventory(GLFWwindow *window, ImageRender &imageRender, TextureManager const &textureManager);
 bool	createDir(std::string const &dirNames);
 bool	createDir(char const *dirNames);
 bool	createMapFiles();
@@ -161,6 +164,7 @@ struct Settings {
 			bool		fullscreen;
 			uint32_t	width;
 			uint32_t	height;
+			uint8_t		inventorySzPercent;
 			struct Text {
 				std::string	path;
 				uint32_t	size;
