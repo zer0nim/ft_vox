@@ -67,7 +67,7 @@
 	},
 	"map": {
 		"seed": 0,
-		"generationType": 0,
+		"generationType": 2,
 		"generateTree": true,
 		"generateOre": true,
 		"cameraStartPos": {
