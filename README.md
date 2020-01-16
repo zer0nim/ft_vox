@@ -1,7 +1,5 @@
 # ft_vox [[42](https://www.42.fr/) project] ![](https://github.com/zer0nim/ft_vox/workflows/make/badge.svg) ![](https://github.com/zer0nim/ft_vox/workflows/linter/badge.svg) ![](https://github.com/zer0nim/ft_vox/workflows/ft_vox/badge.svg)
 
-## ⚠️ NOT WORKING ! WORK IN PROGRESS ⚠️
-
 ## Project
 A little Opengl Voxel World engine
 
@@ -27,9 +25,12 @@ and `glm` to manage matrix/vector/quaternion.
 
 	```./ft_vox --usage```
 
-	```./ft_vox --name <map_name:string>```
+	```./ft_vox --name <map_name:string>  # open or create 'map_name'```
 
-	```./ft_vox --seed <seed:uint32_t>```
+	```./ft_vox --seed <seed:uint32_t>  # create world with given seed```
+
+![biome-preview](/assets/imgs/biome-preview.png)
+![struct-preview](/assets/imgs/struct-preview.png)
 
 ## Debug mode
 
@@ -41,21 +42,11 @@ make DEBUG=1 -j8
 Run with fps analitics
 ``` sh
 ./debug/checkFPS.sh
-./debug/checkFPS.sh re  # if you want to recompile (needed for first use)
+./debug/checkFPS.sh re  # if you want to recompile (needed in first use)
 ```
 
-Change world generation algorithm
-``` sh
-make fclean
-make DEBUG=1 DEFINE="NOISE_USED=0" -j8  # perlin noise generation (default)
-make DEBUG=1 DEFINE="NOISE_USED=1" -j8  # simplex noise generation
-```
-
-Change Chunk generation object (see all Chunk objects in [ft_vox.hpp](includes/ft_vox.hpp))
-``` sh
-make fclean
-make DEBUG=1 DEFINE="CHUNK=Chunk" -j8  # use Chunk object
-```
+In game, you can use `F3` to show debug menu.
+![F3-1](/assets/imgs/F3-1.png)
 
 ---
 
