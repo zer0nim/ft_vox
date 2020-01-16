@@ -27,7 +27,7 @@ class Chunk : public AChunk {
 
 	protected:
 		virtual void	_draw(CAMERA_MAT4 &view, wordIVec3 &chunkOffset, CAMERA_VEC3 &pos, \
-		float nightProgress);
+		float nightProgress, bool pointLight);
 
 	private:
 		void	sendMeshData();

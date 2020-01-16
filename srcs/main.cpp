@@ -185,7 +185,7 @@ ImageRender &imageRender, TextureManager const &textureManager) {
 		}
 
 		// draw here
-		chunkManager.draw(winU->cam, nightProgress);
+		chunkManager.draw(winU->cam, nightProgress, winU->pointLight);
 
 		// draw skybox
 		skybox.draw(nightProgress);
@@ -287,6 +287,7 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *camCrea
 	winU->freezeChunkUpdate = false;
 	winU->putBlock = false;
 	winU->destroyBlock = false;
+	winU->pointLight = false;
 	winU->polygonRenderMode = 0;
 
 	if (!initWindow(window, name, winU))

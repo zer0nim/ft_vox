@@ -443,7 +443,7 @@ void	Chunk::sendMeshData() {
 }
 
 void	Chunk::_draw(CAMERA_MAT4 &view, wordIVec3 &chunkOffset, CAMERA_VEC3 &pos, \
-float nightProgress) {
+float nightProgress, bool pointLight) {
 	if (_meshUpdated) {
 		_meshUpdated = false;
 		_nbVertices = 0;
@@ -462,7 +462,7 @@ float nightProgress) {
 		_shaderData->shader->setFloat("nightProgress", nightProgress);
 
 		_shaderData->shader->setVec3("pointLight.position", pos);
-		_shaderData->shader->setFloat("pointLight.enabled", false);
+		_shaderData->shader->setFloat("pointLight.enabled", pointLight);
 
 		glBindVertexArray(_vao);
 		glDrawArrays(GL_POINTS, 0, _nbVertices);

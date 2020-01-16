@@ -682,6 +682,9 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 			sHelp = "G: change gamemode";
 			textRender.write("normal", sHelp, textX + 20, textY);
 			textY -= lineSz;
+			sHelp = "L: enable / disable point light";
+			textRender.write("normal", sHelp, textX + 20, textY);
+			textY -= lineSz;
 			sHelp = "V: enable / disable mouse cursor";
 			textRender.write("normal", sHelp, textX + 20, textY);
 			textY -= lineSz;

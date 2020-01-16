@@ -90,6 +90,7 @@ typedef struct		sWinUser {
 	bool			freezeChunkUpdate;  // freeze chunk update (F3 + F)
 	bool			putBlock;  // mouse left clicked
 	bool			destroyBlock;  // mouse right clicked
+	bool			pointLight;  // enable point light for the night
 	int8_t			polygonRenderMode;  // toggle polygon render mode (F3 + P)
 }					tWinUser;
 

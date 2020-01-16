@@ -294,7 +294,7 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 	}
 }
 
-void ChunkManager::draw(Camera *cam, float nightProgress) {
+void ChunkManager::draw(Camera *cam, float nightProgress, bool pointLight) {
 	CAMERA_VEC3	chunkSize(CHUNK_SZ_X, CHUNK_SZ_Y, CHUNK_SZ_Z);
 	uint32_t	chunkRendered = 0;
 	uint32_t	squareRendered = 0;
@@ -337,7 +337,7 @@ void ChunkManager::draw(Camera *cam, float nightProgress) {
 							chunk = _chunkMap[chunkPos];
 						}
 						squareRendered += chunk->getNbSquareRendered();
-						chunk->draw(tmpView, chunkOffset, tmpCamPos, nightProgress);
+						chunk->draw(tmpView, chunkOffset, tmpCamPos, nightProgress, pointLight);
 					}
 				}
 			}

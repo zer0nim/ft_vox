@@ -140,6 +140,11 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 		AChunk::getShader().setBool("enableTransparency", s.g.perf.enableTransparency);
 	}
 
+	// enable / disable point light
+	if (key == GLFW_KEY_L && action == GLFW_PRESS) {
+		winU->pointLight = !winU->pointLight;
+	}
+
 	// F3 key -> debug mode
 	if (key == GLFW_KEY_F3 && action == GLFW_RELEASE) {
 		if (launchF3Cmd == false)
