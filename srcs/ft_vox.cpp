@@ -717,6 +717,8 @@ void	drawInventory(GLFWwindow *window, ImageRender &imageRender, TextureManager 
 		if (ID >= NB_TYPE_BLOCKS)
 			ID -= NB_TYPE_BLOCKS;
 		pos.x += step;
+		if (pos.x < 0)
+			continue;
 		texID = textureManager.getBlocks()[ID]->side;
 		imageRender.draw(pos, sz, texID, color);
 	}
@@ -728,6 +730,8 @@ void	drawInventory(GLFWwindow *window, ImageRender &imageRender, TextureManager 
 		if (ID >= NB_TYPE_BLOCKS)
 			ID -= NB_TYPE_BLOCKS;
 		pos.x += step;
+		if (pos.x + sz.x > s.g.screen.width)
+			break;
 		texID = textureManager.getBlocks()[ID]->side;
 		imageRender.draw(pos, sz, texID, color);
 	}
