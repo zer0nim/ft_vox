@@ -79,6 +79,7 @@ typedef struct		sWinUser {
 	ChunkManager	*chunkManager;
 	float			dtTime;
 	float			lastFrame;
+	float			hour;
 
 	bool			runMode;  // mode to auto run (F3 + W)
 	bool			showInventory;  // show inventory (F3 + I)

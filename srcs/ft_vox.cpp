@@ -558,6 +558,16 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 	}
 	textRender.write("normal", sInHand, textX, textY);
 
+	// time
+	textY -= lineSz;
+	uint8_t printHour = static_cast<uint8_t>(winU->hour);
+	uint8_t printMin = static_cast<uint8_t>((winU->hour - printHour) * 60);
+	std::stringstream stream;
+	stream << "Time: " << std::setw(2) << std::setfill('0') << +printHour <<  \
+	":" << std::setw(2) << std::setfill('0') << +printMin;
+	std::string	hour = stream.str();
+	textRender.write("normal", hour, textX, textY);
+
 	// looking at
     { std::lock_guard<std::mutex>	guard(s.mutexOthers);
 		if (chunkManager.raycast.isBlockSelected) {

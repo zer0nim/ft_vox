@@ -55,7 +55,7 @@ class Skybox {
 		Skybox &operator=(Skybox const &rhs);
 
 		void load(std::vector<std::string> &faces);
-		void draw();
+		void draw(float nightProgress);
 
 		Shader			&getShader();
 		Shader const	&getShader() const;

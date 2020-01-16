@@ -72,6 +72,8 @@ ImageRender &imageRender, TextureManager const &textureManager) {
 	bool						firstLoop = true;
 	float						cursorX = s.g.screen.width / 2 - textRender.font["courrier_new"]['+'].size.x / 2;
 	float						cursorY = s.g.screen.height / 2 - textRender.font["courrier_new"]['+'].size.y / 2;
+	float						dayDuration = 20.0;
+	float						nightCycleCount = (dayDuration / 24) * 7;  // launch at 7am
 
 	/* threading */
 	std::array<ThreadupdateArgs *, NB_UPDATE_THREADS>	threadUpdateArgs;
@@ -110,6 +112,8 @@ ImageRender &imageRender, TextureManager const &textureManager) {
 
 	glClearColor(0.11373f, 0.17647f, 0.27059f, 1.0f);
 	checkError();
+	winU->lastFrame = glfwGetTime();
+	uint8_t loopCount = 0;  // used to skip first 5 frames from hour count
 	while (!glfwWindowShouldClose(window)) {
 		time_start = getMs();
 
@@ -143,11 +147,21 @@ ImageRender &imageRender, TextureManager const &textureManager) {
 		skybox.getShader().use();
 		skybox.getShader().setMat4("view", skyView);
 
+		if (loopCount > 5) {
+			nightCycleCount += winU->dtTime;
+			nightCycleCount = nightCycleCount > dayDuration ? 0.0 : nightCycleCount;
+		}
+		else {
+			++loopCount;
+		}
+		winU->hour = nightCycleCount / dayDuration * 24;
+		float nightProgress = 0.0f;  // need to calculate  acording to time
+
 		// draw here
-		chunkManager.draw(winU->cam);
+		chunkManager.draw(winU->cam, nightProgress);
 
 		// draw skybox
-		skybox.draw();
+		skybox.draw(nightProgress);
 
 		// draw text
 		drawText(window, textRender, lastFps, chunkManager);
@@ -236,6 +250,7 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *camCrea
 	winU->chunkManager = nullptr;
 	winU->dtTime = 0.0f;
 	winU->lastFrame = 0.0f;
+	winU->hour = 0.0f;
 	winU->runMode = false;
 	winU->showInventory = true;
 	winU->showInfo = DEBUG;

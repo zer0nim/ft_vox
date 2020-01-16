@@ -1,6 +1,8 @@
 #version 410 core
 
 #define GAMMA 2.2
+#define NIGHT mix(1, 0.05, nightProgress)
+#define NIGHTFOG mix(1, 0.2, nightProgress)
 
 out vec4	FragColor;
 
@@ -43,7 +45,7 @@ uniform Fog			fog = Fog(
 	180,
 	vec4(0.509, 0.8, 0.905, 1.0)
 );
-
+uniform float nightProgress = 0.0;
 
 vec3 calcDirLight(DirLight light, vec3 norm, vec3 viewDir) {
 	vec3	lightDir = normalize(-light.direction);
@@ -65,7 +67,7 @@ vec3 calcDirLight(DirLight light, vec3 norm, vec3 viewDir) {
 	vec3 specular = light.specular;
 	specular *= spec * pow(material.specular, vec3(GAMMA));
 
-	return (ambient + diffuse + specular);
+	return ((ambient + diffuse + specular) * NIGHT);
 }
 
 void main() {
@@ -88,6 +90,6 @@ void main() {
 		float fog_factor = (fog.maxDist - dist) / (fog.maxDist - fog.minDist);
 		fog_factor = clamp(fog_factor, 0.0, 1.0);
 
-		FragColor = mix(fog.color, FragColor, fog_factor);
+		FragColor = mix(vec4(fog.color.rgb * NIGHTFOG, 1.0), FragColor, fog_factor);
 	}
 }

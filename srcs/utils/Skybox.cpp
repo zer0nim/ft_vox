@@ -131,13 +131,14 @@ void Skybox::load(std::vector<std::string> &faces) {
     }
 }
 
-void Skybox::draw() {
+void Skybox::draw(float nightProgress) {
 	_shader.use();
 	glDepthFunc(GL_LEQUAL);
 	glBindVertexArray(_vao);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, _textureID);
 	glBindVertexArray(_vao);
+	_shader.setFloat("nightProgress", nightProgress);
 	glDrawArrays(GL_TRIANGLES, 0, sizeof(_vertices) / sizeof(_vertices[0]));
 	glDepthFunc(GL_LESS);
 	glBindVertexArray(0);
