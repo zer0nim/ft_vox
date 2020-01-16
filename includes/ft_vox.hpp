@@ -196,6 +196,7 @@ struct Settings {
 			float		mouseSensitivity;
 			uint32_t	delayPutMs;  // delay between put 2 blocks
 			uint32_t	delayDestroyMs;  // delay between destroy 2 blocks
+			bool		inverseScrolling;
 		};
 		Player		player;
 

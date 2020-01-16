@@ -51,6 +51,7 @@ void	setDefaultSettings() {
 	s.g.player.mouseSensitivity = 0.1f;
 	s.g.player.delayPutMs = 100;
 	s.g.player.delayDestroyMs = 100;
+	s.g.player.inverseScrolling = false;
 	s.g.fog.enabled = true;
 	s.g.fog.width = 70;
 	s.g.fog.color = glm::vec4(0.509, 0.8, 0.905, 1.0);
@@ -205,6 +206,8 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		s.g.player.delayPutMs = element.get<uint32_t>();
 	else if (element.is_number() && key == ".global.player.delayDestroyMs" && checkUint32(element, 0, 60000))
 		s.g.player.delayDestroyMs = element.get<uint32_t>();
+	else if (element.is_boolean() && key == ".global.player.inverseScrolling")
+		s.g.player.inverseScrolling = element.get<bool>();
 	else if (element.is_number() && key == ".map.generationType" && checkUint32(element, 0, 2))
 		s.m.generationType = element.get<uint32_t>();
 	else if (element.is_boolean() && key == ".map.generateTree")

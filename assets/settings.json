@@ -53,7 +53,8 @@
 			},
 			"mouseSensitivity": 0.1,
 			"delayPutMs": 200,
-			"delayDestroyMs": 200
+			"delayDestroyMs": 200,
+			"inverseScrolling": true
 		},
 		"fog": {
 			"enabled": true,

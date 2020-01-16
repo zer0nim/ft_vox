@@ -3,12 +3,9 @@
 ## Project
 A little Opengl Voxel World engine
 
-Explore an "infinite" world with fly mode
-
+## Explore an "infinite" world with fly mode
 ![moving](/assets/GIFs/moving.gif)
-
-Explore caves with walking mode
-
+## Explore caves with walking mode
 ![caves](/assets/GIFs/survival-caves.gif)
 
 We used `glfw3` API for creating windows and manage input and events,
@@ -37,8 +34,13 @@ and `glm` to manage matrix/vector/quaternion.
 
 	```./ft_vox --seed <seed:uint32_t>  # create world with given seed```
 
+## Try differents generations with multiples biomes
 ![biome-preview](/assets/imgs/biome-preview.png)
+## Explore and find all differents structure
 ![struct-preview](/assets/imgs/struct-preview.png)
+## Try multiples texture packs or create yours
+![texture-pack-1](/assets/imgs/smooth-preview.png)
+![texture-pack-2](/assets/imgs/texture-blocks.png)
 
 ## The project
 

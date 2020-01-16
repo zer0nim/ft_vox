@@ -251,6 +251,9 @@ void scrolling(GLFWwindow* window, double xoffset, double yoffset) {
 	if (offset == 0) {
 		offset = xoffset;
 	}
+	if (s.g.player.inverseScrolling) {
+		offset = -offset;
+	}
 	if (offset > 0) {
 		s.m.handBlockID++;
 		if (s.m.handBlockID > NB_TYPE_BLOCKS) {
