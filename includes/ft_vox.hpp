@@ -232,7 +232,8 @@ struct Settings {
 		uint8_t					gamemode;
 
 		struct NightCycle {
-			bool	enabled;
+			float	time;
+			bool	cycleEnabled;
 			float	dayDuration;
 			float	sunriseStart;
 			float	sunriseEnd;

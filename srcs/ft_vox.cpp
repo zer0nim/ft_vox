@@ -72,7 +72,8 @@ void	setDefaultSettings() {
 	s.m.flatMap.push_back({3, 3, "grass"});
 	s.m.handBlockID = 1;
 	s.m.gamemode = GAMEMODE_CREATIVE;
-	s.m.nightCycle.enabled = true;
+	s.m.nightCycle.time = 6.0;
+	s.m.nightCycle.cycleEnabled = true;
 	s.m.nightCycle.dayDuration = 300.0;
 	s.m.nightCycle.sunriseStart = 5.5;
 	s.m.nightCycle.sunriseEnd = 6.5;
@@ -253,8 +254,10 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 	else if (element.is_number() && key == ".map.gamemode" && checkUint32(element, 0, 1))
 		s.m.gamemode = element.get<uint8_t>();
 	/// nightCycle
-	else if (element.is_boolean() && key == ".map.nightCycle.enabled")
-		s.m.nightCycle.enabled = element.get<bool>();
+	else if (element.is_number() && key == ".map.nightCycle.time" && checkFloat(element, 0.0f, 23.9999f))
+		s.m.nightCycle.time = element.get<float>();
+	else if (element.is_boolean() && key == ".map.nightCycle.cycleEnabled")
+		s.m.nightCycle.cycleEnabled = element.get<bool>();
 	else if (element.is_number() && key == ".map.nightCycle.dayDuration" && checkFloat(element, 1.0f, 86400.0f))
 		s.m.nightCycle.dayDuration = element.get<float>();
 	else if (element.is_number() && key == ".map.nightCycle.sunriseStart" && checkFloat(element, 0.0f, 23.99f))
@@ -471,7 +474,8 @@ bool	saveMap(Camera *cam) {
 			{"handBlockID", s.m.handBlockID},
 			{"gamemode", s.m.gamemode},
 			{"nightCycle", {
-				{"enabled", s.m.nightCycle.enabled},
+				{"time", s.m.nightCycle.time},
+				{"enabled", s.m.nightCycle.cycleEnabled},
 				{"dayDuration", s.m.nightCycle.dayDuration},
 				{"sunriseStart", s.m.nightCycle.sunriseStart},
 				{"sunriseEnd", s.m.nightCycle.sunriseEnd},

@@ -141,7 +141,7 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 	}
 
 	// enable / disable point light
-	if (key == GLFW_KEY_L && action == GLFW_PRESS) {
+	if (key == GLFW_KEY_L && action == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_F3) == GLFW_RELEASE) {
 		winU->pointLight = !winU->pointLight;
 	}
 
