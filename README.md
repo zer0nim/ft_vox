@@ -70,7 +70,7 @@ You can save and quit the game by pressing `escape`.
 
 ## Settings
 
-You can change all world settings in [assets/settings.json](/assets/settings.json).
+You can change all world settings in [assets/settings.json](assets/settings.json).
 
 You can configure the game with this file:
 - FPS
@@ -92,11 +92,11 @@ You can configure the game with this file:
 You have more than 50 parameters to discover !
 
 ## Texture packs
-You can also change the textures by creating a texture atlas [assets/blocs.png](/assets/blocs.png).
-You can create this file with [this](http://free-tex-packer.com/app/) website.
+You can also change the textures by creating a texture atlas [assets/textures/textures-default.png](assets/textures/textures-default.png).
+You can create this file with [this](http://free-tex-packer.com/app/) website (show settings in the image bellow).
 If the images are not in the right size (32px), you can resize all your images in [this](https://www.birme.net/?target_width=32&target_height=32&quality=0) website.
 You can also create your texture on [this](https://www.pixilart.com/draw?ref=home-page) website.
-You need to put blocs in the right order (example in [assets/textures/block](/assets/textures/block)).
+You need to put blocs in the right order (example in [assets/textures](assets/textures)).
 
 There is 2 default texture packs: `textures-default` and `textures-smooth`.
 You can select your texture pack in settings (`global->files->textures`: `"./assets/textures/textures-default.png"`, `"./assets/textures/textures-smooth.png"` or your texture file).
