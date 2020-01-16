@@ -337,7 +337,7 @@ void ChunkManager::draw(Camera *cam, float nightProgress) {
 							chunk = _chunkMap[chunkPos];
 						}
 						squareRendered += chunk->getNbSquareRendered();
-						chunk->draw(tmpView, chunkOffset, tmpCamPos, cam->front, nightProgress);
+						chunk->draw(tmpView, chunkOffset, tmpCamPos, nightProgress);
 					}
 				}
 			}

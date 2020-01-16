@@ -26,12 +26,9 @@ struct DirLight {
 	vec3		specular;
 };
 
-struct SpotLight {
+struct PointLight {
+    bool		enabled;
     vec3		position;
-    vec3		direction;
-
-	float		cutOff;
-	float		outerCutOff;
 
     float		constant;
     float		linear;
@@ -55,7 +52,7 @@ uniform bool		enableTransparency;
 uniform vec3		viewPos;
 uniform Material	material;
 uniform DirLight	dirLight;
-uniform SpotLight	spotLight;
+uniform PointLight	pointLight;
 uniform Fog			fog = Fog(
 	true,
 	256,
@@ -87,7 +84,7 @@ vec3 calcDirLight(DirLight light, vec3 norm, vec3 viewDir) {
 	return ((ambient + diffuse + specular) * NIGHT);
 }
 
-vec3 calcSpotLight(SpotLight light, vec3 norm, vec3 fragPos, vec3 viewDir) {
+vec3 calcPointLight(PointLight light, vec3 norm, vec3 fragPos, vec3 viewDir) {
 	vec3    lightDir = normalize(light.position - fragPos);
 	// diffuse
 	float	diff = max(dot(norm, lightDir), 0.0);
@@ -112,12 +109,9 @@ vec3 calcSpotLight(SpotLight light, vec3 norm, vec3 fragPos, vec3 viewDir) {
 	float	attenuation = 1.0 / (light.constant + light.linear * distance + \
 	light.quadratic * (distance * distance));
 
-	float 	theta = dot(lightDir, normalize(-light.direction));
-	float 	epsilon = light.cutOff - light.outerCutOff;
-	float 	intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
-	ambient *= attenuation * intensity;
-	diffuse *= attenuation * intensity;
-	specular *= attenuation * intensity;
+	ambient *= attenuation;
+	diffuse *= attenuation;
+	specular *= attenuation;
 	return (ambient + diffuse + specular);
 }
 
@@ -131,8 +125,12 @@ void main() {
 
 	// Directional lighting
 	vec3 res = calcDirLight(dirLight, norm, viewDir);
-	// SpotLight
-	res += calcSpotLight(spotLight, norm, fs_in.FragPos, viewDir);
+
+	// PointLight
+	if (pointLight.enabled) {
+		res += calcPointLight(pointLight, norm, fs_in.FragPos, viewDir);
+	}
+
 	FragColor = vec4(res, 1.0);
 
 	// apply gamma correction

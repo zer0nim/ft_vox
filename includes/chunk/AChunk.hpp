@@ -24,7 +24,7 @@ class AChunk {
 		AChunk &operator=(AChunk const &rhs);
 
 		virtual void	draw(CAMERA_MAT4 &view, wordIVec3 &chunkOffset, CAMERA_VEC3 &pos, \
-		CAMERA_VEC3 &camFront, float nightProgress);
+		float nightProgress);
 		virtual void	update(bool isChunkMapMutexed = true) = 0;
 		virtual bool	renderUpdate(int32_t startX, int32_t startZ) = 0;  // return true if updated
 		void			createChunk(wordIVec3 const &chunkPos);
@@ -68,7 +68,7 @@ class AChunk {
 		static std::unique_ptr<ShaderData>	_shaderData;
 
 		virtual void	_draw(CAMERA_MAT4 &view, wordIVec3 &chunkOffset, CAMERA_VEC3 &pos, \
-		CAMERA_VEC3 &camFront, float nightProgress) = 0;
+		float nightProgress) = 0;
 		bool			_createChunkFromFile();
 		virtual void	_createChunk();
 
