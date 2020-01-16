@@ -73,6 +73,10 @@ ImageRender &imageRender, TextureManager const &textureManager) {
 	float						cursorX = s.g.screen.width / 2 - textRender.font["courrier_new"]['+'].size.x / 2;
 	float						cursorY = s.g.screen.height / 2 - textRender.font["courrier_new"]['+'].size.y / 2;
 	float						dayDuration = 20.0;
+	float						sunriseStart = 6.0;
+	float						sunriseEnd = 6.5;
+	float						sunsetStart = 20.0;
+	float						sunsetEnd = 20.5;
 	float						nightCycleCount = (dayDuration / 24) * 7;  // launch at 7am
 
 	/* threading */
@@ -155,7 +159,25 @@ ImageRender &imageRender, TextureManager const &textureManager) {
 			++loopCount;
 		}
 		winU->hour = nightCycleCount / dayDuration * 24;
-		float nightProgress = 0.0f;  // need to calculate  acording to time
+
+		// calculate nightProgress according to time
+		float nightProgress = 0.0f;
+		// night
+		if (winU->hour < sunriseStart || winU->hour > sunsetEnd) {
+			nightProgress = 1.0f;
+		}
+		// day
+		else if (winU->hour > sunriseEnd && winU->hour < sunsetStart) {
+			nightProgress = 0.0f;
+		}
+		// sunset
+		else if (winU->hour >= sunsetStart) {
+			nightProgress = (winU->hour - sunsetStart) / (sunsetEnd - sunsetStart);
+		}
+		// sunrise
+		else {
+			nightProgress = 1 - ((winU->hour - sunriseStart) / (sunriseEnd - sunriseStart));
+		}
 
 		// draw here
 		chunkManager.draw(winU->cam, nightProgress);
