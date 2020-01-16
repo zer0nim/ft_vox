@@ -96,6 +96,14 @@
 			}
 		],
 		"handBlockID": 1,
-		"gamemode": 1
+		"gamemode": 1,
+		"nightCycle": {
+			"enabled": true,
+			"dayDuration": 300.0,
+			"sunriseStart": 5.5,
+			"sunriseEnd": 6.5,
+			"sunsetStart": 19.75,
+			"sunsetEnd": 20.75
+		}
 	}
 }

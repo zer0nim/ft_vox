@@ -72,12 +72,7 @@ ImageRender &imageRender, TextureManager const &textureManager) {
 	bool						firstLoop = true;
 	float						cursorX = s.g.screen.width / 2 - textRender.font["courrier_new"]['+'].size.x / 2;
 	float						cursorY = s.g.screen.height / 2 - textRender.font["courrier_new"]['+'].size.y / 2;
-	float						dayDuration = 20.0;
-	float						sunriseStart = 6.0;
-	float						sunriseEnd = 6.5;
-	float						sunsetStart = 20.0;
-	float						sunsetEnd = 20.5;
-	float						nightCycleCount = (dayDuration / 24) * 7;  // launch at 7am
+	float						nightCycleCount = 0.0f;
 
 	/* threading */
 	std::array<ThreadupdateArgs *, NB_UPDATE_THREADS>	threadUpdateArgs;
@@ -118,6 +113,7 @@ ImageRender &imageRender, TextureManager const &textureManager) {
 	checkError();
 	winU->lastFrame = glfwGetTime();
 	uint8_t loopCount = 0;  // used to skip first 5 frames from hour count
+	nightCycleCount = (s.m.nightCycle.dayDuration / 24) * 7;  // launch at 7am
 	while (!glfwWindowShouldClose(window)) {
 		time_start = getMs();
 
@@ -153,30 +149,38 @@ ImageRender &imageRender, TextureManager const &textureManager) {
 
 		if (loopCount > 5) {
 			nightCycleCount += winU->dtTime;
-			nightCycleCount = nightCycleCount > dayDuration ? 0.0 : nightCycleCount;
+			nightCycleCount = nightCycleCount > s.m.nightCycle.dayDuration \
+			? 0.0 : nightCycleCount;
 		}
 		else {
 			++loopCount;
 		}
-		winU->hour = nightCycleCount / dayDuration * 24;
+		winU->hour = nightCycleCount / s.m.nightCycle.dayDuration * 24;
 
-		// calculate nightProgress according to time
+
 		float nightProgress = 0.0f;
-		// night
-		if (winU->hour < sunriseStart || winU->hour > sunsetEnd) {
-			nightProgress = 1.0f;
-		}
-		// day
-		else if (winU->hour > sunriseEnd && winU->hour < sunsetStart) {
-			nightProgress = 0.0f;
-		}
-		// sunset
-		else if (winU->hour >= sunsetStart) {
-			nightProgress = (winU->hour - sunsetStart) / (sunsetEnd - sunsetStart);
-		}
-		// sunrise
-		else {
-			nightProgress = 1 - ((winU->hour - sunriseStart) / (sunriseEnd - sunriseStart));
+		// calculate nightProgress according to time
+		if (s.m.nightCycle.enabled) {
+			// night
+			if (winU->hour < s.m.nightCycle.sunriseStart || winU->hour > \
+			s.m.nightCycle.sunsetEnd) {
+				nightProgress = 1.0f;
+			}
+			// day
+			else if (winU->hour > s.m.nightCycle.sunriseEnd && winU->hour < \
+			s.m.nightCycle.sunsetStart) {
+				nightProgress = 0.0f;
+			}
+			// sunset
+			else if (winU->hour >= s.m.nightCycle.sunsetStart) {
+				nightProgress = (winU->hour - s.m.nightCycle.sunsetStart) / \
+				(s.m.nightCycle.sunsetEnd - s.m.nightCycle.sunsetStart);
+			}
+			// sunrise
+			else {
+				nightProgress = 1 - ((winU->hour - s.m.nightCycle.sunriseStart) \
+				/ (s.m.nightCycle.sunriseEnd - s.m.nightCycle.sunriseStart));
+			}
 		}
 
 		// draw here

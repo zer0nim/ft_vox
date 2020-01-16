@@ -72,6 +72,12 @@ void	setDefaultSettings() {
 	s.m.flatMap.push_back({3, 3, "grass"});
 	s.m.handBlockID = 1;
 	s.m.gamemode = GAMEMODE_CREATIVE;
+	s.m.nightCycle.enabled = true;
+	s.m.nightCycle.dayDuration = 300.0;
+	s.m.nightCycle.sunriseStart = 5.5;
+	s.m.nightCycle.sunriseEnd = 6.5;
+	s.m.nightCycle.sunsetStart = 19.75;
+	s.m.nightCycle.sunsetEnd = 20.75;
 }
 
 static bool	checkFloat(nlohmann::json &element, float min, float max) {
@@ -246,6 +252,19 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		s.m.handBlockID = element.get<uint32_t>();
 	else if (element.is_number() && key == ".map.gamemode" && checkUint32(element, 0, 1))
 		s.m.gamemode = element.get<uint8_t>();
+	/// nightCycle
+	else if (element.is_boolean() && key == ".map.nightCycle.enabled")
+		s.m.nightCycle.enabled = element.get<bool>();
+	else if (element.is_number() && key == ".map.nightCycle.dayDuration" && checkFloat(element, 1.0f, 86400.0f))
+		s.m.nightCycle.dayDuration = element.get<float>();
+	else if (element.is_number() && key == ".map.nightCycle.sunriseStart" && checkFloat(element, 0.0f, 23.99f))
+		s.m.nightCycle.sunriseStart = element.get<float>();
+	else if (element.is_number() && key == ".map.nightCycle.sunriseEnd" && checkFloat(element, 0.0f, 23.99f))
+		s.m.nightCycle.sunriseEnd = element.get<float>();
+	else if (element.is_number() && key == ".map.nightCycle.sunsetStart" && checkFloat(element, 0.0f, 23.99f))
+		s.m.nightCycle.sunsetStart = element.get<float>();
+	else if (element.is_number() && key == ".map.nightCycle.sunsetEnd" && checkFloat(element, 0.0f, 23.99f))
+		s.m.nightCycle.sunsetEnd = element.get<float>();
 	else
 		logWarn("invalid argument or argument type in settings: " << key << ": " << element);
 }
@@ -451,6 +470,14 @@ bool	saveMap(Camera *cam) {
 			{"flatMap", flatMapElem},
 			{"handBlockID", s.m.handBlockID},
 			{"gamemode", s.m.gamemode},
+			{"nightCycle", {
+				{"enabled", s.m.nightCycle.enabled},
+				{"dayDuration", s.m.nightCycle.dayDuration},
+				{"sunriseStart", s.m.nightCycle.sunriseStart},
+				{"sunriseEnd", s.m.nightCycle.sunriseEnd},
+				{"sunsetStart", s.m.nightCycle.sunsetStart},
+				{"sunsetEnd", s.m.nightCycle.sunsetEnd}
+			}},
 		}
 	}};
 	try {

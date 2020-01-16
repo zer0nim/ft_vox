@@ -229,6 +229,16 @@ struct Settings {
 		std::vector<FlatMap>	flatMap;
 		uint8_t					handBlockID;
 		uint8_t					gamemode;
+
+		struct NightCycle {
+			bool	enabled;
+			float	dayDuration;
+			float	sunriseStart;
+			float	sunriseEnd;
+			float	sunsetStart;
+			float	sunsetEnd;
+		};
+		NightCycle	nightCycle;
 	};
 	Map m;  // map
 
