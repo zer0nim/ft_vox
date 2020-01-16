@@ -688,7 +688,7 @@ void	drawInventory(GLFWwindow *window, ImageRender &imageRender, TextureManager 
 	tWinUser	*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
 	(void)winU;
 
-	if (winU->showInventory || s.g.screen.inventorySzPercent == 0)
+	if (!winU->showInventory || s.g.screen.inventorySzPercent == 0)
 		return;
 
 	glm::vec2	pos;
