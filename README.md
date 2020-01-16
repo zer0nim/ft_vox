@@ -3,6 +3,14 @@
 ## Project
 A little Opengl Voxel World engine
 
+Explore an "infinite" world with fly mode
+
+![moving](/assets/GIFs/moving.gif)
+
+Explore caves with walking mode
+
+![caves](/assets/GIFs/survival-caves.gif)
+
 We used `glfw3` API for creating windows and manage input and events,
 and `glm` to manage matrix/vector/quaternion.
 
