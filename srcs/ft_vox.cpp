@@ -25,6 +25,7 @@ void	setDefaultSettings() {
 	s.g.files.mapsPath = "/tmp/ft_vox/maps/";
 	s.g.files.chunkPath = "chunks/";
 	s.g.files.mapSettingsPath = "map_settings.json";
+	s.g.files.textures = "./assets/textures/blocs.png";
 	s.g.files.saveAllChunks = false;
 	s.g.screen.fullscreen = true;
 	s.g.screen.width = 1200;
@@ -157,6 +158,8 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		s.g.files.chunkPath = element.get<std::string>();
 	else if (element.is_string() && key == ".global.files.mapSettingsPath")
 		s.g.files.mapSettingsPath = element.get<std::string>();
+	else if (element.is_string() && key == ".global.files.textures")
+		s.g.files.textures = element.get<std::string>();
 	else if (element.is_boolean() && key == ".global.files.saveAllChunks")
 		s.g.files.saveAllChunks = element.get<bool>();
 	/// screen

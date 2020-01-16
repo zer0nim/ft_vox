@@ -12,6 +12,7 @@
 			"mapsPath": "/tmp/ft_vox/maps/",
 			"chunkPath": "chunks/",
 			"mapSettingsPath": "map_settings.json",
+			"textures": "./assets/textures/textures-default.png",
 			"saveAllChunks": false
 		},
 		"screen": {

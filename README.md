@@ -74,6 +74,7 @@ You can change all world settings in [assets/settings.json](/assets/settings.jso
 You can configure the game with this file:
 - FPS
 - Render distance
+- Texture pack selection
 - Window size / fullscreen option
 - Speed / mouse sensitivity
 - Destroy / add blocks speed
@@ -89,12 +90,17 @@ You can configure the game with this file:
 
 You have more than 50 parameters to discover !
 
+## Texture packs
 You can also change the textures by creating a texture atlas [assets/blocs.png](/assets/blocs.png).
 You can create this file with [this](http://free-tex-packer.com/app/) website.
+If the images are not in the right size (32px), you can resize all your images in [this](https://www.birme.net/?target_width=32&target_height=32&quality=0) website.
+You can also create your texture on [this](https://www.pixilart.com/draw?ref=home-page) website.
 You need to put blocs in the right order (example in [assets/textures/block](/assets/textures/block)).
 
-![free-tex-settings](/assets/imgs/free-tex-settings.png)
+There is 2 default texture packs: `textures-default` and `textures-smooth`.
+You can select your texture pack in settings (`global->files->textures`: `"./assets/textures/textures-default.png"`, `"./assets/textures/textures-smooth.png"` or your texture file).
 
+![free-tex-settings](/assets/imgs/free-tex-settings.png)
 
 ## Debug mode
 

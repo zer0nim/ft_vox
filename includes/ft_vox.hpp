@@ -159,6 +159,7 @@ struct Settings {
 			std::string	mapsPath;
 			std::string	chunkPath;
 			std::string mapSettingsPath;
+			std::string	textures;
 			bool		saveAllChunks;
 		};
 		Files	files;
