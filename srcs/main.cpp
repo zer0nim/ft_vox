@@ -102,7 +102,8 @@ ImageRender &imageRender, TextureManager const &textureManager) {
 	skybox.getShader().setMat4("projection", projection);
 
 	for (uint8_t i = 0; i < NB_UPDATE_THREADS; i++) {
-		int rc = pthread_create(&(threadUpdate[i]), NULL, threadUpdateFunction, reinterpret_cast<void*>(threadUpdateArgs[i]));
+		int rc = pthread_create(&(threadUpdate[i]), NULL, threadUpdateFunction, \
+		reinterpret_cast<void*>(threadUpdateArgs[i]));
 		if (rc) {
 			logErr("unable to create thread," << rc);
 			return;
@@ -113,7 +114,7 @@ ImageRender &imageRender, TextureManager const &textureManager) {
 	checkError();
 	winU->lastFrame = glfwGetTime();
 	uint8_t loopCount = 0;  // used to skip first 5 frames from hour count
-	nightCycleCount = (s.m.nightCycle.dayDuration / 24) * 7;  // launch at 7am
+	nightCycleCount = (s.m.nightCycle.dayDuration / 24) * 2;  // launch at 7am
 	while (!glfwWindowShouldClose(window)) {
 		time_start = getMs();
 

@@ -26,7 +26,8 @@ class Chunk : public AChunk {
 		virtual uint32_t	getNbSquareRendered() const;
 
 	protected:
-		virtual void	_draw(CAMERA_MAT4 &view, wordIVec3 &chunkOffset, CAMERA_VEC3 &pos, float nightProgress);
+		virtual void	_draw(CAMERA_MAT4 &view, wordIVec3 &chunkOffset, CAMERA_VEC3 &pos, \
+		CAMERA_VEC3 &camFront, float nightProgress);
 
 	private:
 		void	sendMeshData();

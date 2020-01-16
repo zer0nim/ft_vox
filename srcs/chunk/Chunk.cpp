@@ -442,7 +442,8 @@ void	Chunk::sendMeshData() {
 	}
 }
 
-void	Chunk::_draw(CAMERA_MAT4 &view, wordIVec3 &chunkOffset, CAMERA_VEC3 &pos, float nightProgress) {
+void	Chunk::_draw(CAMERA_MAT4 &view, wordIVec3 &chunkOffset, CAMERA_VEC3 &pos, \
+CAMERA_VEC3 &camFront, float nightProgress) {
 	if (_meshUpdated) {
 		_meshUpdated = false;
 		_nbVertices = 0;
@@ -459,6 +460,9 @@ void	Chunk::_draw(CAMERA_MAT4 &view, wordIVec3 &chunkOffset, CAMERA_VEC3 &pos, f
 		glm::mat4 model = glm::translate(glm::mat4(1.0), glm::vec3(_chunkPos - chunkOffset));
 		_shaderData->shader->setMat4("model", model);
 		_shaderData->shader->setFloat("nightProgress", nightProgress);
+
+		_shaderData->shader->setVec3("spotLight.position", pos);
+		_shaderData->shader->setVec3("spotLight.direction", camFront);
 
 		glBindVertexArray(_vao);
 		glDrawArrays(GL_POINTS, 0, _nbVertices);
@@ -478,6 +482,17 @@ void	Chunk::sendConstUniforms(TextureManager const &textureManager) {
 	_shaderData->shader->setVec3("dirLight.ambient", 0.4f, 0.4f, 0.4f);
 	_shaderData->shader->setVec3("dirLight.diffuse", 0.8f, 0.8f, 0.8f);
 	_shaderData->shader->setVec3("dirLight.specular", 0.1f, 0.1f, 0.1f);
+
+	// set spot light
+	_shaderData->shader->setFloat("spotLight.cutOff", cos(glm::radians(20.5f)));
+	_shaderData->shader->setFloat("spotLight.outerCutOff", cos(glm::radians(25.0f)));
+	_shaderData->shader->setFloat("spotLight.constant", 1.0f);
+	_shaderData->shader->setFloat("spotLight.linear", 0.045f);
+	_shaderData->shader->setFloat("spotLight.quadratic", 0.0075f);
+
+	_shaderData->shader->setVec3("spotLight.ambient", 0.05f, 0.05f, 0.05f);
+	_shaderData->shader->setVec3("spotLight.diffuse", 0.8f, 0.8f, 0.8f);
+	_shaderData->shader->setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
 
 	// send textures
 	textureManager.setUniform(*_shaderData->shader);
