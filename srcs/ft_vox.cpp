@@ -25,6 +25,7 @@ void	setDefaultSettings() {
 	s.g.files.mapsPath = "/tmp/ft_vox/maps/";
 	s.g.files.chunkPath = "chunks/";
 	s.g.files.mapSettingsPath = "map_settings.json";
+	s.g.files.textures = "./assets/textures/blocs.png";
 	s.g.files.saveAllChunks = false;
 	s.g.screen.fullscreen = true;
 	s.g.screen.width = 1200;
@@ -50,6 +51,7 @@ void	setDefaultSettings() {
 	s.g.player.mouseSensitivity = 0.1f;
 	s.g.player.delayPutMs = 100;
 	s.g.player.delayDestroyMs = 100;
+	s.g.player.inverseScrolling = false;
 	s.g.fog.enabled = true;
 	s.g.fog.width = 70;
 	s.g.fog.color = glm::vec4(0.509, 0.8, 0.905, 1.0);
@@ -163,6 +165,8 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		s.g.files.chunkPath = element.get<std::string>();
 	else if (element.is_string() && key == ".global.files.mapSettingsPath")
 		s.g.files.mapSettingsPath = element.get<std::string>();
+	else if (element.is_string() && key == ".global.files.textures")
+		s.g.files.textures = element.get<std::string>();
 	else if (element.is_boolean() && key == ".global.files.saveAllChunks")
 		s.g.files.saveAllChunks = element.get<bool>();
 	/// screen
@@ -208,6 +212,8 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		s.g.player.delayPutMs = element.get<uint32_t>();
 	else if (element.is_number() && key == ".global.player.delayDestroyMs" && checkUint32(element, 0, 60000))
 		s.g.player.delayDestroyMs = element.get<uint32_t>();
+	else if (element.is_boolean() && key == ".global.player.inverseScrolling")
+		s.g.player.inverseScrolling = element.get<bool>();
 	else if (element.is_number() && key == ".map.generationType" && checkUint32(element, 0, 2))
 		s.m.generationType = element.get<uint32_t>();
 	else if (element.is_boolean() && key == ".map.generateTree")
@@ -645,6 +651,9 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 		sHelp = "F3 + W: toggle auto run mode";
 		textRender.write("normal", sHelp, textX + 20, textY);
 		textY -= lineSz;
+		sHelp = "F3 + R: reset position to last saved (creative)";
+		textRender.write("normal", sHelp, textX + 20, textY);
+		textY -= lineSz;
 		sHelp = "F3 + C: show commands list";
 		textRender.write("normal", sHelp, textX + 20, textY);
 		textY -= lineSz;
@@ -689,9 +698,6 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 			textRender.write("normal", sHelp, textX + 20, textY);
 			textY -= lineSz;
 			sHelp = "T: enable / disable transparency";
-			textRender.write("normal", sHelp, textX + 20, textY);
-			textY -= lineSz;
-			sHelp = "R: reset position to last saved (creative)";
 			textRender.write("normal", sHelp, textX + 20, textY);
 			textY -= lineSz;
 			sHelp = "ESCAPE: save and quit game";
@@ -754,6 +760,8 @@ void	drawInventory(GLFWwindow *window, ImageRender &imageRender, TextureManager 
 		if (ID >= NB_TYPE_BLOCKS)
 			ID -= NB_TYPE_BLOCKS;
 		pos.x += step;
+		if (pos.x < 0)
+			continue;
 		texID = textureManager.getBlocks()[ID]->side;
 		imageRender.draw(pos, sz, texID, color);
 	}
@@ -765,6 +773,8 @@ void	drawInventory(GLFWwindow *window, ImageRender &imageRender, TextureManager 
 		if (ID >= NB_TYPE_BLOCKS)
 			ID -= NB_TYPE_BLOCKS;
 		pos.x += step;
+		if (pos.x + sz.x > s.g.screen.width)
+			break;
 		texID = textureManager.getBlocks()[ID]->side;
 		imageRender.draw(pos, sz, texID, color);
 	}

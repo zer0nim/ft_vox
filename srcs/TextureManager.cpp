@@ -4,7 +4,7 @@
 
 #include "utils/Texture.hpp"
 #include "Logging.hpp"
-
+#include "ft_vox.hpp"
 
 std::map<std::string, uint8_t>	TextureManager::blocksNames = {
 	{"dirt",				1},
@@ -114,7 +114,7 @@ TextureManager &TextureManager::operator=(TextureManager const &rhs) {
 void	TextureManager::loadBlocksTextures(nlohmann::json const &data) {
 	// load texture atlas
 	_textureAtlas = new TextureManager::Texture();
-	std::string path = "./assets/textures/blocs.png";
+	std::string path = s.g.files.textures;
 	bool inSpaceSRGB = true;
 	try {
 		_textureAtlas->id = textureAtlasFromFile(path, inSpaceSRGB, 32, 256);

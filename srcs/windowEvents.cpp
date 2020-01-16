@@ -75,11 +75,6 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 	if (key == GLFW_KEY_V && action == GLFW_PRESS)
 		toggleCursor(window);
 
-	// reset key
-	if (key == GLFW_KEY_R && action == GLFW_PRESS) {
-		winU->cam->resetPosition();
-	}
-
 	// enable / disable fog
 	if (key == GLFW_KEY_F && action == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_F3) == GLFW_RELEASE) {
 		s.g.fog.enabled = !s.g.fog.enabled;
@@ -163,6 +158,11 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 	if (key == GLFW_KEY_F && action == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
 		winU->freezeChunkUpdate = !winU->freezeChunkUpdate;
 		launchF3Cmd = true;
+	}
+
+	// F3 + R -> reset key
+	if (key == GLFW_KEY_R && action == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS) {
+		winU->cam->resetPosition();
 	}
 
 	// F3 + H -> toggle help menu
@@ -250,6 +250,9 @@ void scrolling(GLFWwindow* window, double xoffset, double yoffset) {
 	double offset = yoffset;
 	if (offset == 0) {
 		offset = xoffset;
+	}
+	if (s.g.player.inverseScrolling) {
+		offset = -offset;
 	}
 	if (offset > 0) {
 		s.m.handBlockID++;

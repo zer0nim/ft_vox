@@ -12,6 +12,7 @@
 			"mapsPath": "/tmp/ft_vox/maps/",
 			"chunkPath": "chunks/",
 			"mapSettingsPath": "map_settings.json",
+			"textures": "./assets/textures/textures-default.png",
 			"saveAllChunks": false
 		},
 		"screen": {
@@ -52,7 +53,8 @@
 			},
 			"mouseSensitivity": 0.1,
 			"delayPutMs": 200,
-			"delayDestroyMs": 200
+			"delayDestroyMs": 200,
+			"inverseScrolling": true
 		},
 		"fog": {
 			"enabled": true,
