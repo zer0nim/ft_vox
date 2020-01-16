@@ -42,10 +42,11 @@ AChunk &AChunk::operator=(AChunk const &rhs) {
 	return *this;
 }
 
-void	AChunk::draw(CAMERA_MAT4 &view, wordIVec3 &chunkOffset, CAMERA_VEC3 &pos, float nightProgress) {
+void	AChunk::draw(CAMERA_MAT4 &view, wordIVec3 &chunkOffset, CAMERA_VEC3 &pos, \
+float nightProgress, bool pointLight) {
     { std::lock_guard<std::mutex>	guard(mutexChunk);
 		if (_data.nbBlocks > 0) {
-			_draw(view, chunkOffset, pos, nightProgress);
+			_draw(view, chunkOffset, pos, nightProgress, pointLight);
 		}
 	}
 }

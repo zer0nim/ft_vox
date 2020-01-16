@@ -102,7 +102,8 @@ ImageRender &imageRender, TextureManager const &textureManager) {
 	skybox.getShader().setMat4("projection", projection);
 
 	for (uint8_t i = 0; i < NB_UPDATE_THREADS; i++) {
-		int rc = pthread_create(&(threadUpdate[i]), NULL, threadUpdateFunction, reinterpret_cast<void*>(threadUpdateArgs[i]));
+		int rc = pthread_create(&(threadUpdate[i]), NULL, threadUpdateFunction, \
+		reinterpret_cast<void*>(threadUpdateArgs[i]));
 		if (rc) {
 			logErr("unable to create thread," << rc);
 			return;
@@ -113,7 +114,7 @@ ImageRender &imageRender, TextureManager const &textureManager) {
 	checkError();
 	winU->lastFrame = glfwGetTime();
 	uint8_t loopCount = 0;  // used to skip first 5 frames from hour count
-	nightCycleCount = (s.m.nightCycle.dayDuration / 24) * 7;  // launch at 7am
+	nightCycleCount = (s.m.nightCycle.time / 24) * s.m.nightCycle.dayDuration;
 	while (!glfwWindowShouldClose(window)) {
 		time_start = getMs();
 
@@ -147,44 +148,43 @@ ImageRender &imageRender, TextureManager const &textureManager) {
 		skybox.getShader().use();
 		skybox.getShader().setMat4("view", skyView);
 
-		if (loopCount > 5) {
-			nightCycleCount += winU->dtTime;
-			nightCycleCount = nightCycleCount > s.m.nightCycle.dayDuration \
-			? 0.0 : nightCycleCount;
+		if (s.m.nightCycle.cycleEnabled) {
+			if (loopCount > 5) {
+				nightCycleCount += winU->dtTime;
+				nightCycleCount = nightCycleCount > s.m.nightCycle.dayDuration \
+				? 0.0 : nightCycleCount;
+			}
+			else {
+				++loopCount;
+			}
+			winU->hour = nightCycleCount / s.m.nightCycle.dayDuration * 24;
 		}
-		else {
-			++loopCount;
-		}
-		winU->hour = nightCycleCount / s.m.nightCycle.dayDuration * 24;
-
 
 		float nightProgress = 0.0f;
 		// calculate nightProgress according to time
-		if (s.m.nightCycle.enabled) {
-			// night
-			if (winU->hour < s.m.nightCycle.sunriseStart || winU->hour > \
-			s.m.nightCycle.sunsetEnd) {
-				nightProgress = 1.0f;
-			}
-			// day
-			else if (winU->hour > s.m.nightCycle.sunriseEnd && winU->hour < \
-			s.m.nightCycle.sunsetStart) {
-				nightProgress = 0.0f;
-			}
-			// sunset
-			else if (winU->hour >= s.m.nightCycle.sunsetStart) {
-				nightProgress = (winU->hour - s.m.nightCycle.sunsetStart) / \
-				(s.m.nightCycle.sunsetEnd - s.m.nightCycle.sunsetStart);
-			}
-			// sunrise
-			else {
-				nightProgress = 1 - ((winU->hour - s.m.nightCycle.sunriseStart) \
-				/ (s.m.nightCycle.sunriseEnd - s.m.nightCycle.sunriseStart));
-			}
+		// night
+		if (winU->hour < s.m.nightCycle.sunriseStart || winU->hour > \
+		s.m.nightCycle.sunsetEnd) {
+			nightProgress = 1.0f;
+		}
+		// day
+		else if (winU->hour > s.m.nightCycle.sunriseEnd && winU->hour < \
+		s.m.nightCycle.sunsetStart) {
+			nightProgress = 0.0f;
+		}
+		// sunset
+		else if (winU->hour >= s.m.nightCycle.sunsetStart) {
+			nightProgress = (winU->hour - s.m.nightCycle.sunsetStart) / \
+			(s.m.nightCycle.sunsetEnd - s.m.nightCycle.sunsetStart);
+		}
+		// sunrise
+		else {
+			nightProgress = 1 - ((winU->hour - s.m.nightCycle.sunriseStart) \
+			/ (s.m.nightCycle.sunriseEnd - s.m.nightCycle.sunriseStart));
 		}
 
 		// draw here
-		chunkManager.draw(winU->cam, nightProgress);
+		chunkManager.draw(winU->cam, nightProgress, winU->pointLight);
 
 		// draw skybox
 		skybox.draw(nightProgress);
@@ -276,7 +276,7 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *camCrea
 	winU->chunkManager = nullptr;
 	winU->dtTime = 0.0f;
 	winU->lastFrame = 0.0f;
-	winU->hour = 0.0f;
+	winU->hour = s.m.nightCycle.time;
 	winU->runMode = false;
 	winU->showInventory = true;
 	winU->showInfo = DEBUG;
@@ -286,6 +286,7 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *camCrea
 	winU->freezeChunkUpdate = false;
 	winU->putBlock = false;
 	winU->destroyBlock = false;
+	winU->pointLight = false;
 	winU->polygonRenderMode = 0;
 
 	if (!initWindow(window, name, winU))

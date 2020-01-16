@@ -442,7 +442,8 @@ void	Chunk::sendMeshData() {
 	}
 }
 
-void	Chunk::_draw(CAMERA_MAT4 &view, wordIVec3 &chunkOffset, CAMERA_VEC3 &pos, float nightProgress) {
+void	Chunk::_draw(CAMERA_MAT4 &view, wordIVec3 &chunkOffset, CAMERA_VEC3 &pos, \
+float nightProgress, bool pointLight) {
 	if (_meshUpdated) {
 		_meshUpdated = false;
 		_nbVertices = 0;
@@ -459,6 +460,9 @@ void	Chunk::_draw(CAMERA_MAT4 &view, wordIVec3 &chunkOffset, CAMERA_VEC3 &pos, f
 		glm::mat4 model = glm::translate(glm::mat4(1.0), glm::vec3(_chunkPos - chunkOffset));
 		_shaderData->shader->setMat4("model", model);
 		_shaderData->shader->setFloat("nightProgress", nightProgress);
+
+		_shaderData->shader->setVec3("pointLight.position", pos);
+		_shaderData->shader->setFloat("pointLight.enabled", pointLight);
 
 		glBindVertexArray(_vao);
 		glDrawArrays(GL_POINTS, 0, _nbVertices);
@@ -478,6 +482,15 @@ void	Chunk::sendConstUniforms(TextureManager const &textureManager) {
 	_shaderData->shader->setVec3("dirLight.ambient", 0.4f, 0.4f, 0.4f);
 	_shaderData->shader->setVec3("dirLight.diffuse", 0.8f, 0.8f, 0.8f);
 	_shaderData->shader->setVec3("dirLight.specular", 0.1f, 0.1f, 0.1f);
+
+	// set point light
+	_shaderData->shader->setFloat("pointLight.constant", 1.0f);
+	_shaderData->shader->setFloat("pointLight.linear", 0.09f);
+	_shaderData->shader->setFloat("pointLight.quadratic", 0.032f);
+
+	_shaderData->shader->setVec3("pointLight.ambient", 0.4f, 0.4f, 0.4f);
+	_shaderData->shader->setVec3("pointLight.diffuse", 0.8f, 0.8f, 0.8f);
+	_shaderData->shader->setVec3("pointLight.specular", 0.1f, 0.1f, 0.1f);
 
 	// send textures
 	textureManager.setUniform(*_shaderData->shader);

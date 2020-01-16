@@ -16,7 +16,7 @@ class ChunkManager {
 
 		void	init(wordFVec3 camPos, glm::mat4 &projection);  // load the firsts chunks
 		void	update(wordFVec3 &camPos, uint8_t threadID, bool createAll = false);  // global update (call each frame)
-		void	draw(Camera *cam, float nightProgress);  // draw all chunks
+		void	draw(Camera *cam, float nightProgress, bool pointLight);  // draw all chunks
 		void	saveAndQuit();  // save all chunks (if needed) and destroy them
 		void	destroyBlock();  // destroy block using raycasting
 		void	putBlock(uint8_t type);  // put block using raycasting
