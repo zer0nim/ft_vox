@@ -106,11 +106,11 @@ void ChunkManager::init(wordFVec3 camPos, glm::mat4 &projection) {
 		_lastChunkPos[i].x = -1;
 		_lastChunkPos[i].y = -1;
 		_lastChunkPos[i].z = -1;
-		update(camPos, i, LOAD_ALL_BEFORE_OPEN_WINDOW);  // call update once to create the chunks
+		update(camPos, i, 0, LOAD_ALL_BEFORE_OPEN_WINDOW);  // call update once to create the chunks
 	}
 }
 
-void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
+void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, uint64_t nbUpdateCall, bool createAll) {
 	AChunk *	newChunk;
 	if (threadID == 0) {
 	    { std::lock_guard<std::mutex>	guard(s.mutexOthers), guard2(s.mutexCamera);
@@ -171,7 +171,8 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, bool createAll) {
 			nbLoaded = getNbChunkLoaded();
 		}
 		// if all chunks are created and option is enabled
-		if (s.g.perf.enableFacesOptimizer && nbLoaded >= (s.g.perf.renderDist * 2 - 1) * (s.g.perf.renderDist * 2 - 1) * 2) {
+		if (nbUpdateCall % REMOVE_CHUNKS_BORDERS_FREQUENCY == 0
+		&& s.g.perf.enableFacesOptimizer && nbLoaded >= (s.g.perf.renderDist * 2 - 1) * (s.g.perf.renderDist * 2 - 1) * 2) {
 			uint8_t	nbUpdated = 0;
 			for (int32_t x = startXthread; x < _chunkActPos.x + CHUNK_SZ_X * s.g.perf.renderDist;
 			x += CHUNK_SZ_X * NB_UPDATE_THREADS) {

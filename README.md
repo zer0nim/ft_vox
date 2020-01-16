@@ -87,6 +87,7 @@ You can configure the game with this file:
 - Starting position of the player
 - Fully personalised flatMap generation
 - Gamemode
+- Days duration
 - ...
 
 You have more than 50 parameters to discover !

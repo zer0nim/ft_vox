@@ -61,6 +61,7 @@ void	setDefaultSettings() {
 	rand_r(&seedRand);
 	s.m.seed = rand_r(&seedRand);
 	s.m.generationType = GENERATION_NORMAL;
+	s.m.generateCavern = true;
 	s.m.generateTree = true;
 	s.m.generateOre = true;
 	s.m.cameraStartPos.pos.x = 0;
@@ -216,6 +217,8 @@ static void	loadSettingElement(nlohmann::json &element, std::string key) {
 		s.g.player.inverseScrolling = element.get<bool>();
 	else if (element.is_number() && key == ".map.generationType" && checkUint32(element, 0, 2))
 		s.m.generationType = element.get<uint32_t>();
+	else if (element.is_boolean() && key == ".map.generateCavern")
+		s.m.generateCavern = element.get<bool>();
 	else if (element.is_boolean() && key == ".map.generateTree")
 		s.m.generateTree = element.get<bool>();
 	else if (element.is_boolean() && key == ".map.generateOre")

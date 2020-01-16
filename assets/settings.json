@@ -3,7 +3,7 @@
 		"perf": {
 			"fps": 120,
 			"renderDist": 10,
-			"enableFacesOptimizer": false,
+			"enableFacesOptimizer": true,
 			"speedFacesOptimizer": 1,
 			"speedCreationChunk": 1,
 			"enableTransparency": true
@@ -16,7 +16,7 @@
 			"saveAllChunks": false
 		},
 		"screen": {
-			"fullscreen": false,
+		"fullscreen": true,
 			"width": 1200,
 			"height": 800,
 			"inventorySzPercent": 5,
@@ -70,6 +70,7 @@
 	"map": {
 		"seed": 0,
 		"generationType": 2,
+		"generateCavern": true,
 		"generateTree": true,
 		"generateOre": true,
 		"cameraStartPos": {

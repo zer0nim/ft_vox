@@ -22,6 +22,7 @@ void	*threadUpdateFunction(void *args_) {
 	std::chrono::milliseconds	time_start;
 	tWinUser					*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(args->window));
 	bool						firstLoop = true;
+	uint64_t					nbUpdateCall = 0;
 
 	while (!args->quit) {
 		time_start = getMs();
@@ -31,7 +32,8 @@ void	*threadUpdateFunction(void *args_) {
 		if (args->deleteLocker.isLocked == false) {  // thread is unlocked
 			// update
 			if (winU->freezeChunkUpdate == false) {
-				args->chunkManager.update(winU->cam->pos, args->threadID);
+				args->chunkManager.update(winU->cam->pos, args->threadID, nbUpdateCall);
+				nbUpdateCall++;
 			    { std::lock_guard<std::mutex>	guard(s.mutexToDelete);
 					if (args->chunkManager.toDelete.empty() == false) {  // auto lock
 						args->deleteLocker.ask = true;

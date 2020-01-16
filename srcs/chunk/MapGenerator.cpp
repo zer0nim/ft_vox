@@ -946,7 +946,7 @@ bool &isTreeXZ) {
 	}
 
 	// cavern
-	if (cavernY1 > 0) {
+	if (s.m.generateCavern && cavernY1 > 0) {
 		float cavernY = fy * MAP_CAVERN_Y_MULTIPLIER;
 		if (cavernY > cavernY1 && cavernY < cavernY2) {
 			return 0;

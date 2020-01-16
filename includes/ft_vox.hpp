@@ -27,6 +27,7 @@
 #define ENABLE_MAX_CREATED_CHUNK_UPDATE	true  // enable / disable option
 #define LOAD_ALL_BEFORE_OPEN_WINDOW		false
 #define REMOVE_CHUNKS_BORDERS			true
+#define REMOVE_CHUNKS_BORDERS_FREQUENCY	3  // each # update, remove chunks border
 
 #define NB_UPDATE_THREADS				4
 
@@ -214,6 +215,7 @@ struct Settings {
 		std::string fullMapName;  // don't set it in settings.json
 		uint32_t	seed;
 		uint32_t	generationType;
+		bool		generateCavern;
 		bool		generateTree;
 		bool		generateOre;
 		struct CameraStartPos {
