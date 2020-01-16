@@ -608,6 +608,9 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 		sHelp = "F3 + W: toggle auto run mode";
 		textRender.write("normal", sHelp, textX + 20, textY);
 		textY -= lineSz;
+		sHelp = "F3 + R: reset position to last saved (creative)";
+		textRender.write("normal", sHelp, textX + 20, textY);
+		textY -= lineSz;
 		sHelp = "F3 + C: show commands list";
 		textRender.write("normal", sHelp, textX + 20, textY);
 		textY -= lineSz;
@@ -652,9 +655,6 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 			textRender.write("normal", sHelp, textX + 20, textY);
 			textY -= lineSz;
 			sHelp = "T: enable / disable transparency";
-			textRender.write("normal", sHelp, textX + 20, textY);
-			textY -= lineSz;
-			sHelp = "R: reset position to last saved (creative)";
 			textRender.write("normal", sHelp, textX + 20, textY);
 			textY -= lineSz;
 			sHelp = "ESCAPE: save and quit game";
