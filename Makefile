@@ -86,16 +86,17 @@ LINTER = $(CPPLINT)
 LINTER_RULES =	--filter=-whitespace/tab,-legal/copyright,-build/c++11,-whitespace/newline,-readability/braces,-whitespace/indent,-build/include_what_you_use,-build/header_guard,-runtime/references \
 				--linelength=120 --quiet
 
-CC = g++
-DEBUG_FLAGS = -g3 -DDEBUG=true
-LIBS_FLAGS	=	-L ~/.brew/lib -framework OpenGL -lglfw -L ~/.brew/opt/freetype/lib -lfreetype \
-				-lboost_filesystem
-LIBS_INC	=	~/.brew/include \
-				$(INC_DIR)/lib/stb_image.h \
-				$(INC_DIR)/lib/json.hpp \
-				$(INC_DIR)/lib/PerlinNoise.hpp \
-				/usr/local/opt/freetype/include/freetype2 \
-				~/.brew/opt/freetype/include/freetype2
+CC				= g++
+DEBUG_FLAGS		= -g3 -DDEBUG=true
+NODEBUG_FLAGS	= -Werror
+LIBS_FLAGS		= -L ~/.brew/lib -framework OpenGL -lglfw -L ~/.brew/opt/freetype/lib -lfreetype \
+				  -lboost_filesystem
+LIBS_INC		= ~/.brew/include \
+				  $(INC_DIR)/lib/stb_image.h \
+				  $(INC_DIR)/lib/json.hpp \
+				  $(INC_DIR)/lib/PerlinNoise.hpp \
+				  /usr/local/opt/freetype/include/freetype2 \
+				  ~/.brew/opt/freetype/include/freetype2
 
 DEPFLAGS	= -MT $@ -MD -MP -MF $(DEP_DIR)/$*.Td
 CFLAGS		= -Ofast -std=c++11 -Wall -Wextra -Wno-deprecated
@@ -105,7 +106,7 @@ DEFINE		=
 ifneq ($(DEBUG),)
 	CFLAGS := $(CFLAGS) $(DEBUG_FLAGS)
 else
-	CFLAGS := $(CFLAGS) -Werror
+	CFLAGS := $(CFLAGS) $(NODEBUG_FLAGS)
 endif
 
 # send define to program
