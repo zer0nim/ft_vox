@@ -14,6 +14,8 @@ A little Opengl Voxel World engine
 ## Try multiples texture packs or create yours
 ![texture-pack-1](/assets/imgs/smooth-preview.png)
 ![texture-pack-2](/assets/imgs/texture-blocks.png)
+## Explore day and night
+![day-night-cycle](/assets/imgs/day-night-cycle.png)
 
 We used `glfw3` API for creating windows and manage input and events,
 and `glm` to manage matrix/vector/quaternion.
