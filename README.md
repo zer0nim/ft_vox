@@ -6,11 +6,11 @@ A Simple Voxel Engine in Opengl, with custom procedural generation
 ## Explore an almost infinite world with fly mode
 
 ![moving](/assets/GIFs/moving.gif)
-## Explore caves with walking mode
+## Traverse caves with walking mode
 ![caves](/assets/GIFs/survival-caves.gif)
-## Explore diverse biomes and try multiples types of generations
+## Observe diverse biomes and try multiples types of generations
 ![biome-preview](/assets/imgs/biome-preview.png)
-## Explore and find the generated structures
+## Discover the generated structures
 ![struct-preview](/assets/imgs/struct-preview.png)
 ## Try multiples texture packs or create yours
 ![texture-pack-1](/assets/imgs/smooth-preview.png)
@@ -48,19 +48,26 @@ and `glm` to manage matrix/vector/quaternion.
 
 ### Gamemode
 
+In ft_vox, you have 2 gamemodes: *survival* and *creative*.
+
 Change current gamemode with `g`.
-In ft_vox, you have 2 gamemodes: survival and creative.
-In survival mode, you can walk in the world but can't walk through blocks, the gravity is enabled.
-In creative mode, you can fly and you don't have any collision detection with the world.
+
+#### Survival
+You can walk in the world but can't walk through blocks, the gravity is enabled.
+
+#### Creative
+You can fly and you don't have any collision detection with the world.
+
 In both modes, you can add or destroy blocks in the world.
 
-If you want to save the world, don't forget to set a world name (`./ft_vox --name worldName`).
+> If you want to save the world, don't forget to set a world name (`./ft_vox --name worldName`).
 
 ### Moving
 
 You can move with `arrows` or `wasd` keys.
 To run, just press `shift`.
-To fly up (creative) or jump (survival): `space` or `e`.
+
+To fly up (creative) or jump (survival): `space` / `e`.
 To fly down (creative): `ctrl` or `q`.
 
 ### World interaction
@@ -115,6 +122,7 @@ If your textures are not in the right dimension (32x32px), you can resize them [
 You can design your own textures on [this](https://www.pixilart.com/draw?ref=home-page) website.
 
 You can merge them with [this](http://free-tex-packer.com/app/) website (look at the settings in the image below).
+
 You need to put blocs in the right order (example in [assets/textures](assets/textures)).
 
 ![free-tex-settings](/assets/imgs/free-tex-settings.png)
