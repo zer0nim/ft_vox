@@ -275,7 +275,6 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, uint64_t nbUpdate
 		if (_getID(actChunkPos) == threadID) {
 			if (_isInChunkLoaded(actChunkPos)) {
 			    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap), guard2(actChunk->mutexChunk);
-					// /!\ WARNING /!\ this update will call mutexChunkMap
 					actChunk->update();
 				}
 			}
@@ -283,10 +282,11 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, uint64_t nbUpdate
 			    { std::lock_guard<std::mutex>	guard(s.mutexToDelete);
 					toDelete.push_back(actChunkPos);
 				}
-				if (s.g.files.saveAllChunks || actChunk->isModifiedFromBegining())  // save (if needed)
+				if (s.g.files.saveAllChunks || actChunk->isModifiedFromBegining()) {  // save (if needed)
 				    { std::lock_guard<std::mutex>	guard(actChunk->mutexChunk);
 						actChunk->save();
 					}
+				}
 			}
 		}
 	    { std::lock_guard<std::mutex>	guard(s.mutexChunkMap);

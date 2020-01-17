@@ -100,6 +100,7 @@ Shader::Shader(Shader const &src) {
 }
 
 Shader::~Shader() {
+	glDeleteProgram(id);
 }
 
 Shader &Shader::operator=(Shader const &rhs) {
