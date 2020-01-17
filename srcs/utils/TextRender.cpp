@@ -127,6 +127,16 @@ GLfloat scale, glm::vec3 color) {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+uint32_t	TextRender::strWidth(std::string const &fontName, std::string text, GLfloat scale) {
+	uint32_t	width = 0;
+	for (auto c = text.begin(); c != text.end(); c++) {  // foreach chars
+        Character ch = font[fontName][*c];
+        width += (ch.advance >> 6) * scale;
+    }
+	return width;
+}
+
+
 Shader			&TextRender::getShader() { return _shader; }
 Shader const	&TextRender::getShader() const { return _shader; }
 uint32_t		TextRender::getVao() const { return _vao; }

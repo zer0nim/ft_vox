@@ -620,6 +620,15 @@ void	drawText(GLFWwindow *window, TextRender &textRender, int actFps, ChunkManag
 		}
 	}
 
+	// torch
+	textY -= lineSz;
+	std::string sTorch = "Torch (L): ";
+	uint32_t	width = textRender.strWidth("normal", sTorch);
+	textRender.write("normal", sTorch, textX, textY);
+	sTorch = (winU->pointLight) ? "on" : "off";
+	glm::vec3 color = (winU->pointLight) ? glm::vec3(0, 1, 0) : glm::vec3(1, 0, 0);
+	textRender.write("normal", sTorch, textX + width, textY, 1, color);
+
 	if (winU->freezeChunkUpdate) {
 		// freeze chunk update
 		textY -= lineSz;
