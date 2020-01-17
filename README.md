@@ -10,9 +10,9 @@ A Simple Voxel Engine in Opengl, with custom procedural generation
 ![caves](/assets/GIFs/survival-caves.gif)
 ## Observe diverse biomes and try multiples types of generations
 ![biome-preview](/assets/imgs/biome-preview.png)
-## Discover the generated structures
+## Discover generated structures
 ![struct-preview](/assets/imgs/struct-preview.png)
-## Try multiples texture packs or create yours
+## Try multiples texture packs or [create yours](#texture-packs)
 ![texture-pack-1](/assets/imgs/smooth-preview.png)
 ![texture-pack-2](/assets/imgs/texture-blocks.png)
 ## Experience day and night exploration
@@ -68,6 +68,7 @@ You can move with `arrows` or `wasd` keys.
 To run, just press `shift`.
 
 To fly up (creative) or jump (survival): `space` / `e`.
+
 To fly down (creative): `ctrl` or `q`.
 
 ### World interaction
