@@ -44,12 +44,8 @@ class AChunk {
 	protected:
 		struct ShaderData {
 			Shader		*shader;
-			uint32_t	vbo;
-			uint32_t	vao;
-			bool		vaoUsed;
 
 			ShaderData(std::string const vs, std::string const fs, std::string const gs = "") {
-				vaoUsed = false;
 				if (gs.empty()) {
 					shader = new Shader(vs, fs);
 				}
@@ -58,10 +54,6 @@ class AChunk {
 				}
 			}
 			~ShaderData() {
-				if (vaoUsed) {
-					glDeleteVertexArrays(1, &vao);
-					glDeleteBuffers(1, &vbo);
-				}
 				delete shader;
 			}
 		};
