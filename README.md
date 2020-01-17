@@ -1,26 +1,27 @@
 # ft_vox [[42](https://www.42.fr/) project] ![](https://github.com/zer0nim/ft_vox/workflows/make/badge.svg) ![](https://github.com/zer0nim/ft_vox/workflows/linter/badge.svg) ![](https://github.com/zer0nim/ft_vox/workflows/ft_vox/badge.svg)
 
 ## Project
-A little Opengl Voxel World engine
+A Simple Voxel Engine in Opengl, with custom procedural generation
 
-## Explore an "infinite" world with fly mode
+## Explore an almost infinite world with fly mode
+
 ![moving](/assets/GIFs/moving.gif)
 ## Explore caves with walking mode
 ![caves](/assets/GIFs/survival-caves.gif)
-## Try differents generations with multiples biomes
+## Explore diverse biomes and try multiples types of generations
 ![biome-preview](/assets/imgs/biome-preview.png)
-## Explore and find all differents structure
+## Explore and find the generated structures
 ![struct-preview](/assets/imgs/struct-preview.png)
 ## Try multiples texture packs or create yours
 ![texture-pack-1](/assets/imgs/smooth-preview.png)
 ![texture-pack-2](/assets/imgs/texture-blocks.png)
-## Explore day and night
+## Experience day and night exploration
 ![day-night-cycle](/assets/imgs/day-night-cycle.png)
+
+## Installation
 
 We used `glfw3` API for creating windows and manage input and events,
 and `glm` to manage matrix/vector/quaternion.
-
-## Installation
 
 - Install depencies (osx)
 
@@ -49,29 +50,34 @@ and `glm` to manage matrix/vector/quaternion.
 
 Change current gamemode with `g`.
 In ft_vox, you have 2 gamemodes: survival and creative.
-In survival mode, you can walk in the world. You can't walk through blocks, the gravity is enabled.
+In survival mode, you can walk in the world but can't walk through blocks, the gravity is enabled.
 In creative mode, you can fly and you don't have any collision detection with the world.
-In both mode, you can add or destroy blocks in the world. If you want to save the world, don't forget to set a world name (`./ft_vox --name worldName`).
+In both modes, you can add or destroy blocks in the world.
+
+If you want to save the world, don't forget to set a world name (`./ft_vox --name worldName`).
 
 ### Moving
 
-You can move with arrows or with `wasd`. To run, just press `shift`.
-To fly up (creative) or jump (survival): `space` or `e`, to fly down (creative): `ctrl` or `q`.
+You can move with `arrows` or `wasd` keys.
+To run, just press `shift`.
+To fly up (creative) or jump (survival): `space` or `e`.
+To fly down (creative): `ctrl` or `q`.
 
 ### World interaction
 
-You can add blocks on the world with `right-click` and you can destroy blocks with `left-click`.
-To change the selected block, you can `scroll-up`, `scroll-down`, `[`, `]` or select the block under cursor with `middle-click`.
+Add blocks on the world with `right-click` and destroy thems with `left-click`.
+
+To change the selected block, `scroll-up`, `scroll-down`, `[`, `]` or select the block under cursor with `middle-click`.
 
 ### Quit game
 
-You can save and quit the game by pressing `escape`.
+Save and quit the game by pressing `escape`.
 
 ## Settings
 
-You can change all world settings in [assets/settings.json](assets/settings.json).
+Feel free to change world settings in [assets/settings.json](assets/settings.json).
 
-You can configure the game with this file:
+In the file, you can configure:
 - FPS
 - Render distance
 - Texture pack selection
@@ -93,14 +99,23 @@ You can configure the game with this file:
 You have more than 50 parameters to discover !
 
 ## Texture packs
-You can also change the textures by creating a texture atlas [assets/textures/textures-default.png](assets/textures/textures-default.png).
-You can create this file with [this](http://free-tex-packer.com/app/) website (show settings in the image bellow).
-If the images are not in the right size (32px), you can resize all your images in [this](https://www.birme.net/?target_width=32&target_height=32&quality=0) website.
-You can also create your texture on [this](https://www.pixilart.com/draw?ref=home-page) website.
-You need to put blocs in the right order (example in [assets/textures](assets/textures)).
 
-There is 2 default texture packs: `textures-default` and `textures-smooth`.
-You can select your texture pack in settings (`global->files->textures`: `"./assets/textures/textures-default.png"`, `"./assets/textures/textures-smooth.png"` or your texture file).
+To change the texture pack, edit the settings file: (`global->files->textures`).
+
+You can set one of the two textures pack provided:
+- `"./assets/textures/textures-default.png"`
+- `"./assets/textures/textures-smooth.png"`
+
+#### Or you can also build your own 😎.
+
+You will need to create 32x32px textures and merge them in one texture atlas.
+
+If your textures are not in the right dimension (32x32px), you can resize them [here](https://www.birme.net/?target_width=32&target_height=32&quality=0).
+
+You can design your own textures on [this](https://www.pixilart.com/draw?ref=home-page) website.
+
+You can merge them with [this](http://free-tex-packer.com/app/) website (look at the settings in the image below).
+You need to put blocs in the right order (example in [assets/textures](assets/textures)).
 
 ![free-tex-settings](/assets/imgs/free-tex-settings.png)
 
