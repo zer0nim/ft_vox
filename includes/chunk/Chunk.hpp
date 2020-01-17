@@ -38,7 +38,6 @@ class Chunk : public AChunk {
 		bool					_meshUpdated;
 		bool					_needInitVao;
 		uint32_t				_vbo;
-		uint32_t				_vao;
 		std::vector<float>		_faces;
 		int						_nbVertices;
 };
