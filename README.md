@@ -26,7 +26,7 @@ and `glm` to manage matrix/vector/quaternion.
 
 	```./configure```
 
-- Add precommit rules
+- Add precommit rules (for dev only)
 
 	```make init```
 
@@ -78,9 +78,10 @@ You can configure the game with this file:
 - Window size / fullscreen option
 - Speed / mouse sensitivity
 - Destroy / add blocks speed
-- Fog
+- Enable / disable fog
 - Map seed (0 for random seed)
 - Generation type (0 -> void world, 1 -> flat world, 2 -> classic generation)
+- For classic generation, enable / disable cavern
 - For classic generation, enable / disable tree
 - For classic generation, enable / disable ores
 - Starting position of the player
