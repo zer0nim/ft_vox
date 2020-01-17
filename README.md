@@ -45,9 +45,6 @@ and `glm` to manage matrix/vector/quaternion.
 
 ## The project
 
-You can toogle debug panel with `F3`.
-To show the full list of commands: `F3 + C`.
-
 ### Gamemode
 
 Change current gamemode with `g`.
@@ -119,7 +116,8 @@ Run with fps analitics
 ./debug/checkFPS.sh re  # if you want to recompile (needed in first use)
 ```
 
-In game, you can use `F3` to show debug menu.
+You can toogle debug panel with `F3`.
+To show the full list of commands: `F3 + C`.
 ![F3-1](/assets/imgs/F3-1.png)
 
 ---
