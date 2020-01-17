@@ -424,20 +424,25 @@ void	Chunk::sendMeshData() {
 				_needInitVao = false;
 				glGenVertexArrays(1, &_vao);
 				glGenBuffers(1, &_vbo);
+
+				glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+				glBindVertexArray(_vao);
+				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, rowSize * sizeof(float), \
+					reinterpret_cast<void*>(0));
+				glEnableVertexAttribArray(0);
+				glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, rowSize * sizeof(float), \
+					reinterpret_cast<void*>(3 * sizeof(float)));
+				glEnableVertexAttribArray(1);
+				glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, rowSize * sizeof(float), \
+					reinterpret_cast<void*>(5 * sizeof(float)));
+				glEnableVertexAttribArray(2);
+				glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, rowSize * sizeof(float), \
+					reinterpret_cast<void*>(6 * sizeof(float)));
+				glEnableVertexAttribArray(3);
 			}
 
 			glBindBuffer(GL_ARRAY_BUFFER, _vbo);
 			glBufferData(GL_ARRAY_BUFFER, _faces.size() * sizeof(float), &_faces[0], GL_STATIC_DRAW);
-
-			glBindVertexArray(_vao);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, rowSize * sizeof(float), reinterpret_cast<void*>(0));
-			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, rowSize * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
-			glEnableVertexAttribArray(1);
-			glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, rowSize * sizeof(float), reinterpret_cast<void*>(5 * sizeof(float)));
-			glEnableVertexAttribArray(2);
-			glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, rowSize * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
-			glEnableVertexAttribArray(3);
 		}
 	}
 }
