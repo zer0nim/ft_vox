@@ -3,8 +3,8 @@
 #include "lib/stb_image.h"
 #include "Logging.hpp"
 
-u_int32_t	textureFromFile(const std::string path, bool inSpaceSRGB) {
-	u_int32_t	textureID;
+uint32_t	textureFromFile(const std::string path, bool inSpaceSRGB) {
+	uint32_t	textureID;
     int			nrComponents;
     int			width;
     int			height;
@@ -57,8 +57,8 @@ u_int32_t	textureFromFile(const std::string path, bool inSpaceSRGB) {
     return textureID;
 }
 
-u_int32_t	textureAtlasFromFile(const std::string path, bool inSpaceSRGB, int tileSize, int layerCount) {
-	u_int32_t	textureID;
+uint32_t	textureAtlasFromFile(const std::string path, bool inSpaceSRGB, int tileSize, int layerCount) {
+	uint32_t	textureID;
     int			nrComponents;
     int			width;
     int			height;

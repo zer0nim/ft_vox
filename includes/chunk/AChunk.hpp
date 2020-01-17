@@ -44,8 +44,8 @@ class AChunk {
 	protected:
 		struct ShaderData {
 			Shader		*shader;
-			u_int32_t	vbo;
-			u_int32_t	vao;
+			uint32_t	vbo;
+			uint32_t	vao;
 			bool		vaoUsed;
 
 			ShaderData(std::string const vs, std::string const fs, std::string const gs = "") {

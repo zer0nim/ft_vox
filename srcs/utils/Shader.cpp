@@ -50,9 +50,9 @@ Shader::Shader(std::string const vsPath, std::string const fsPath, std::string c
 	const char	*vsData;
 	const char	*fsData;
 	const char	*gsData;
-	u_int32_t	vertex;
-	u_int32_t	fragment;
-	u_int32_t	geometry;
+	uint32_t	vertex;
+	uint32_t	fragment;
+	uint32_t	geometry;
 
 	fillShaderStr(vsPath, fsPath, gsPath, &vsCode, &fsCode, &gsCode);
 
@@ -177,7 +177,7 @@ void	Shader::setMat4(const std::string &name, const glm::mat4 &mat) const {
 /*
 	checking shader compilation/linking errors.
 */
-void	Shader::checkCompileErrors(u_int32_t shader, std::string type) {
+void	Shader::checkCompileErrors(uint32_t shader, std::string type) {
 	int		success;
 	char	infoLog[1024];
 

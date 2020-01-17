@@ -4,8 +4,8 @@
 #include <stdexcept>
 #include "commonInclude.hpp"
 
-u_int32_t	textureFromFile(const std::string path, bool inSpaceSRGB);
-u_int32_t	textureAtlasFromFile(const std::string path, bool inSpaceSRGB, \
+uint32_t	textureFromFile(const std::string path, bool inSpaceSRGB);
+uint32_t	textureAtlasFromFile(const std::string path, bool inSpaceSRGB, \
 	int tileSize, int layerCount);
 
 class TextureFailToLoad : public std::exception {

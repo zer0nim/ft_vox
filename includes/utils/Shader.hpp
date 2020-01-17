@@ -67,10 +67,10 @@ class Shader {
 				}
 		};
 
-		u_int32_t	id;
+		uint32_t	id;
 
 	private:
-		void	checkCompileErrors(u_int32_t shader, std::string type);
+		void	checkCompileErrors(uint32_t shader, std::string type);
 };
 
 #endif  // SHADER_HPP_

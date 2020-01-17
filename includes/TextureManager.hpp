@@ -20,9 +20,9 @@ class TextureManager {
 
 		struct Texture {
 			Texture() {}
-			Texture(u_int32_t const &id, std::string const &path)
+			Texture(uint32_t const &id, std::string const &path)
 			: id(id), path(path) {}
-			u_int32_t	id;
+			uint32_t	id;
 			std::string	path;
 		};
 		struct BlockTexture {
