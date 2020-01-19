@@ -17,6 +17,8 @@ A Simple Voxel Engine in Opengl, with custom procedural generation
 ![texture-pack-2](/assets/imgs/texture-blocks.png)
 ## Experience day and night exploration
 ![day-night-cycle](/assets/imgs/day-night-cycle.png)
+## Build your own world
+![castle](/assets/imgs/castle.png)
 
 ## Installation
 
