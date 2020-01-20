@@ -120,6 +120,7 @@ void	TextureManager::loadBlocksTextures(nlohmann::json const &data) {
 		_textureAtlas->id = textureAtlasFromFile(path, inSpaceSRGB, 32, 256);
 	}
 	catch(TextureFailToLoad const & e) {
+		delete _textureAtlas;
 		throw TextureManager::failed2LoadTextureException();
 	}
 
@@ -162,6 +163,14 @@ void	TextureManager::loadBlocksTextures(nlohmann::json const &data) {
 					}
 
 					if (blockTexture->side == -1) {
+						// free memory
+						for (BlockTexture *block : _blocks) {
+							if (block != nullptr) {
+								delete block;
+							}
+						}
+						delete _textureAtlas;
+
 						logErr("missing default texture for block \"" << block.key() << '"');
 						throw TextureManager::missingBlockException();
 					}
@@ -170,6 +179,14 @@ void	TextureManager::loadBlocksTextures(nlohmann::json const &data) {
 				}
 			}
 			else {
+				// free memory
+				for (BlockTexture *block : _blocks) {
+					if (block != nullptr) {
+						delete block;
+					}
+				}
+				delete _textureAtlas;
+
 				logErr("invalid block name in textures.json: " << block.key());
 				throw TextureManager::missingBlockException();
 			}
@@ -185,6 +202,14 @@ void	TextureManager::loadBlocksTextures(nlohmann::json const &data) {
 		}
 	}
 	if (missingBlock) {
+		// free memory
+		for (BlockTexture *block : _blocks) {
+			if (block != nullptr) {
+				delete block;
+			}
+		}
+		delete _textureAtlas;
+
 		throw TextureManager::missingBlockException();
 	}
 }

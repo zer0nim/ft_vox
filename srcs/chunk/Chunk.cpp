@@ -25,6 +25,7 @@ Chunk::~Chunk() {
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 		glDeleteBuffers(1, &_vbo);
+		glDeleteVertexArrays(1, &_vao);
 	}
 }
 
