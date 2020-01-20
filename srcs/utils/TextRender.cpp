@@ -8,6 +8,7 @@ _projection(glm::ortho(0.0f, static_cast<GLfloat>(width), 0.0f, static_cast<GLfl
 	// create VAO & VBO
 	_vao = 0;
 	_vbo = 0;
+	_shader.use();
 	glGenVertexArrays(1, &_vao);
 	glGenBuffers(1, &_vbo);
 	glBindVertexArray(_vao);
@@ -18,8 +19,8 @@ _projection(glm::ortho(0.0f, static_cast<GLfloat>(width), 0.0f, static_cast<GLfl
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	_shader.use();
 	_shader.setMat4("projection", _projection);
+	_shader.unuse();
 }
 
 void TextRender::loadFont(std::string name, std::string const &filename, uint32_t size) {
@@ -80,6 +81,7 @@ _shader(src.getShader()) {
 }
 
 TextRender::~TextRender() {
+    _shader.use();
 	glDeleteVertexArrays(1, &_vao);
 	glDeleteBuffers(1, &_vbo);
 
@@ -88,6 +90,7 @@ TextRender::~TextRender() {
 			glDeleteTextures(1, &elem.second.begin()->second.textureID);
 		}
 	}
+    _shader.unuse();
 }
 
 TextRender &TextRender::operator=(TextRender const &rhs) {
@@ -133,6 +136,7 @@ GLfloat scale, glm::vec3 color) {
     }
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
+    _shader.unuse();
 }
 
 uint32_t	TextRender::strWidth(std::string const &fontName, std::string text, GLfloat scale) {

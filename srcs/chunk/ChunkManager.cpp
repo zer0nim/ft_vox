@@ -106,8 +106,10 @@ void ChunkManager::init(wordFVec3 camPos, glm::mat4 &projection) {
     glBufferData(GL_ARRAY_BUFFER, sizeof(ChunkManager::_borderVertices), ChunkManager::_borderVertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(0);
+
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+	_borderShader->unuse();
 
 	for (uint8_t i = 0; i < NB_UPDATE_THREADS; i++) {
 		_lastChunkPos[i].x = -1;
@@ -366,6 +368,7 @@ void ChunkManager::draw(Camera *cam, float nightProgress, bool pointLight) {
 		glBindVertexArray(_borderShaderVAO);
 		glDrawArrays(GL_LINES, 0, 24);
 		glBindVertexArray(0);
+		_borderShader->unuse();
 	}
     { std::lock_guard<std::mutex>	guard(s.mutexOthers);
 		_nbChunkRendered = chunkRendered;

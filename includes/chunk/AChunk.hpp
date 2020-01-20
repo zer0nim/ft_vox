@@ -55,10 +55,12 @@ class AChunk {
 				}
 				shader->use();
 				glGenVertexArrays(1, &vao);
+				shader->unuse();
 			}
 			~ShaderData() {
 				shader->use();
 				glDeleteVertexArrays(1, &vao);
+				shader->unuse();
 				delete shader;
 			}
 		};

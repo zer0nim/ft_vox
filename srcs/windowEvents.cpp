@@ -80,6 +80,7 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 		s.g.fog.enabled = !s.g.fog.enabled;
 		AChunk::getShader().use();
 		AChunk::getShader().setBool("fog.enabled", s.g.fog.enabled);
+		AChunk::getShader().unuse();
 	}
 
 	// prev item
@@ -133,6 +134,7 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 		s.g.perf.enableTransparency = !s.g.perf.enableTransparency;
 		AChunk::getShader().use();
 		AChunk::getShader().setBool("enableTransparency", s.g.perf.enableTransparency);
+		AChunk::getShader().unuse();
 	}
 
 	// enable / disable point light

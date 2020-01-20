@@ -102,6 +102,7 @@ ImageRender &imageRender, TextureManager const &textureManager) {
 
 	skybox.getShader().use();
 	skybox.getShader().setMat4("projection", projection);
+	skybox.getShader().unuse();
 
 	for (uint8_t i = 0; i < NB_UPDATE_THREADS; i++) {
 		int rc = pthread_create(&(threadUpdate[i]), NULL, threadUpdateFunction, \
@@ -149,6 +150,7 @@ ImageRender &imageRender, TextureManager const &textureManager) {
 		skyView[3][2] = 0;
 		skybox.getShader().use();
 		skybox.getShader().setMat4("view", skyView);
+		skybox.getShader().unuse();
 
 		if (s.m.nightCycle.cycleEnabled) {
 			if (loopCount > 5) {
@@ -382,7 +384,9 @@ int		main(int ac, char const **av) {
 
 		// load image render
 		ImageRender imageRender(s.g.screen.width, s.g.screen.height);
+		imageRender.getShader().use();
 		textureManager->setUniform(imageRender.getShader());
+		imageRender.getShader().unuse();
 
 		// load skybox
 		Skybox skybox;

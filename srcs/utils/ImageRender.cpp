@@ -8,6 +8,7 @@ _projection(glm::ortho(0.0f, static_cast<GLfloat>(width), 0.0f, static_cast<GLfl
 	// create VAO & VBO
 	_vao = 0;
 	_vbo = 0;
+	_shader.use();
 	glGenVertexArrays(1, &_vao);
 	glGenBuffers(1, &_vbo);
 	glBindVertexArray(_vao);
@@ -24,8 +25,8 @@ _projection(glm::ortho(0.0f, static_cast<GLfloat>(width), 0.0f, static_cast<GLfl
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	_shader.use();
 	_shader.setMat4("projection", _projection);
+	_shader.unuse();
 }
 
 
@@ -72,6 +73,7 @@ void ImageRender::draw(float posx, float posy, float w, float h, int texID, glm:
 	// draw image
 	glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
+    _shader.unuse();
 }
 
 Shader			&ImageRender::getShader() { return _shader; }

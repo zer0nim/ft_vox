@@ -72,6 +72,7 @@ _shader(SHADER_SKYBOX_VS, SHADER_SKYBOX_FS) {
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+	_shader.unuse();
 }
 
 Skybox::Skybox(Skybox const &src) :
@@ -80,11 +81,13 @@ _shader(src.getShader()) {
 }
 
 Skybox::~Skybox() {
+	_shader.use();
     glDeleteVertexArrays(1, &_vao);
     glDeleteBuffers(1, &_vbo);
 	if (_textureID != 0) {
 		glDeleteTextures(1, &_textureID);
 	}
+	_shader.unuse();
 }
 
 Skybox &Skybox::operator=(Skybox const &rhs) {
@@ -148,6 +151,7 @@ void Skybox::draw(float nightProgress) {
 	glDrawArrays(GL_TRIANGLES, 0, sizeof(_vertices) / sizeof(_vertices[0]));
 	glDepthFunc(GL_LESS);
 	glBindVertexArray(0);
+	_shader.unuse();
 }
 
 Shader			&Skybox::getShader() { return _shader; }

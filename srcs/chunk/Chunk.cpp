@@ -22,8 +22,8 @@ Chunk::~Chunk() {
 	if (_needInitVao == false) {
 		_shaderData->shader->use();
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
 		glDeleteBuffers(1, &_vbo);
+		_shaderData->shader->unuse();
 	}
 }
 
@@ -47,6 +47,7 @@ void	Chunk::initShader(glm::mat4 &projection, TextureManager const &textureManag
 		_shaderData->shader->use();
 		_shaderData->shader->setMat4("projection", projection);
 		sendConstUniforms(textureManager);
+		_shaderData->shader->unuse();
 	}
 }
 
@@ -436,6 +437,7 @@ void	Chunk::sendMeshData() {
 			glBufferData(GL_ARRAY_BUFFER, _faces.size() * sizeof(float), &_faces[0], GL_STATIC_DRAW);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindVertexArray(0);
+			_shaderData->shader->unuse();
 		}
 	}
 }
@@ -471,6 +473,7 @@ float nightProgress, bool pointLight) {
 		glDrawArrays(GL_POINTS, 0, _nbVertices);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
+		_shaderData->shader->unuse();
 	}
 }
 
@@ -509,6 +512,8 @@ void	Chunk::sendConstUniforms(TextureManager const &textureManager) {
 	_shaderData->shader->setInt("fog.maxDist", dist);
 	_shaderData->shader->setInt("fog.minDist", dist - s.g.fog.width);
 	_shaderData->shader->setVec4("fog.color", s.g.fog.color);
+
+	_shaderData->shader->unuse();
 }
 
 uint32_t	Chunk::getNbSquareRendered() const {
