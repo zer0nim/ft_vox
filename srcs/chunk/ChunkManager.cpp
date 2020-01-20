@@ -54,6 +54,8 @@ _nbChunkLoaded(0),
 _borderShader(nullptr) {
 	_lastDestroyed = getMs();
 	_lastPut = getMs();
+	_borderShaderVAO = 0;
+	_borderShaderVBO = 0;
 }
 
 ChunkManager::ChunkManager(ChunkManager const &src) :
@@ -73,8 +75,12 @@ ChunkManager::~ChunkManager() {
 		toDelete.pop_front();
 	}
 
-	glDeleteVertexArrays(1, &_borderShaderVAO);
-	glDeleteBuffers(1, &_borderShaderVBO);
+	if (_borderShaderVAO != 0) {
+		glDeleteVertexArrays(1, &_borderShaderVAO);
+	}
+	if (_borderShaderVBO != 0) {
+		glDeleteBuffers(1, &_borderShaderVBO);
+	}
 	delete _borderShader;
 }
 

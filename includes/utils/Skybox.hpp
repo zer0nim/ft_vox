@@ -60,8 +60,6 @@ class Skybox {
 		Shader			&getShader();
 		Shader const	&getShader() const;
 		uint32_t		getTextureID() const;
-		uint32_t		getVao() const;
-		uint32_t		getVbo() const;
 	protected:
 	private:
 		Shader		_shader;

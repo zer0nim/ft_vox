@@ -21,8 +21,6 @@ class ImageRender {
 
 		Shader			&getShader();
 		Shader const	&getShader() const;
-		uint32_t		getVao() const;
-		uint32_t		getVbo() const;
 
 		class ImageRenderError : public std::exception {
 			public:

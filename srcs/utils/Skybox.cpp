@@ -58,6 +58,8 @@ _shader(SHADER_SKYBOX_VS, SHADER_SKYBOX_FS) {
 	_shader.use();
 	load(skyboxFaces);
 
+	_vao = 0;
+	_vbo = 0;
 	glGenVertexArrays(1, &_vao);
 	glGenBuffers(1, &_vbo);
 
@@ -87,8 +89,8 @@ Skybox::~Skybox() {
 Skybox &Skybox::operator=(Skybox const &rhs) {
 	if (this != &rhs) {
 		_textureID = getTextureID();
-		_vao = getVao();
-		_vbo = getVbo();
+		_vao = rhs._vao;
+		_vbo = rhs._vbo;
 	}
 	return *this;
 }
@@ -151,5 +153,3 @@ void Skybox::draw(float nightProgress) {
 Shader			&Skybox::getShader() { return _shader; }
 Shader const	&Skybox::getShader() const { return _shader; }
 uint32_t		Skybox::getTextureID() const { return _textureID; }
-uint32_t		Skybox::getVao() const { return _vao; }
-uint32_t		Skybox::getVbo() const { return _vbo; }
