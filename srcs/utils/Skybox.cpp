@@ -70,6 +70,7 @@ _shader(SHADER_SKYBOX_VS, SHADER_SKYBOX_FS) {
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, reinterpret_cast<void*>(0));
 
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
 
@@ -143,7 +144,6 @@ void Skybox::draw(float nightProgress) {
 	glBindVertexArray(_vao);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, _textureID);
-	glBindVertexArray(_vao);
 	_shader.setFloat("nightProgress", nightProgress);
 	glDrawArrays(GL_TRIANGLES, 0, sizeof(_vertices) / sizeof(_vertices[0]));
 	glDepthFunc(GL_LESS);
