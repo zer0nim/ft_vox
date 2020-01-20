@@ -55,6 +55,7 @@ _shader(SHADER_SKYBOX_VS, SHADER_SKYBOX_FS) {
 		std::string(SKYBOX_START) + SKYBOX_NAME_FRONT + SKYBOX_EXT,  // front
 		std::string(SKYBOX_START) + SKYBOX_NAME_BACK + SKYBOX_EXT,  // back
 	};
+	_shader.use();
 	load(skyboxFaces);
 
 	glGenVertexArrays(1, &_vao);
@@ -78,6 +79,9 @@ _shader(src.getShader()) {
 Skybox::~Skybox() {
     glDeleteVertexArrays(1, &_vao);
     glDeleteBuffers(1, &_vbo);
+	if (_textureID != 0) {
+		glDeleteTextures(1, &_textureID);
+	}
 }
 
 Skybox &Skybox::operator=(Skybox const &rhs) {

@@ -19,9 +19,14 @@ class TextureManager {
 		TextureManager &operator=(TextureManager const &rhs);
 
 		struct Texture {
-			Texture() {}
+			Texture(): id(0), path("") {}
 			Texture(uint32_t const &id, std::string const &path)
 			: id(id), path(path) {}
+			~Texture() {
+				if (id != 0) {
+					glDeleteTextures(1, &id);
+				}
+			}
 			uint32_t	id;
 			std::string	path;
 		};

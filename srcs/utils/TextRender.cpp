@@ -80,6 +80,12 @@ _shader(src.getShader()) {
 TextRender::~TextRender() {
 	glDeleteVertexArrays(1, &_vao);
 	glDeleteBuffers(1, &_vbo);
+
+	for (auto const & elem : font) {
+		if (elem.second.size() > 0 && elem.second.begin()->second.textureID != 0) {
+			glDeleteTextures(1, &elem.second.begin()->second.textureID);
+		}
+	}
 }
 
 TextRender &TextRender::operator=(TextRender const &rhs) {
