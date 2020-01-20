@@ -287,7 +287,7 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, uint64_t nbUpdate
 					actChunk->update();
 				}
 			}
-			else {  // we need to remove the chunk
+			else if (_isNeededToDelete(actChunkPos)) {  // we need to remove the chunk
 			    { std::lock_guard<std::mutex>	guard(s.mutexToDelete);
 					toDelete.push_back(actChunkPos);
 				}
@@ -520,6 +520,15 @@ bool	ChunkManager::_isInChunkLoaded(wordIVec3 const &chunkPos) const {
 	|| chunkPos.z >= _chunkActPos.z + s.g.perf.renderDist * CHUNK_SZ_Z)
 		return false;
 	return true;
+}
+
+bool	ChunkManager::_isNeededToDelete(wordIVec3 const &chunkPos) const {
+	if (chunkPos.x <= _chunkActPos.x - (s.g.perf.renderDist + NB_ROWS_SAVED) * CHUNK_SZ_X
+	|| chunkPos.x >= _chunkActPos.x + (s.g.perf.renderDist + NB_ROWS_SAVED) * CHUNK_SZ_X
+	|| chunkPos.z <= _chunkActPos.z - (s.g.perf.renderDist + NB_ROWS_SAVED) * CHUNK_SZ_Z
+	|| chunkPos.z >= _chunkActPos.z + (s.g.perf.renderDist + NB_ROWS_SAVED) * CHUNK_SZ_Z)
+		return true;
+	return false;
 }
 
 bool	ChunkManager::isChunkExist(wordIVec3 const &chunkPos) const {
