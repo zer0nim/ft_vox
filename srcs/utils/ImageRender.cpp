@@ -6,6 +6,8 @@ ImageRender::ImageRender(uint32_t width, uint32_t height) :
 _shader(SHADER_IMAGE_VS, SHADER_IMAGE_FS),
 _projection(glm::ortho(0.0f, static_cast<GLfloat>(width), 0.0f, static_cast<GLfloat>(height))) {
 	// create VAO & VBO
+	_vao = 0;
+	_vbo = 0;
 	glGenVertexArrays(1, &_vao);
 	glGenBuffers(1, &_vbo);
 	glBindVertexArray(_vao);
@@ -40,8 +42,8 @@ ImageRender::~ImageRender() {
 ImageRender &ImageRender::operator=(ImageRender const &rhs) {
 	(void)rhs;
 	if (this != &rhs) {
-		_vao = rhs.getVao();
-		_vbo = rhs.getVbo();
+		_vao = rhs._vao;
+		_vbo = rhs._vbo;
 	}
 	return *this;
 }
@@ -74,5 +76,3 @@ void ImageRender::draw(float posx, float posy, float w, float h, int texID, glm:
 
 Shader			&ImageRender::getShader() { return _shader; }
 Shader const	&ImageRender::getShader() const { return _shader; }
-uint32_t		ImageRender::getVao() const { return _vao; }
-uint32_t		ImageRender::getVbo() const { return _vbo; }

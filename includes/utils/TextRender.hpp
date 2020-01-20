@@ -26,8 +26,6 @@ class TextRender {
 
 		Shader			&getShader();
 		Shader const	&getShader() const;
-		uint32_t		getVao() const;
-		uint32_t		getVbo() const;
 
 		class TextRenderError : public std::exception {
 			public:

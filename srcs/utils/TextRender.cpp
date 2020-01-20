@@ -6,6 +6,8 @@ TextRender::TextRender(uint32_t width, uint32_t height) :
 _shader(SHADER_TEXT_VS, SHADER_TEXT_FS),
 _projection(glm::ortho(0.0f, static_cast<GLfloat>(width), 0.0f, static_cast<GLfloat>(height))) {
 	// create VAO & VBO
+	_vao = 0;
+	_vbo = 0;
 	glGenVertexArrays(1, &_vao);
 	glGenBuffers(1, &_vbo);
 	glBindVertexArray(_vao);
@@ -91,8 +93,8 @@ TextRender::~TextRender() {
 TextRender &TextRender::operator=(TextRender const &rhs) {
 	(void)rhs;
 	if (this != &rhs) {
-		_vao = rhs.getVao();
-		_vbo = rhs.getVbo();
+		_vao = rhs._vao;
+		_vbo = rhs._vbo;
 	}
 	return *this;
 }
@@ -145,5 +147,3 @@ uint32_t	TextRender::strWidth(std::string const &fontName, std::string text, GLf
 
 Shader			&TextRender::getShader() { return _shader; }
 Shader const	&TextRender::getShader() const { return _shader; }
-uint32_t		TextRender::getVao() const { return _vao; }
-uint32_t		TextRender::getVbo() const { return _vbo; }
