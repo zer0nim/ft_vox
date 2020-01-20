@@ -43,7 +43,6 @@ class TextureManager {
 
 		void									setUniform(Shader &sh) const;
 		void									activateTextures() const;
-		Texture const *							getTextureAtlas() const;
 		std::array<BlockTexture *, NB_TYPE_BLOCKS> const &	getBlocks() const;
 
 		// Exceptions _______________________________

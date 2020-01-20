@@ -105,7 +105,7 @@ TextureManager &TextureManager::operator=(TextureManager const &rhs) {
 		}
 
 		// clone _texturesLoaded
-		TextureManager::Texture const *	oldOne = rhs.getTextureAtlas();
+		TextureManager::Texture const *	oldOne = rhs._textureAtlas;
 		_textureAtlas = new Texture(oldOne->id, oldOne->path);
 	}
 	return *this;
@@ -246,10 +246,6 @@ void	TextureManager::activateTextures() const {
 	// activate textures
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, _textureAtlas->id);
-}
-
-TextureManager::Texture const *	TextureManager::getTextureAtlas() const {
-	return _textureAtlas;
 }
 
 std::array<TextureManager::BlockTexture *, NB_TYPE_BLOCKS> const &	TextureManager::getBlocks() const {
