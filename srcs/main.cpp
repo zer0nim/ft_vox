@@ -12,7 +12,6 @@
 #include "utils/Skybox.hpp"
 #include "utils/TextRender.hpp"
 #include "utils/ImageRender.hpp"
-#include "utils/Stats.hpp"
 #include "utils/CameraCreative.hpp"
 #include "utils/CameraSurvival.hpp"
 
@@ -397,7 +396,6 @@ int		main(int ac, char const **av) {
 
 		// run the game
 		gameLoop(window, skybox, textRender, chunkManager, imageRender, *textureManager);
-		Stats::printStats();
 
 		// save and quit all chunks
 		chunkManager.saveAndQuit();
