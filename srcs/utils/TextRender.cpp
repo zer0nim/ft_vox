@@ -50,6 +50,7 @@ void TextRender::loadFont(std::string name, std::string const &filename, uint32_
 		// generate texture
 		GLuint texture;
 		glGenTextures(1, &texture);
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, face->glyph->bitmap.width, face->glyph->bitmap.rows, 0,
 			GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
@@ -66,8 +67,8 @@ void TextRender::loadFont(std::string name, std::string const &filename, uint32_
 			face->glyph->advance.x
 		};
 		font[name].insert(std::pair<GLchar, Character>(c, character));
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
-    glBindTexture(GL_TEXTURE_2D, 0);
 
 	// delete freetype objects
 	FT_Done_Face(face);
@@ -81,7 +82,8 @@ _shader(src.getShader()) {
 }
 
 TextRender::~TextRender() {
-    _shader.use();
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glDeleteVertexArrays(1, &_vao);
 	glDeleteBuffers(1, &_vbo);
 
@@ -131,11 +133,11 @@ GLfloat scale, glm::vec3 color) {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         // draw char
         glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindTexture(GL_TEXTURE_2D, 0);
         // move cursor to the next character
         x += (ch.advance >> 6) * scale;
     }
     glBindVertexArray(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
     _shader.unuse();
 }
 
