@@ -101,6 +101,7 @@ Skybox &Skybox::operator=(Skybox const &rhs) {
 
 void Skybox::load(std::vector<std::string> &faces) {
     glGenTextures(1, &_textureID);
+	glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, _textureID);
 
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -139,6 +140,8 @@ void Skybox::load(std::vector<std::string> &faces) {
             stbi_image_free(data);
         }
     }
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
 void Skybox::draw(float nightProgress) {
@@ -149,6 +152,7 @@ void Skybox::draw(float nightProgress) {
 	glBindTexture(GL_TEXTURE_CUBE_MAP, _textureID);
 	_shader.setFloat("nightProgress", nightProgress);
 	glDrawArrays(GL_TRIANGLES, 0, sizeof(_vertices) / sizeof(_vertices[0]));
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	glDepthFunc(GL_LESS);
 	glBindVertexArray(0);
 	_shader.unuse();

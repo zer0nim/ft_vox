@@ -1,6 +1,7 @@
 #pragma once
 
 #include "commonInclude.hpp"
+#include "TextureManager.hpp"
 #include "Shader.hpp"
 
 #define SHADER_IMAGE_VS "./shaders/image_vs.glsl"
@@ -9,7 +10,8 @@
 
 class ImageRender {
 	public:
-		explicit ImageRender(uint32_t width, uint32_t height);
+		ImageRender(TextureManager const &textureManager, uint32_t width, \
+		uint32_t height);
 		ImageRender(ImageRender const &src);
 		virtual ~ImageRender();
 
@@ -36,6 +38,7 @@ class ImageRender {
 	private:
 		ImageRender();
 
+		TextureManager const	&_textureManager;
 		Shader		_shader;
 		glm::mat4	_projection;
 		GLuint		_vao;

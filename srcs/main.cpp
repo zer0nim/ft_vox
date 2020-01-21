@@ -383,7 +383,7 @@ int		main(int ac, char const **av) {
 		textRender.loadFont("courrier_new", s.g.screen.text["courrier_new"].path, s.g.screen.text["courrier_new"].size);
 
 		// load image render
-		ImageRender imageRender(s.g.screen.width, s.g.screen.height);
+		ImageRender imageRender(*textureManager, s.g.screen.width, s.g.screen.height);
 		imageRender.getShader().use();
 		textureManager->setUniform(imageRender.getShader());
 		imageRender.getShader().unuse();

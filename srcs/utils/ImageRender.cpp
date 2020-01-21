@@ -2,8 +2,8 @@
 #include "debug.hpp"
 #include "Logging.hpp"
 
-ImageRender::ImageRender(uint32_t width, uint32_t height) :
-_shader(SHADER_IMAGE_VS, SHADER_IMAGE_FS),
+ImageRender::ImageRender(TextureManager const &textureManager, uint32_t width, uint32_t height) :
+_textureManager(textureManager), _shader(SHADER_IMAGE_VS, SHADER_IMAGE_FS),
 _projection(glm::ortho(0.0f, static_cast<GLfloat>(width), 0.0f, static_cast<GLfloat>(height))) {
 	// create VAO & VBO
 	_vao = 0;
@@ -31,7 +31,7 @@ _projection(glm::ortho(0.0f, static_cast<GLfloat>(width), 0.0f, static_cast<GLfl
 
 
 ImageRender::ImageRender(ImageRender const &src) :
-_shader(src.getShader()) {
+_textureManager(src._textureManager), _shader(src.getShader()) {
 	*this = src;
 }
 
@@ -55,7 +55,6 @@ void ImageRender::draw(glm::vec2 pos, glm::vec2 size, int texID, glm::vec4 color
 void ImageRender::draw(float posx, float posy, float w, float h, int texID, glm::vec4 color) {
     _shader.use();
     _shader.setVec4("color", color);
-    glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(_vao);
 	// set VBO values
 	GLfloat vertices[6][SHADER_IMAGE_ROW_SIZE] = {
@@ -70,8 +69,10 @@ void ImageRender::draw(float posx, float posy, float w, float h, int texID, glm:
 	glBindBuffer(GL_ARRAY_BUFFER, _vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	_textureManager.activateTextures();
 	// draw image
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
     glBindVertexArray(0);
     _shader.unuse();
 }
