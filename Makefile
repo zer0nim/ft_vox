@@ -58,6 +58,8 @@ SRC =	main.cpp \
 		utils/Material.cpp \
 		utils/Stats.cpp \
 		utils/Logging.cpp \
+\
+		glad.cpp \
 
 HEAD =	commonInclude.hpp \
 		ft_vox.hpp \
@@ -80,6 +82,7 @@ HEAD =	commonInclude.hpp \
 		utils/Material.hpp \
 		utils/Stats.hpp \
 		utils/Logging.hpp \
+
 
 # download the cpp linter (https://github.com/isocpp/CppCoreGuidelines)
 # set command to launch linter on LINTER
