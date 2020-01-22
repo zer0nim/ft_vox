@@ -23,6 +23,8 @@
 #	make -j8
 #	make DEBUG=1 -j8
 
+_MAKE = +$(MAKE) --no-print-directory
+
 NAME = ft_vox
 PROJECT_NAME = $(shell echo $(NAME) | tr a-z A-Z)  # name in MAJUSCULE
 
@@ -127,7 +129,7 @@ PRE_COMMIT_FILE = .git/hooks/pre-commit
 define PRE_COMMIT
 #!/bin/zsh
 
-make lint
+$(_MAKE) lint
 res=$$?
 
 exit $${res}
@@ -139,7 +141,7 @@ PRE_PUSH_FILE = .git/hooks/pre-push
 define PRE_PUSH
 #!/bin/zsh
 
-make check -j8
+$(_MAKE) check -j8
 res=$$?
 
 exit $${res}
@@ -170,15 +172,15 @@ END = @printf $(GREEN)$(BOLD)"--------------------\n"$(NORMAL)
 all:
 ifneq ($(DEBUG),)
 	@if [ -d $(DEBUG_DIR) ] && [ ! -f $(DEBUG_DIR)/DEBUG ]; then \
-		make fclean; \
+		$(_MAKE) fclean; \
 	fi;
 else
 	@if [ -d $(DEBUG_DIR) ] && [ -f $(DEBUG_DIR)/DEBUG ]; then \
-		make fclean; \
+		$(_MAKE) fclean; \
 	fi;
 endif
 	$(START)
-	@make $(NAME)
+	@$(_MAKE) $(NAME)
 	$(END)
 ifneq ($(DEBUG),)
 	@touch $(DEBUG_DIR)/DEBUG
@@ -231,17 +233,17 @@ fclean: clean
 	$(END)
 
 re: fclean
-	@make
+	@$(_MAKE)
 
 exec-nolint:
-	@make
+	@$(_MAKE)
 	@printf $(MAGENTA)$(BOLD)"EXEC $(PROJECT_NAME)\n--------------------\n"$(NORMAL)
 	@./$(NAME) $(ARGS)
 	@printf $(MAGENTA)$(BOLD)"--------------------\n"$(NORMAL)
 
 exec:
-	@make lint ; true
-	@make exec-nolint ; true
+	@$(_MAKE) lint ; true
+	@$(_MAKE) exec-nolint ; true
 
 lint:
 	@printf $(BLUE)$(BOLD)"LINTER ON $(PROJECT_NAME)\n--------------------\n"$(NORMAL)
@@ -253,9 +255,9 @@ lint:
 	@printf $(BLUE)$(BOLD)"--------------------\n"$(NORMAL)
 
 check:
-	@make fclean
-	@make lint
-	@make
+	@$(_MAKE) fclean
+	@$(_MAKE) lint
+	@$(_MAKE)
 
 help:
 	@printf $(YELLOW)$(BOLD)"HELP\n--------------------\n"$(NORMAL)
