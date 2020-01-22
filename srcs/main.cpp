@@ -417,7 +417,7 @@ int		main(int ac, char const **av) {
 
 	if (s.m.mapName != "") {  // if we have a map
 		logInfo("saving...");
-		if (saveMap(winU.cam)) {
+		if (saveMap(window, winU.cam)) {
 			logInfo("settings saved");
 		}
 		else {

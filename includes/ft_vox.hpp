@@ -30,7 +30,7 @@
 #define REMOVE_CHUNKS_BORDERS_FREQUENCY	3  // each # update, remove chunks border
 
 #define NB_UPDATE_THREADS				4
-#define NB_ROWS_SAVED					2  // don't delete all chunks in renderDist + # region
+#define NB_ROWS_SAVED					4  // don't delete all chunks in renderDist + # region
 
 #define SMART_LOAD_ORDER				true  // load chunks next to the player first
 
@@ -145,7 +145,7 @@ bool	createDir(char const *dirNames);
 bool	createMapFiles();
 void	setDefaultSettings();
 void	loadSettings(std::string settingFile);
-bool	saveMap(Camera *cam);
+bool	saveMap(GLFWwindow *window, Camera *cam);
 
 struct Settings {
 	struct Global {
