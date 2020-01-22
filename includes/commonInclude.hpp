@@ -14,7 +14,9 @@
 #endif
 #define DEBUG_SHOW_FPS_ALLTHREAD	DEBUG & false  // show all fps count for all threads
 
+
 // glfw
+#include <glad/glad.h>
 #define GLFW_INCLUDE_GLCOREARB
 #include <GLFW/glfw3.h>
 

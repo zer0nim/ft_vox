@@ -347,6 +347,12 @@ bool	initWindow(GLFWwindow **window, const char *name, tWinUser *winU) {
 	}
 	glfwMakeContextCurrent(*window);
 
+
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+		std::cout << "Failed to initialize GLAD" << std::endl;
+		return -1;
+	}
+
 	glfwSetFramebufferSizeCallback(*window, frambuffResizeCb);
 	glfwSetCursorPosCallback(*window, mouseCb);
 	glfwSetMouseButtonCallback(*window, mouseClick);
