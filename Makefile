@@ -86,7 +86,7 @@ LINTER = $(CPPLINT)
 LINTER_RULES =	--filter=-whitespace/tab,-legal/copyright,-build/c++11,-whitespace/newline,-readability/braces,-whitespace/indent,-build/include_what_you_use,-build/header_guard,-runtime/references \
 				--linelength=120 --quiet
 
-CC				= g++
+CC				= clang++
 DEBUG_FLAGS		= -g3 -DDEBUG=true
 NODEBUG_FLAGS	= -Werror
 LIBS_FLAGS		= -L ~/.brew/lib -framework OpenGL -lglfw -L ~/.brew/opt/freetype/lib -lfreetype \
