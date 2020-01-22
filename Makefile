@@ -102,6 +102,15 @@ DEPFLAGS	= -MT $@ -MD -MP -MF $(DEP_DIR)/$*.Td
 CFLAGS		= -Ofast -std=c++11 -Wall -Wextra -Wno-deprecated
 DEFINE		=
 
+# setup correct shell
+ifneq (,$(wildcard /bin/zsh))
+	SHELL := /bin/zsh
+else ifneq (,$(wildcard /bin/bash))
+	SHELL := /bin/bash
+else
+	SHELL := /bin/sh
+endif
+
 # setup debug mode or normal mode
 ifneq ($(DEBUG),)
 	CFLAGS := $(CFLAGS) $(DEBUG_FLAGS)
@@ -159,11 +168,11 @@ END = @printf $(GREEN)$(BOLD)"--------------------\n"$(NORMAL)
 
 all:
 ifneq ($(DEBUG),)
-	@if [[ -d $(DEBUG_DIR) && ! -f $(DEBUG_DIR)/DEBUG ]] ; then \
+	@if [ -d $(DEBUG_DIR) ] && [ ! -f $(DEBUG_DIR)/DEBUG ]; then \
 		make fclean; \
 	fi;
 else
-	@if [[ -d $(DEBUG_DIR) && -f $(DEBUG_DIR)/DEBUG ]] ; then \
+	@if [ -d $(DEBUG_DIR) ] && [ -f $(DEBUG_DIR)/DEBUG ]; then \
 		make fclean; \
 	fi;
 endif
