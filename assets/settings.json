@@ -12,11 +12,11 @@
 			"mapsPath": "/tmp/ft_vox/maps/",
 			"chunkPath": "chunks/",
 			"mapSettingsPath": "map_settings.json",
-			"textures": "./assets/textures/textures-smooth.png",
+			"textures": "./assets/textures/textures-default.png",
 			"saveAllChunks": false
 		},
 		"screen": {
-		"fullscreen": false,
+		"fullscreen": true,
 			"width": 1200,
 			"height": 800,
 			"inventorySzPercent": 5,

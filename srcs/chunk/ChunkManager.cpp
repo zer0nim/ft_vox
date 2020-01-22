@@ -77,7 +77,6 @@ ChunkManager::~ChunkManager() {
 
 	if (_borderShaderVAO != 0) {
 		glBindVertexArray(0);
-		glDeleteVertexArrays(1, &_borderShaderVAO);
 	}
 	if (_borderShaderVBO != 0) {
 		glBindBuffer(GL_ARRAY_BUFFER, 0);

@@ -83,7 +83,6 @@ _shader(src.getShader()) {
 Skybox::~Skybox() {
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glDeleteVertexArrays(1, &_vao);
     glDeleteBuffers(1, &_vbo);
 	if (_textureID != 0) {
 		glDeleteTextures(1, &_textureID);

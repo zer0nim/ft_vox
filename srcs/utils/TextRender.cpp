@@ -84,7 +84,6 @@ _shader(src.getShader()) {
 TextRender::~TextRender() {
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glDeleteVertexArrays(1, &_vao);
 	glDeleteBuffers(1, &_vbo);
 
 	for (auto const & elem : font) {

@@ -441,10 +441,5 @@ int		main(int ac, char const **av) {
 		AChunk::deleteShader();
 	}
 
-	glfwDestroyWindow(window);
-	window = nullptr;
-	glfwPollEvents();
-	glfwTerminate();
-
 	return 0;
 }
