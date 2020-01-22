@@ -96,7 +96,8 @@ LIBS_INC		= ~/.brew/include \
 				  $(INC_DIR)/lib/json.hpp \
 				  $(INC_DIR)/lib/PerlinNoise.hpp \
 				  /usr/local/opt/freetype/include/freetype2 \
-				  ~/.brew/opt/freetype/include/freetype2
+				  ~/.brew/opt/freetype/include/freetype2 \
+				  /usr/include/freetype2
 
 DEPFLAGS	= -MT $@ -MD -MP -MF $(DEP_DIR)/$*.Td
 CFLAGS		= -Ofast -std=c++11 -Wall -Wextra -Wno-deprecated
