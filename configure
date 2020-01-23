@@ -1,4 +1,0 @@
-brew install boost  # c++ lib
-brew install glfw3  # window management
-brew install glm  # matrix/quaternions
-brew install freetype  # text on opengl

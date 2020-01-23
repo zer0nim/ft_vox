@@ -25,9 +25,9 @@ A Simple Voxel Engine in Opengl, with custom procedural generation
 We used `glfw3` API for creating windows and manage input and events,
 and `glm` to manage matrix/vector/quaternion.
 
-- Install depencies (osx)
+- Install depencies
 
-	```./configure```
+	```./configure.sh```
 
 - Add precommit rules (for dev only)
 
