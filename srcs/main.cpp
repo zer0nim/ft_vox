@@ -351,7 +351,7 @@ int		main(int ac, char const **av) {
 	}
 	setSeed(s.m.seed);
 
-	GLFWwindow		*window;
+	GLFWwindow		*window = nullptr;
 	tWinUser		winU;
 	Camera			*camCrea = new CameraCreative(s.m.cameraStartPos.pos, glm::vec3(0, 1, 0),
 		s.m.cameraStartPos.yaw, s.m.cameraStartPos.pitch);
@@ -410,8 +410,9 @@ int		main(int ac, char const **av) {
 		logErr("when loading textures: " << e.what());
 
 		glfwDestroyWindow(window);
+		window = nullptr;
 		glfwPollEvents();
-		glfwTerminate();
+		// glfwTerminate();
 		return 1;
 	}
 	catch(const Shader::ShaderError& e) {
@@ -436,6 +437,7 @@ int		main(int ac, char const **av) {
 	delete winU.camSurv;
 
 	glfwDestroyWindow(window);
+	window = nullptr;
 	glfwPollEvents();
 	// glfwTerminate();
 
