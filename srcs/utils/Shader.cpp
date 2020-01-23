@@ -114,6 +114,9 @@ Shader &Shader::operator=(Shader const &rhs) {
 void	Shader::use() {
 	glUseProgram(id);
 }
+void	Shader::unuse() {
+	glUseProgram(0);
+}
 void	Shader::setBool(const std::string &name, bool value) const {
 	glUniform1i(glGetUniformLocation(id, name.c_str()), static_cast<int>(value));
 }

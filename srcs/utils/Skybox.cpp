@@ -70,7 +70,9 @@ _shader(SHADER_SKYBOX_VS, SHADER_SKYBOX_FS) {
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, reinterpret_cast<void*>(0));
 
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+	_shader.unuse();
 }
 
 Skybox::Skybox(Skybox const &src) :
@@ -86,6 +88,7 @@ Skybox::~Skybox() {
 	if (_textureID != 0) {
 		glDeleteTextures(1, &_textureID);
 	}
+	_shader.unuse();
 }
 
 Skybox &Skybox::operator=(Skybox const &rhs) {
@@ -99,6 +102,7 @@ Skybox &Skybox::operator=(Skybox const &rhs) {
 
 void Skybox::load(std::vector<std::string> &faces) {
     glGenTextures(1, &_textureID);
+	glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, _textureID);
 
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -137,6 +141,8 @@ void Skybox::load(std::vector<std::string> &faces) {
             stbi_image_free(data);
         }
     }
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
 void Skybox::draw(float nightProgress) {
@@ -145,11 +151,12 @@ void Skybox::draw(float nightProgress) {
 	glBindVertexArray(_vao);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, _textureID);
-	glBindVertexArray(_vao);
 	_shader.setFloat("nightProgress", nightProgress);
 	glDrawArrays(GL_TRIANGLES, 0, sizeof(_vertices) / sizeof(_vertices[0]));
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	glDepthFunc(GL_LESS);
 	glBindVertexArray(0);
+	_shader.unuse();
 }
 
 Shader			&Skybox::getShader() { return _shader; }
