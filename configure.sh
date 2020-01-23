@@ -18,3 +18,5 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 	brew install glm  # matrix/quaternions
 	brew install freetype  # text on opengl
 fi
+
+exit 0
