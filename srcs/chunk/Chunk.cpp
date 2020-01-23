@@ -45,8 +45,8 @@ Chunk &Chunk::operator=(Chunk const &rhs) {
 void	Chunk::initShader(glm::mat4 &projection, TextureManager const &textureManager) {
 	if (!_shaderData) {
 		_shaderData = std::unique_ptr<ShaderData>(new AChunk::ShaderData(
-			"./shaders/Chunk_vs.glsl", "./shaders/naive_fs.glsl", \
-			"./shaders/Chunk_gs.glsl"));
+			"./shaders/chunk_vs.glsl", "./shaders/naive_fs.glsl", \
+			"./shaders/chunk_gs.glsl"));
 		_shaderData->shader->use();
 		_shaderData->shader->setMat4("projection", projection);
 		sendConstUniforms(textureManager);

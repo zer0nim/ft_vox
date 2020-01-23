@@ -1,8 +1,8 @@
 #version 410 core
 
 #define GAMMA 2.2
-#define NIGHT mix(1, 0.05, nightProgress)
-#define NIGHTFOG mix(1, 0.2, nightProgress)
+#define NIGHT mix(1.0, 0.05, nightProgress)
+#define NIGHTFOG mix(1.0, 0.2, nightProgress)
 
 out vec4	FragColor;
 
