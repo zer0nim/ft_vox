@@ -1,5 +1,5 @@
 #include "Skybox.hpp"
-#include "lib/stb_image.h"
+#include "libs/stb_image.h"
 
 const float Skybox::_vertices[] = {
 	-1.0f,  1.0f, -1.0f,

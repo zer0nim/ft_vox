@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ft_vox.hpp"
-#include "lib/PerlinNoise.hpp"
+#include "libs/PerlinNoise.hpp"
 #include "TextureManager.hpp"
 
 #define PERLIN mapInfo.perlin.noise     // shortcut to perlin call

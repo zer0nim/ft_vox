@@ -1,6 +1,6 @@
 #include "Texture.hpp"
 #define STB_IMAGE_IMPLEMENTATION
-#include "lib/stb_image.h"
+#include "libs/stb_image.h"
 #include "Logging.hpp"
 
 uint32_t	textureFromFile(const std::string path, bool inSpaceSRGB) {

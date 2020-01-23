@@ -1,20 +1,25 @@
 # Makefile
 # for each projects, change value of:
-#	-> NAME
-#	-> SRC
-#	-> HEAD
-#	-> LIBS_FLAGS
-#	-> LIBS_INC
+#	-> NAME  # name of the exectutable
+#	-> SRC  # all .cpp files
+#	-> HEAD  # all .hpp files
+
+# to setup libs
+#	-> LIBS_SRC_C  # all internal .c of libs
+#	-> LIBS_SRC_CPP  # all internal .cpp of libs
+#	-> LIBS_HEAD  # all internal .h & .hpp of libs
+#	-> LIBS_FLAGS  # all flags to compile with the libs
+#	-> LIBS_INC  # how to find external libs header
 
 # you can also configure your Makefile with these variables:
-#	-> ARGS
-#	-> LINTER_RULES
-#	-> DEBUG_FLAGS
-#	-> PRE_COMMIT
-#	-> PRE_PUSH
+#	-> ARGS  # args sended when run executable
+#	-> LINTER_RULES  # all rules when running linter
+#	-> DEBUG_FLAGS  # flags for debug mode (ex -g)
+#	-> PRE_COMMIT  # the content of pre-commit file
+#	-> PRE_PUSH  # the content of pre-push file
 
-# after this, init the project:
-#	make init
+# after this, install the project:
+#	make install  # this command will exectute ./configure.sh so you need to create this file
 
 # to get help:
 #	make help
@@ -33,6 +38,7 @@ MAKE_OPT = --no-print-directory
 SRCS_DIR	= srcs
 OBJS_DIR	= objs
 INC_DIR		= includes
+LIBS_DIR	= libs
 DEP_DIR		= .dep
 DEBUG_DIR	= $(DEP_DIR)
 
@@ -58,8 +64,6 @@ SRC =	main.cpp \
 		utils/Material.cpp \
 		utils/Stats.cpp \
 		utils/Logging.cpp \
-\
-		glad.cpp \
 
 HEAD =	commonInclude.hpp \
 		ft_vox.hpp \
@@ -82,6 +86,19 @@ HEAD =	commonInclude.hpp \
 		utils/Material.hpp \
 		utils/Stats.hpp \
 		utils/Logging.hpp \
+
+# for c libs
+LIBS_SRC_C =	glad/glad.c \
+
+# for cpp libs
+LIBS_SRC_CPP =
+
+# headers for c & cpp libs
+LIBS_HEAD =		glad/glad.h \
+				KHR/khrplatform.h \
+				json.hpp \
+				stb_image.h \
+				PerlinNoise.hpp \
 
 
 # download the cpp linter (https://github.com/isocpp/CppCoreGuidelines)
@@ -158,10 +175,17 @@ exit $${res}
 endef
 export PRE_PUSH
 
-HEADS		= $(addprefix $(INC_DIR)/, $(HEAD))
-OBJS		= $(addprefix $(OBJS_DIR)/, $(SRC:.cpp=.o))
-DEPFILES	= $(addprefix $(DEP_DIR)/, $(SRC:.cpp=.d))
-INC			= $(addprefix -I , $(sort $(dir $(HEADS)))) $(addprefix -I , $(LIBS_INC))
+HEADS		= $(addprefix $(INC_DIR)/, $(HEAD)) $(addprefix $(LIBS_DIR)/, $(LIBS_HEAD))
+SRCS		= $(addprefix $(SRCS_DIR)/, $(SRC)) \
+			  $(addprefix $(LIBS_DIR)/, $(LIBS_SRC_C)) \
+			  $(addprefix $(LIBS_DIR)/, $(LIBS_SRC_CPP))
+OBJS		= $(addprefix $(OBJS_DIR)/, $(SRC:.cpp=.o)) \
+			  $(addprefix $(OBJS_DIR)/, $(LIBS_SRC_C:.c=.o)) \
+			  $(addprefix $(OBJS_DIR)/, $(LIBS_SRC_CPP:.cpp=.o))
+DEPFILES	= $(addprefix $(DEP_DIR)/, $(SRC:.cpp=.d)) \
+			  $(addprefix $(DEP_DIR)/, $(LIBS_SRC_C:.c=.d)) \
+			  $(addprefix $(DEP_DIR)/, $(LIBS_SRC_CPP:.cpp=.d))
+INC			= $(addprefix -I , $(sort $(dir $(HEADS)))) $(addprefix -I , $(LIBS_INC)) -I .
 
 NORMAL = "\x1B[0m"
 RED = "\x1B[31m"
@@ -212,6 +236,13 @@ $(NAME): $(OBJS_DIR) $(OBJS)
 	@printf $(CYAN)"-> create program : $(NAME)\n"$(NORMAL)
 	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LIBS_FLAGS)
 
+$(OBJS_DIR)/%.o: $(LIBS_DIR)/%.c
+$(OBJS_DIR)/%.o: $(LIBS_DIR)/%.c $(DEP_DIR)/%.d
+	@printf $(YELLOW)"-> $<\n"$(NORMAL)
+	@$(CC) $(DEPFLAGS) $(CFLAGS) -c $< -o $@ $(INC)
+	@mv -f $(DEP_DIR)/$*.Td $(DEP_DIR)/$*.d
+
+
 $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp
 $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp $(DEP_DIR)/%.d
 	@printf $(YELLOW)"-> $<\n"$(NORMAL)
@@ -260,7 +291,7 @@ lint:
 	@if [ "$(LINTER)" = "" ]; then\
 		printf $(RED)$(BOLD)"Error:"$(NORMAL)" env var CPPLINT is not set\n"; \
 	else \
-		$(LINTER) $(LINTER_RULES) $(HEADS) $(addprefix $(SRCS_DIR)/, $(SRC)); \
+		$(LINTER) $(LINTER_RULES) $(addprefix $(INC_DIR)/, $(HEAD)) $(addprefix $(SRCS_DIR)/, $(SRC)); \
     fi
 	@printf $(BLUE)$(BOLD)"--------------------\n"$(NORMAL)
 
