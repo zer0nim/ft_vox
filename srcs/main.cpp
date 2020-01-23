@@ -421,10 +421,6 @@ int		main(int ac, char const **av) {
 		logErr("when loading TextRender: " << e.what());
 	}
 
-	glfwDestroyWindow(window);
-	glfwPollEvents();
-	glfwTerminate();
-
 	if (s.m.mapName != "") {  // if we have a map
 		logInfo("saving...");
 		if (saveMap(winU.cam)) {
@@ -438,6 +434,10 @@ int		main(int ac, char const **av) {
 	delete textureManager;
 	delete winU.camCrea;
 	delete winU.camSurv;
+
+	glfwDestroyWindow(window);
+	glfwPollEvents();
+	// glfwTerminate();
 
 	return 0;
 }
