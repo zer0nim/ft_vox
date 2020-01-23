@@ -289,7 +289,7 @@ install:
 	@printf $(YELLOW)$(BOLD)"INSTALL $(PROJECT_NAME)\n--------------------\n"$(NORMAL)
 	@./configure
 	@printf $(YELLOW)$(BOLD)"--------------------\n"$(NORMAL)
-	@make init
+	@$(MAKE) $(MAKE_OPT) init
 
 init:
 	@printf $(YELLOW)$(BOLD)"INIT $(PROJECT_NAME)\n--------------------\n"$(NORMAL)

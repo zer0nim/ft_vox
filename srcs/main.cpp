@@ -415,7 +415,7 @@ int		main(int ac, char const **av) {
 			glfwDestroyWindow(window);
 			window = nullptr;
 			glfwPollEvents();
-			// glfwTerminate();
+			glfwTerminate();
 			return 1;
 		}
 		catch(const Shader::ShaderError& e) {
@@ -444,7 +444,7 @@ int		main(int ac, char const **av) {
 	glfwDestroyWindow(window);
 	window = nullptr;
 	glfwPollEvents();
-	// glfwTerminate();
+	glfwTerminate();
 
 	return 0;
 }
