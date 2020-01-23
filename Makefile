@@ -1,49 +1,90 @@
 # Makefile
-# for each projects, change value of:
-#	-> NAME  # name of the exectutable
-#	-> SRC  # all .cpp files
-#	-> HEAD  # all .hpp files
+# for each project, you can configure the Makefile
+# /!\ each variables with -> need to be changed /!\
 
-# to setup libs
-#	-> LIBS_SRC_C  # all internal .c of libs
-#	-> LIBS_SRC_CPP  # all internal .cpp of libs
-#	-> LIBS_HEAD  # all internal .h & .hpp of libs
-#	-> LIBS_FLAGS  # all flags to compile with the libs
-#	-> LIBS_INC  # how to find external libs header
+# project global config
+#	-> NAME
+#	ARGS
+#	CC
+#	CFLAGS
+#	DEBUG_FLAGS
+#	NODEBUG_FLAGS
+#	DEPFLAGS
+#	DEFINE
 
-# update if needed the make install command
+# source files
+#	SRCS_DIR
+#	OBJS_DIR
+#	INC_DIR
+#	LIBS_DIR
+#	DEP_DIR
+#	DEBUG_DIR
+#	-> SRC
+#	-> HEAD
 
-# you can also configure your Makefile with these variables:
-#	-> ARGS  # args sended when run executable
-#	-> LINTER_RULES  # all rules when running linter
-#	-> DEBUG_FLAGS  # flags for debug mode (ex -g)
-#	-> PRE_COMMIT  # the content of pre-commit file
-#	-> PRE_PUSH  # the content of pre-push file
+# libs configuration
+#	-> LIBS_SRC_C
+#	-> LIBS_SRC_CPP
+#	-> LIBS_HEAD
+#	-> LIBS_FLAGS
+#	-> LIBS_FLAGS_OSX
+#	-> LIBS_FLAGS_LINUX
+#	-> LIBS_INC
 
-# after this, install the project:
+# linter config
+#	LINTER
+#	LINTER_RULES
+
+# pre-commit & pre-push files
+#	PRE_COMMIT_FILE
+#	PRE_COMMIT
+#	PRE_PUSH_FILE
+#	PRE_PUSH
+
+# after this, to install the project:
 #	make install  # this command will exectute ./configure.sh so you need to create this file
-
+# to compile & run
+#	make exec -j8 ARGS="--usage"
 # to get help:
 #	make help
 
-# to run:
-#	make -j8
+# to compile with debug mode:
 #	make DEBUG=1 -j8
 
+################################################################################
+# project global config
+
+# executable name
 NAME = ft_vox
-PROJECT_NAME = $(shell echo $(NAME) | tr a-z A-Z)  # name in MAJUSCULE
-
+# args (./NAME ARGS) (make exec ARGS="-v" -> ./name -v)
 ARGS =
+# compiler (g++ or clang++)
+CC = g++
+# flags for compilation
+CFLAGS = -Ofast -std=c++11 -Wall -Wextra -Wno-deprecated
+# flags only for debug mode (make DEBUG=1)
+DEBUG_FLAGS = -g3 -DDEBUG=true
+# classic flags
+NODEBUG_FLAGS = -Werror
+# flags to create the .d files
+DEPFLAGS = -MT $@ -MD -MP -MF $(DEP_DIR)/$*.Td
+# to send define to program (make DEFINE="WIDTH=120")
+DEFINE =
 
-MAKE_OPT = --no-print-directory
 
+################################################################################
+# source files
+
+# directory names
 SRCS_DIR	= srcs
 OBJS_DIR	= objs
 INC_DIR		= includes
 LIBS_DIR	= libs
 DEP_DIR		= .dep
+# this will create a DEBUG file if we are in debug mode (make DEBUG=1)
 DEBUG_DIR	= $(DEP_DIR)
 
+# SRCS_DIR/SRC
 SRC =	main.cpp \
 		windowEvents.cpp \
 		TextureManager.cpp \
@@ -67,6 +108,7 @@ SRC =	main.cpp \
 		utils/Stats.cpp \
 		utils/Logging.cpp \
 
+# INC_DIR/HEAD
 HEAD =	commonInclude.hpp \
 		ft_vox.hpp \
 		TextureManager.hpp \
@@ -89,19 +131,39 @@ HEAD =	commonInclude.hpp \
 		utils/Stats.hpp \
 		utils/Logging.hpp \
 
+
+################################################################################
+# libs configuration
+
 # for c libs
-LIBS_SRC_C =	glad/glad.c \
+LIBS_SRC_C		= glad/glad.c \
 
 # for cpp libs
-LIBS_SRC_CPP =
+LIBS_SRC_CPP	=
 
 # headers for c & cpp libs
-LIBS_HEAD =		glad/glad.h \
-				KHR/khrplatform.h \
-				json.hpp \
-				stb_image.h \
-				PerlinNoise.hpp \
+LIBS_HEAD		= glad/glad.h \
+				  KHR/khrplatform.h \
+				  json.hpp \
+				  stb_image.h \
+				  PerlinNoise.hpp \
 
+# all flags for libs
+LIBS_FLAGS			= -L ~/.brew/lib -lglfw -L ~/.brew/opt/freetype/lib -lfreetype \
+					  -lboost_filesystem
+# flags for libs on OSX only
+LIBS_FLAGS_OSX		= -framework OpenGL
+# flags for libs on LINUX only
+LIBS_FLAGS_LINUX	= -ldl -pthread -lboost_system
+# includes dir for external libs
+LIBS_INC			= ~/.brew/include \
+					  $(INC_DIR)/lib \
+					  /usr/local/opt/freetype/include/freetype2 \
+					  ~/.brew/opt/freetype/include/freetype2 \
+					  /usr/include/freetype2
+
+################################################################################
+# linter config
 
 # download the cpp linter (https://github.com/isocpp/CppCoreGuidelines)
 # set command to launch linter on LINTER
@@ -110,48 +172,8 @@ LINTER = $(CPPLINT)
 LINTER_RULES =	--filter=-whitespace/tab,-legal/copyright,-build/c++11,-whitespace/newline,-readability/braces,-whitespace/indent,-build/include_what_you_use,-build/header_guard,-runtime/references \
 				--linelength=120 --quiet
 
-CC				= g++
-DEBUG_FLAGS		= -g3 -DDEBUG=true
-NODEBUG_FLAGS	= -Werror
-LIBS_FLAGS		= -L ~/.brew/lib -lglfw -L ~/.brew/opt/freetype/lib -lfreetype \
-				  -lboost_filesystem
-
-# osx specific flags
-UNAME_S := $(shell uname -s)
-ifeq ($(UNAME_S), Darwin)
-	LIBS_FLAGS += -framework OpenGL
-else
-	LIBS_FLAGS += -ldl -pthread -lboost_system
-endif
-
-LIBS_INC		= ~/.brew/include \
-				  $(INC_DIR)/lib \
-				  /usr/local/opt/freetype/include/freetype2 \
-				  ~/.brew/opt/freetype/include/freetype2 \
-				  /usr/include/freetype2
-
-DEPFLAGS	= -MT $@ -MD -MP -MF $(DEP_DIR)/$*.Td
-CFLAGS		= -Ofast -std=c++11 -Wall -Wextra -Wno-deprecated
-DEFINE		=
-
-# setup correct shell
-ifneq (,$(wildcard /bin/zsh))
-	SHELL := /bin/zsh
-else ifneq (,$(wildcard /bin/bash))
-	SHELL := /bin/bash
-else
-	SHELL := /bin/sh
-endif
-
-# setup debug mode or normal mode
-ifneq ($(DEBUG),)
-	CFLAGS := $(CFLAGS) $(DEBUG_FLAGS)
-else
-	CFLAGS := $(CFLAGS) $(NODEBUG_FLAGS)
-endif
-
-# send define to program
-CFLAGS := $(CFLAGS) $(addprefix -D, $(DEFINE))
+################################################################################
+# pre-commit & pre-push files
 
 # pre-commit rules
 PRE_COMMIT_FILE = .git/hooks/pre-commit
@@ -176,6 +198,42 @@ res=$$?
 exit $${res}
 endef
 export PRE_PUSH
+
+################################################################################
+# automatic defined variables
+
+# name in majuscule
+PROJECT_NAME = $(shell echo $(NAME) | tr a-z A-Z)  # name in MAJUSCULE
+
+MAKE_OPT = --no-print-directory
+
+# os specific flags for libs
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S), Darwin)
+	LIBS_FLAGS += $(LIBS_FLAGS_OSX)
+else
+	LIBS_FLAGS += $(LIBS_FLAGS_LINUX)
+endif
+
+# setup correct shell
+ifneq (,$(wildcard /bin/zsh))
+	SHELL := /bin/zsh
+else ifneq (,$(wildcard /bin/bash))
+	SHELL := /bin/bash
+else
+	SHELL := /bin/sh
+endif
+
+# setup debug mode or normal mode
+ifneq ($(DEBUG),)
+	CFLAGS := $(CFLAGS) $(DEBUG_FLAGS)
+else
+	CFLAGS := $(CFLAGS) $(NODEBUG_FLAGS)
+endif
+
+# send define to program
+CFLAGS := $(CFLAGS) $(addprefix -D, $(DEFINE))
+
 
 HEADS		= $(addprefix $(INC_DIR)/, $(HEAD)) $(addprefix $(LIBS_DIR)/, $(LIBS_HEAD))
 SRCS		= $(addprefix $(SRCS_DIR)/, $(SRC)) \
@@ -204,6 +262,9 @@ ULINE = "\e[4m"
 
 START = @printf $(GREEN)$(BOLD)"$(PROJECT_NAME)\n--------------------\n"$(NORMAL)
 END = @printf $(GREEN)$(BOLD)"--------------------\n"$(NORMAL)
+
+################################################################################
+# make rules
 
 all:
 ifneq ($(DEBUG),)
@@ -317,11 +378,12 @@ help:
 	@printf $(NORMAL)"-> make "$(BOLD)"fclean"$(NORMAL)": make clean and remove executable\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"re"$(NORMAL)": make fclean and make all\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"lint"$(NORMAL)": exec linter on project (use env var CPPLINT)\n"
-	@printf $(NORMAL)"-> make "$(BOLD)"exec"$(NORMAL)": make lint, make all and exec the program with ARGS='$(ARGS)'\n"
-	@printf $(NORMAL)"-> make "$(BOLD)"exec-nolint"$(NORMAL)": make all and exec the program with ARGS='$(ARGS)'\n"
+	@printf $(NORMAL)"-> make "$(BOLD)"exec"$(NORMAL)": make lint, make all and exec the program: ./$(NAME) ARGS('$(ARGS)')\n"
+	@printf $(NORMAL)"-> make "$(BOLD)"exec-nolint"$(NORMAL)": make all and exec the program: ./$(NAME) ARGS('$(ARGS)')\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"check"$(NORMAL)": make fclean, make lint, make exec-nolint -> stop if there is an error\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"help | usage"$(NORMAL)": show the help\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"... DEBUG=1"$(NORMAL)": use debug mode\n"
+	@printf $(NORMAL)"-> make "$(BOLD)"... ARGS='...'"$(NORMAL)": add arguments to exec: ./$(NAME) ARGS (for make exec & exec-nolint)\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"... DEFINE=\"DEFINE=value\""$(NORMAL)": send `#define DEFINE value` to all files\n"
 	@printf $(YELLOW)$(BOLD)"--------------------\n"$(NORMAL)
 
