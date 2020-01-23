@@ -58,7 +58,7 @@ TextureManager::TextureManager(std::string const &texturesSettings) {
 
 		if (fileStream.is_open()) {
 			nlohmann::json	data;
-			data << fileStream;
+			fileStream >> data;
 			loadBlocksTextures(data);
 		}
 		else {

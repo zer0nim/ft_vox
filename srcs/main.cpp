@@ -21,8 +21,10 @@ void	*threadUpdateFunction(void *args_) {
 	ThreadupdateArgs			*args = reinterpret_cast<ThreadupdateArgs*>(args_);
 	std::chrono::milliseconds	time_start;
 	tWinUser					*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(args->window));
-	bool						firstLoop = true;
 	uint64_t					nbUpdateCall = 0;
+	#if DEBUG_FPS_LOW == true
+		bool						firstLoop = true;
+	#endif
 
 	while (!args->quit) {
 		time_start = getMs();
@@ -58,7 +60,9 @@ void	*threadUpdateFunction(void *args_) {
 			std::cout << "FPS: |update" << static_cast<int>(args->threadID) << "| " << getMs().count() << " | "
 				<< (getMs() - time_start).count() << std::endl;
 		#endif
-		firstLoop = false;
+		#if DEBUG_FPS_LOW == true
+			firstLoop = false;
+		#endif
 	}
 	args->quit = true;
 	pthread_exit(NULL);
@@ -71,7 +75,9 @@ ImageRender &imageRender, TextureManager const &textureManager) {
 	std::chrono::milliseconds	time_start;
 	int							lastFps = 0;
 	tWinUser					*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
-	bool						firstLoop = true;
+	#if DEBUG_FPS_LOW == true
+		bool						firstLoop = true;
+	#endif
 	float						cursorX = s.g.screen.width / 2 - textRender.font["courrier_new"]['+'].size.x / 2;
 	float						cursorY = s.g.screen.height / 2 - textRender.font["courrier_new"]['+'].size.y / 2;
 	float						nightCycleCount = 0.0f;
@@ -250,7 +256,9 @@ ImageRender &imageRender, TextureManager const &textureManager) {
 		#if DEBUG_SHOW_FPS
 			std::cout << "FPS: |main| " << getMs().count() << " | " << (getMs() - time_start).count() << std::endl;
 		#endif
-		firstLoop = false;
+		#if DEBUG_FPS_LOW == true
+			firstLoop = false;
+		#endif
 	}
 
 	for (uint8_t i = 0; i < NB_UPDATE_THREADS; i++) {

@@ -299,9 +299,7 @@ void	mouseCb(GLFWwindow *window, double xPos, double yPos) {
 	windows resize cb
 */
 void	frambuffResizeCb(GLFWwindow *window, int width, int height) {
-	tWinUser	*winU;
-
-	winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
+	(void)window;
 	s.g.screen.width = width;
 	s.g.screen.height = height;
 	glViewport(0, 0, width, height);

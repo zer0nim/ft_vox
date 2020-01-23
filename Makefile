@@ -94,8 +94,15 @@ LINTER_RULES =	--filter=-whitespace/tab,-legal/copyright,-build/c++11,-whitespac
 CC				= g++
 DEBUG_FLAGS		= -g3 -DDEBUG=true
 NODEBUG_FLAGS	= -Werror
-LIBS_FLAGS		= -L ~/.brew/lib -framework OpenGL -lglfw -L ~/.brew/opt/freetype/lib -lfreetype \
+LIBS_FLAGS		= -L ~/.brew/lib -lglfw -L ~/.brew/opt/freetype/lib -lfreetype \
 				  -lboost_filesystem
+
+# osx specific flags
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S), Darwin)
+	LIBS_FLAGS += -framework OpenGL
+endif
+
 LIBS_INC		= ~/.brew/include \
 				  $(INC_DIR)/lib \
 				  /usr/local/opt/freetype/include/freetype2 \
@@ -180,6 +187,7 @@ else
 		$(MAKE) $(MAKE_OPT) fclean; \
 	fi;
 endif
+	@echo $(LIBS_FLAGS)
 	$(START)
 	@$(MAKE) $(MAKE_OPT) $(NAME)
 	$(END)

@@ -434,7 +434,6 @@ void ChunkManager::putBlock(uint8_t type) {
 void ChunkManager::updateRaycast() {
 	wordIVec3	point;
 	wordIVec3	pointLastBlock;
-	bool		isBeforeBlock = false;
 	float		start = 0.6;
 	float		end = 0.99;
 	float		stepDivVal = 0.97;
@@ -475,7 +474,6 @@ void ChunkManager::updateRaycast() {
 		if (dist > start) {
 			if (pointLastBlock != point && block == 0) {
 				pointLastBlock = point;
-				isBeforeBlock = true;
 			}
 		}
 		else {

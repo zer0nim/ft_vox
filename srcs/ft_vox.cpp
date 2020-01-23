@@ -304,7 +304,7 @@ void	loadSettings(std::string settingFile) {
 
 		if (fileStream.is_open()) {
 			nlohmann::json	data;
-			data << fileStream;
+			fileStream >> data;
 			loadSettingsJson(data);
 		}
 		else {
@@ -455,7 +455,7 @@ bool	saveMap(Camera *cam) {
 	try {
 		std::ifstream fileStream(settingsFilename, std::ifstream::in);
 		if (fileStream.is_open()) {
-			lastSettings << fileStream;
+			fileStream >> lastSettings;
 		}
 	}
 	catch (const nlohmann::json::parse_error& e) {}
