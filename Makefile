@@ -6,6 +6,8 @@
 #	-> LIBS_FLAGS
 #	-> LIBS_INC
 
+# update if needed the make install command
+
 # you can also configure your Makefile with these variables:
 #	-> ARGS
 #	-> LINTER_RULES
@@ -185,15 +187,21 @@ else
 	@rm -f $(DEBUG_DIR)/DEBUG
 endif
 
+install:
+	@printf $(YELLOW)$(BOLD)"INSTALL $(PROJECT_NAME)\n--------------------\n"$(NORMAL)
+	@./configure
+	@printf $(YELLOW)$(BOLD)"--------------------\n"$(NORMAL)
+	@make init
+
 init:
-	$(START)
+	@printf $(YELLOW)$(BOLD)"INIT $(PROJECT_NAME)\n--------------------\n"$(NORMAL)
 	@printf $(CYAN)"create pre-commit\n"$(NORMAL)
 	@echo "$$PRE_COMMIT" > $(PRE_COMMIT_FILE)
 	@chmod 755 $(PRE_COMMIT_FILE)
 	@printf $(CYAN)"create pre-push\n"$(NORMAL)
 	@echo "$$PRE_PUSH" > $(PRE_PUSH_FILE)
 	@chmod 755 $(PRE_PUSH_FILE)
-	$(END)
+	@printf $(YELLOW)$(BOLD)"--------------------\n"$(NORMAL)
 
 $(NAME): $(OBJS_DIR) $(OBJS)
 	@printf $(CYAN)"-> create program : $(NAME)\n"$(NORMAL)
@@ -267,9 +275,11 @@ help:
 	@printf $(NORMAL)"-> make "$(BOLD)"exec"$(NORMAL)": make lint, make all and exec the program with ARGS='$(ARGS)'\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"exec-nolint"$(NORMAL)": make all and exec the program with ARGS='$(ARGS)'\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"check"$(NORMAL)": make fclean, make lint, make exec-nolint -> stop if there is an error\n"
-	@printf $(NORMAL)"-> make "$(BOLD)"help"$(NORMAL)": show the help\n"
+	@printf $(NORMAL)"-> make "$(BOLD)"help | usage"$(NORMAL)": show the help\n"
 	@printf $(NORMAL)"-> make "$(BOLD)"... DEBUG=1"$(NORMAL)": use debug mode\n"
-	@printf $(NORMAL)"-> make "$(BOLD)"... DEFINE=\"DEFINE=value\""$(NORMAL)": use send `#define DEFINE value` to all files\n"
+	@printf $(NORMAL)"-> make "$(BOLD)"... DEFINE=\"DEFINE=value\""$(NORMAL)": send `#define DEFINE value` to all files\n"
 	@printf $(YELLOW)$(BOLD)"--------------------\n"$(NORMAL)
 
-.PHONY: init all clean fclean re exec-nolint exec lint check help
+usage: help
+
+.PHONY: init all clean fclean re exec-nolint exec lint check help usage
