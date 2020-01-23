@@ -101,6 +101,8 @@ LIBS_FLAGS		= -L ~/.brew/lib -lglfw -L ~/.brew/opt/freetype/lib -lfreetype \
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S), Darwin)
 	LIBS_FLAGS += -framework OpenGL
+else
+	LIBS_FLAGS += -ldl -pthread -lboost_system
 endif
 
 LIBS_INC		= ~/.brew/include \
@@ -187,7 +189,6 @@ else
 		$(MAKE) $(MAKE_OPT) fclean; \
 	fi;
 endif
-	@echo $(LIBS_FLAGS)
 	$(START)
 	@$(MAKE) $(MAKE_OPT) $(NAME)
 	$(END)
