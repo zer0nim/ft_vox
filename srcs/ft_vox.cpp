@@ -304,7 +304,7 @@ void	loadSettings(std::string settingFile) {
 
 		if (fileStream.is_open()) {
 			nlohmann::json	data;
-			data << fileStream;
+			fileStream >> data;
 			loadSettingsJson(data);
 		}
 		else {
@@ -449,13 +449,14 @@ bool	createMapFiles() {
 	return true;
 }
 
-bool	saveMap(Camera *cam) {
+bool	saveMap(GLFWwindow *window, Camera *cam) {
 	std::string		settingsFilename = s.m.fullMapName + "/" + s.g.files.mapSettingsPath;
+	tWinUser		*winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
 	nlohmann::json	lastSettings;
 	try {
 		std::ifstream fileStream(settingsFilename, std::ifstream::in);
 		if (fileStream.is_open()) {
-			lastSettings << fileStream;
+			fileStream >> lastSettings;
 		}
 	}
 	catch (const nlohmann::json::parse_error& e) {}
@@ -483,8 +484,8 @@ bool	saveMap(Camera *cam) {
 			{"handBlockID", s.m.handBlockID},
 			{"gamemode", s.m.gamemode},
 			{"nightCycle", {
-				{"time", s.m.nightCycle.time},
-				{"enabled", s.m.nightCycle.cycleEnabled},
+				{"time", winU->hour},
+				{"cycleEnabled", s.m.nightCycle.cycleEnabled},
 				{"dayDuration", s.m.nightCycle.dayDuration},
 				{"sunriseStart", s.m.nightCycle.sunriseStart},
 				{"sunriseEnd", s.m.nightCycle.sunriseEnd},

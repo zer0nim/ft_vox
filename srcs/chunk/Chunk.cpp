@@ -11,7 +11,6 @@ Chunk::Chunk(TextureManager const &textureManager, ChunkManager &chunkManager)
 	_nbVertices = 0;
 	_needInitVao = true;
 	_meshUpdated = false;
-	_vao = 0;
 	_vbo = 0;
 }
 
@@ -23,9 +22,8 @@ Chunk::~Chunk() {
 	if (_needInitVao == false) {
 		_shaderData->shader->use();
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
 		glDeleteBuffers(1, &_vbo);
-		glDeleteVertexArrays(1, &_vao);
+		_shaderData->shader->unuse();
 	}
 }
 
@@ -35,7 +33,6 @@ Chunk &Chunk::operator=(Chunk const &rhs) {
 		_meshUpdated = rhs._meshUpdated;
 		_needInitVao = rhs._needInitVao;
 		_vbo = rhs._vbo;
-		_vao = rhs._vao;
 		_faces = rhs._faces;
 		_nbVertices = rhs._nbVertices;
 	}
@@ -45,11 +42,12 @@ Chunk &Chunk::operator=(Chunk const &rhs) {
 void	Chunk::initShader(glm::mat4 &projection, TextureManager const &textureManager) {
 	if (!_shaderData) {
 		_shaderData = std::unique_ptr<ShaderData>(new AChunk::ShaderData(
-			"./shaders/Chunk_vs.glsl", "./shaders/naive_fs.glsl", \
-			"./shaders/Chunk_gs.glsl"));
+			"./shaders/chunk_vs.glsl", "./shaders/naive_fs.glsl", \
+			"./shaders/chunk_gs.glsl"));
 		_shaderData->shader->use();
 		_shaderData->shader->setMat4("projection", projection);
 		sendConstUniforms(textureManager);
+		_shaderData->shader->unuse();
 	}
 }
 
@@ -425,27 +423,21 @@ void	Chunk::sendMeshData() {
 			// generate vao vbo only on first call
 			if (_needInitVao) {
 				_needInitVao = false;
-				glGenVertexArrays(1, &_vao);
 				glGenBuffers(1, &_vbo);
 
+				glBindVertexArray(_shaderData->vao);
 				glBindBuffer(GL_ARRAY_BUFFER, _vbo);
-				glBindVertexArray(_vao);
-				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, rowSize * sizeof(float), \
-					reinterpret_cast<void*>(0));
 				glEnableVertexAttribArray(0);
-				glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, rowSize * sizeof(float), \
-					reinterpret_cast<void*>(3 * sizeof(float)));
 				glEnableVertexAttribArray(1);
-				glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, rowSize * sizeof(float), \
-					reinterpret_cast<void*>(5 * sizeof(float)));
 				glEnableVertexAttribArray(2);
-				glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, rowSize * sizeof(float), \
-					reinterpret_cast<void*>(6 * sizeof(float)));
 				glEnableVertexAttribArray(3);
 			}
 
 			glBindBuffer(GL_ARRAY_BUFFER, _vbo);
 			glBufferData(GL_ARRAY_BUFFER, _faces.size() * sizeof(float), &_faces[0], GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindVertexArray(0);
+			_shaderData->shader->unuse();
 		}
 	}
 }
@@ -472,8 +464,17 @@ float nightProgress, bool pointLight) {
 		_shaderData->shader->setVec3("pointLight.position", pos);
 		_shaderData->shader->setFloat("pointLight.enabled", pointLight);
 
-		glBindVertexArray(_vao);
+		glBindVertexArray(_shaderData->vao);
+		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), reinterpret_cast<void*>(0));
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
+		glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 7 * sizeof(float), reinterpret_cast<void*>(5 * sizeof(float)));
+		glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 7 * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
 		glDrawArrays(GL_POINTS, 0, _nbVertices);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+		_shaderData->shader->unuse();
 	}
 }
 
@@ -512,6 +513,8 @@ void	Chunk::sendConstUniforms(TextureManager const &textureManager) {
 	_shaderData->shader->setInt("fog.maxDist", dist);
 	_shaderData->shader->setInt("fog.minDist", dist - s.g.fog.width);
 	_shaderData->shader->setVec4("fog.color", s.g.fog.color);
+
+	_shaderData->shader->unuse();
 }
 
 uint32_t	Chunk::getNbSquareRendered() const {

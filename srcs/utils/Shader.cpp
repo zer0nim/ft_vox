@@ -50,9 +50,9 @@ Shader::Shader(std::string const vsPath, std::string const fsPath, std::string c
 	const char	*vsData;
 	const char	*fsData;
 	const char	*gsData;
-	uint32_t	vertex;
-	uint32_t	fragment;
-	uint32_t	geometry;
+	uint32_t	vertex = 0;
+	uint32_t	fragment = 0;
+	uint32_t	geometry = 0;
 
 	fillShaderStr(vsPath, fsPath, gsPath, &vsCode, &fsCode, &gsCode);
 
@@ -83,8 +83,9 @@ Shader::Shader(std::string const vsPath, std::string const fsPath, std::string c
 	id = glCreateProgram();
 	glAttachShader(id, vertex);
 	glAttachShader(id, fragment);
-	if (!gsPath.empty())
+	if (!gsPath.empty()) {
 		glAttachShader(id, geometry);
+	}
 	glLinkProgram(id);
 	checkCompileErrors(id, "PROGRAM");
 
@@ -112,6 +113,9 @@ Shader &Shader::operator=(Shader const &rhs) {
 
 void	Shader::use() {
 	glUseProgram(id);
+}
+void	Shader::unuse() {
+	glUseProgram(0);
 }
 void	Shader::setBool(const std::string &name, bool value) const {
 	glUniform1i(glGetUniformLocation(id, name.c_str()), static_cast<int>(value));

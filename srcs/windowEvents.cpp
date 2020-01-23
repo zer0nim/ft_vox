@@ -80,6 +80,7 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 		s.g.fog.enabled = !s.g.fog.enabled;
 		AChunk::getShader().use();
 		AChunk::getShader().setBool("fog.enabled", s.g.fog.enabled);
+		AChunk::getShader().unuse();
 	}
 
 	// prev item
@@ -133,6 +134,7 @@ void	keyCb(GLFWwindow *window, int key, int scancode, int action, int mods) {
 		s.g.perf.enableTransparency = !s.g.perf.enableTransparency;
 		AChunk::getShader().use();
 		AChunk::getShader().setBool("enableTransparency", s.g.perf.enableTransparency);
+		AChunk::getShader().unuse();
 	}
 
 	// enable / disable point light
@@ -299,9 +301,7 @@ void	mouseCb(GLFWwindow *window, double xPos, double yPos) {
 	windows resize cb
 */
 void	frambuffResizeCb(GLFWwindow *window, int width, int height) {
-	tWinUser	*winU;
-
-	winU = reinterpret_cast<tWinUser *>(glfwGetWindowUserPointer(window));
+	(void)window;
 	s.g.screen.width = width;
 	s.g.screen.height = height;
 	glViewport(0, 0, width, height);
@@ -346,6 +346,12 @@ bool	initWindow(GLFWwindow **window, const char *name, tWinUser *winU) {
 		return (false);
 	}
 	glfwMakeContextCurrent(*window);
+
+
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+		std::cout << "Failed to initialize GLAD" << std::endl;
+		return -1;
+	}
 
 	glfwSetFramebufferSizeCallback(*window, frambuffResizeCb);
 	glfwSetCursorPosCallback(*window, mouseCb);

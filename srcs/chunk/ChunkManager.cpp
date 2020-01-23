@@ -103,13 +103,16 @@ void ChunkManager::init(wordFVec3 camPos, glm::mat4 &projection) {
     glGenVertexArrays(1, &_borderShaderVAO);
     glGenBuffers(1, &_borderShaderVBO);
 
+    glBindVertexArray(_borderShaderVAO);
     glBindBuffer(GL_ARRAY_BUFFER, _borderShaderVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(ChunkManager::_borderVertices), ChunkManager::_borderVertices, GL_STATIC_DRAW);
-
-    glBindVertexArray(_borderShaderVAO);
-
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), reinterpret_cast<void*>(0));
     glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+	_borderShader->unuse();
+
 	for (uint8_t i = 0; i < NB_UPDATE_THREADS; i++) {
 		_lastChunkPos[i].x = -1;
 		_lastChunkPos[i].y = -1;
@@ -286,7 +289,7 @@ void ChunkManager::update(wordFVec3 &camPos, uint8_t threadID, uint64_t nbUpdate
 					actChunk->update();
 				}
 			}
-			else {  // we need to remove the chunk
+			else if (_isNeededToDelete(actChunkPos)) {  // we need to remove the chunk
 			    { std::lock_guard<std::mutex>	guard(s.mutexToDelete);
 					toDelete.push_back(actChunkPos);
 				}
@@ -366,6 +369,8 @@ void ChunkManager::draw(Camera *cam, float nightProgress, bool pointLight) {
 		_borderShader->setMat4("model", model);
 		glBindVertexArray(_borderShaderVAO);
 		glDrawArrays(GL_LINES, 0, 24);
+		glBindVertexArray(0);
+		_borderShader->unuse();
 	}
     { std::lock_guard<std::mutex>	guard(s.mutexOthers);
 		_nbChunkRendered = chunkRendered;
@@ -434,7 +439,6 @@ void ChunkManager::putBlock(uint8_t type) {
 void ChunkManager::updateRaycast() {
 	wordIVec3	point;
 	wordIVec3	pointLastBlock;
-	bool		isBeforeBlock = false;
 	float		start = 0.6;
 	float		end = 0.99;
 	float		stepDivVal = 0.97;
@@ -475,7 +479,6 @@ void ChunkManager::updateRaycast() {
 		if (dist > start) {
 			if (pointLastBlock != point && block == 0) {
 				pointLastBlock = point;
-				isBeforeBlock = true;
 			}
 		}
 		else {
@@ -517,6 +520,15 @@ bool	ChunkManager::_isInChunkLoaded(wordIVec3 const &chunkPos) const {
 	|| chunkPos.z >= _chunkActPos.z + s.g.perf.renderDist * CHUNK_SZ_Z)
 		return false;
 	return true;
+}
+
+bool	ChunkManager::_isNeededToDelete(wordIVec3 const &chunkPos) const {
+	if (chunkPos.x <= _chunkActPos.x - (s.g.perf.renderDist + NB_ROWS_SAVED) * CHUNK_SZ_X
+	|| chunkPos.x >= _chunkActPos.x + (s.g.perf.renderDist + NB_ROWS_SAVED) * CHUNK_SZ_X
+	|| chunkPos.z <= _chunkActPos.z - (s.g.perf.renderDist + NB_ROWS_SAVED) * CHUNK_SZ_Z
+	|| chunkPos.z >= _chunkActPos.z + (s.g.perf.renderDist + NB_ROWS_SAVED) * CHUNK_SZ_Z)
+		return true;
+	return false;
 }
 
 bool	ChunkManager::isChunkExist(wordIVec3 const &chunkPos) const {

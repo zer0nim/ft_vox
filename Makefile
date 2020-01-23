@@ -1,22 +1,27 @@
 # Makefile
 # for each projects, change value of:
-#	-> NAME
-#	-> SRC
-#	-> HEAD
-#	-> LIBS_FLAGS
-#	-> LIBS_INC
+#	-> NAME  # name of the exectutable
+#	-> SRC  # all .cpp files
+#	-> HEAD  # all .hpp files
+
+# to setup libs
+#	-> LIBS_SRC_C  # all internal .c of libs
+#	-> LIBS_SRC_CPP  # all internal .cpp of libs
+#	-> LIBS_HEAD  # all internal .h & .hpp of libs
+#	-> LIBS_FLAGS  # all flags to compile with the libs
+#	-> LIBS_INC  # how to find external libs header
 
 # update if needed the make install command
 
 # you can also configure your Makefile with these variables:
-#	-> ARGS
-#	-> LINTER_RULES
-#	-> DEBUG_FLAGS
-#	-> PRE_COMMIT
-#	-> PRE_PUSH
+#	-> ARGS  # args sended when run executable
+#	-> LINTER_RULES  # all rules when running linter
+#	-> DEBUG_FLAGS  # flags for debug mode (ex -g)
+#	-> PRE_COMMIT  # the content of pre-commit file
+#	-> PRE_PUSH  # the content of pre-push file
 
-# after this, init the project:
-#	make init
+# after this, install the project:
+#	make install  # this command will exectute ./configure.sh so you need to create this file
 
 # to get help:
 #	make help
@@ -30,9 +35,12 @@ PROJECT_NAME = $(shell echo $(NAME) | tr a-z A-Z)  # name in MAJUSCULE
 
 ARGS =
 
+MAKE_OPT = --no-print-directory
+
 SRCS_DIR	= srcs
 OBJS_DIR	= objs
 INC_DIR		= includes
+LIBS_DIR	= libs
 DEP_DIR		= .dep
 DEBUG_DIR	= $(DEP_DIR)
 
@@ -81,6 +89,20 @@ HEAD =	commonInclude.hpp \
 		utils/Stats.hpp \
 		utils/Logging.hpp \
 
+# for c libs
+LIBS_SRC_C =	glad/glad.c \
+
+# for cpp libs
+LIBS_SRC_CPP =
+
+# headers for c & cpp libs
+LIBS_HEAD =		glad/glad.h \
+				KHR/khrplatform.h \
+				json.hpp \
+				stb_image.h \
+				PerlinNoise.hpp \
+
+
 # download the cpp linter (https://github.com/isocpp/CppCoreGuidelines)
 # set command to launch linter on LINTER
 # add rules for linter in LINTER_RULES
@@ -88,17 +110,25 @@ LINTER = $(CPPLINT)
 LINTER_RULES =	--filter=-whitespace/tab,-legal/copyright,-build/c++11,-whitespace/newline,-readability/braces,-whitespace/indent,-build/include_what_you_use,-build/header_guard,-runtime/references \
 				--linelength=120 --quiet
 
-CC				= clang++
+CC				= g++
 DEBUG_FLAGS		= -g3 -DDEBUG=true
 NODEBUG_FLAGS	= -Werror
-LIBS_FLAGS		= -L ~/.brew/lib -framework OpenGL -lglfw -L ~/.brew/opt/freetype/lib -lfreetype \
+LIBS_FLAGS		= -L ~/.brew/lib -lglfw -L ~/.brew/opt/freetype/lib -lfreetype \
 				  -lboost_filesystem
+
+# osx specific flags
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S), Darwin)
+	LIBS_FLAGS += -framework OpenGL
+else
+	LIBS_FLAGS += -ldl -pthread -lboost_system
+endif
+
 LIBS_INC		= ~/.brew/include \
-				  $(INC_DIR)/lib/stb_image.h \
-				  $(INC_DIR)/lib/json.hpp \
-				  $(INC_DIR)/lib/PerlinNoise.hpp \
+				  $(INC_DIR)/lib \
 				  /usr/local/opt/freetype/include/freetype2 \
-				  ~/.brew/opt/freetype/include/freetype2
+				  ~/.brew/opt/freetype/include/freetype2 \
+				  /usr/include/freetype2
 
 DEPFLAGS	= -MT $@ -MD -MP -MF $(DEP_DIR)/$*.Td
 CFLAGS		= -Ofast -std=c++11 -Wall -Wextra -Wno-deprecated
@@ -128,7 +158,7 @@ PRE_COMMIT_FILE = .git/hooks/pre-commit
 define PRE_COMMIT
 #!/bin/zsh
 
-make lint
+$(MAKE) $(MAKE_OPT) lint
 res=$$?
 
 exit $${res}
@@ -140,17 +170,24 @@ PRE_PUSH_FILE = .git/hooks/pre-push
 define PRE_PUSH
 #!/bin/zsh
 
-make check -j8
+$(MAKE) $(MAKE_OPT) check -j8
 res=$$?
 
 exit $${res}
 endef
 export PRE_PUSH
 
-HEADS		= $(addprefix $(INC_DIR)/, $(HEAD))
-OBJS		= $(addprefix $(OBJS_DIR)/, $(SRC:.cpp=.o))
-DEPFILES	= $(addprefix $(DEP_DIR)/, $(SRC:.cpp=.d))
-INC			= -I $(INC_DIR) $(addprefix -I , $(addprefix $(INC_DIR)/, $(dir $(HEAD)))) $(addprefix -I , $(LIBS_INC))
+HEADS		= $(addprefix $(INC_DIR)/, $(HEAD)) $(addprefix $(LIBS_DIR)/, $(LIBS_HEAD))
+SRCS		= $(addprefix $(SRCS_DIR)/, $(SRC)) \
+			  $(addprefix $(LIBS_DIR)/, $(LIBS_SRC_C)) \
+			  $(addprefix $(LIBS_DIR)/, $(LIBS_SRC_CPP))
+OBJS		= $(addprefix $(OBJS_DIR)/, $(SRC:.cpp=.o)) \
+			  $(addprefix $(OBJS_DIR)/, $(LIBS_SRC_C:.c=.o)) \
+			  $(addprefix $(OBJS_DIR)/, $(LIBS_SRC_CPP:.cpp=.o))
+DEPFILES	= $(addprefix $(DEP_DIR)/, $(SRC:.cpp=.d)) \
+			  $(addprefix $(DEP_DIR)/, $(LIBS_SRC_C:.c=.d)) \
+			  $(addprefix $(DEP_DIR)/, $(LIBS_SRC_CPP:.cpp=.d))
+INC			= $(addprefix -I , $(sort $(dir $(HEADS)))) $(addprefix -I , $(LIBS_INC)) -I .
 
 NORMAL = "\x1B[0m"
 RED = "\x1B[31m"
@@ -171,15 +208,15 @@ END = @printf $(GREEN)$(BOLD)"--------------------\n"$(NORMAL)
 all:
 ifneq ($(DEBUG),)
 	@if [ -d $(DEBUG_DIR) ] && [ ! -f $(DEBUG_DIR)/DEBUG ]; then \
-		make fclean; \
+		$(MAKE) $(MAKE_OPT) fclean; \
 	fi;
 else
 	@if [ -d $(DEBUG_DIR) ] && [ -f $(DEBUG_DIR)/DEBUG ]; then \
-		make fclean; \
+		$(MAKE) $(MAKE_OPT) fclean; \
 	fi;
 endif
 	$(START)
-	@make $(NAME)
+	@$(MAKE) $(MAKE_OPT) $(NAME)
 	$(END)
 ifneq ($(DEBUG),)
 	@touch $(DEBUG_DIR)/DEBUG
@@ -206,6 +243,13 @@ init:
 $(NAME): $(OBJS_DIR) $(OBJS)
 	@printf $(CYAN)"-> create program : $(NAME)\n"$(NORMAL)
 	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LIBS_FLAGS)
+
+$(OBJS_DIR)/%.o: $(LIBS_DIR)/%.c
+$(OBJS_DIR)/%.o: $(LIBS_DIR)/%.c $(DEP_DIR)/%.d
+	@printf $(YELLOW)"-> $<\n"$(NORMAL)
+	@$(CC) $(DEPFLAGS) $(CFLAGS) -c $< -o $@ $(INC)
+	@mv -f $(DEP_DIR)/$*.Td $(DEP_DIR)/$*.d
+
 
 $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp
 $(OBJS_DIR)/%.o: $(SRCS_DIR)/%.cpp $(DEP_DIR)/%.d
@@ -238,31 +282,31 @@ fclean: clean
 	$(END)
 
 re: fclean
-	@make
+	@$(MAKE) $(MAKE_OPT)
 
 exec-nolint:
-	@make
+	@$(MAKE) $(MAKE_OPT)
 	@printf $(MAGENTA)$(BOLD)"EXEC $(PROJECT_NAME)\n--------------------\n"$(NORMAL)
 	@./$(NAME) $(ARGS)
 	@printf $(MAGENTA)$(BOLD)"--------------------\n"$(NORMAL)
 
 exec:
-	@make lint ; true
-	@make exec-nolint ; true
+	@$(MAKE) $(MAKE_OPT) lint ; true
+	@$(MAKE) $(MAKE_OPT) exec-nolint ; true
 
 lint:
 	@printf $(BLUE)$(BOLD)"LINTER ON $(PROJECT_NAME)\n--------------------\n"$(NORMAL)
 	@if [ "$(LINTER)" = "" ]; then\
 		printf $(RED)$(BOLD)"Error:"$(NORMAL)" env var CPPLINT is not set\n"; \
 	else \
-		$(LINTER) $(LINTER_RULES) $(HEADS) $(addprefix $(SRCS_DIR)/, $(SRC)); \
+		$(LINTER) $(LINTER_RULES) $(addprefix $(INC_DIR)/, $(HEAD)) $(addprefix $(SRCS_DIR)/, $(SRC)); \
     fi
 	@printf $(BLUE)$(BOLD)"--------------------\n"$(NORMAL)
 
 check:
-	@make fclean
-	@make lint
-	@make
+	@$(MAKE) $(MAKE_OPT) fclean
+	@$(MAKE) $(MAKE_OPT) lint
+	@$(MAKE) $(MAKE_OPT)
 
 help:
 	@printf $(YELLOW)$(BOLD)"HELP\n--------------------\n"$(NORMAL)

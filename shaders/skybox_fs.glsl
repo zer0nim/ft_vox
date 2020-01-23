@@ -1,6 +1,6 @@
 #version 410 core
 
-#define NIGHTFOG mix(1, 0.2, nightProgress)
+#define NIGHTFOG mix(1.0, 0.2, nightProgress)
 
 out vec4 fragColor;
 

@@ -8,6 +8,7 @@ _projection(glm::ortho(0.0f, static_cast<GLfloat>(width), 0.0f, static_cast<GLfl
 	// create VAO & VBO
 	_vao = 0;
 	_vbo = 0;
+	_shader.use();
 	glGenVertexArrays(1, &_vao);
 	glGenBuffers(1, &_vbo);
 	glBindVertexArray(_vao);
@@ -18,8 +19,8 @@ _projection(glm::ortho(0.0f, static_cast<GLfloat>(width), 0.0f, static_cast<GLfl
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	_shader.use();
 	_shader.setMat4("projection", _projection);
+	_shader.unuse();
 }
 
 void TextRender::loadFont(std::string name, std::string const &filename, uint32_t size) {
@@ -49,6 +50,7 @@ void TextRender::loadFont(std::string name, std::string const &filename, uint32_
 		// generate texture
 		GLuint texture;
 		glGenTextures(1, &texture);
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, face->glyph->bitmap.width, face->glyph->bitmap.rows, 0,
 			GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
@@ -65,8 +67,8 @@ void TextRender::loadFont(std::string name, std::string const &filename, uint32_
 			face->glyph->advance.x
 		};
 		font[name].insert(std::pair<GLchar, Character>(c, character));
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
-    glBindTexture(GL_TEXTURE_2D, 0);
 
 	// delete freetype objects
 	FT_Done_Face(face);
@@ -90,6 +92,7 @@ TextRender::~TextRender() {
 			glDeleteTextures(1, &elem.second.begin()->second.textureID);
 		}
 	}
+    _shader.unuse();
 }
 
 TextRender &TextRender::operator=(TextRender const &rhs) {
@@ -130,11 +133,12 @@ GLfloat scale, glm::vec3 color) {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         // draw char
         glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindTexture(GL_TEXTURE_2D, 0);
         // move cursor to the next character
         x += (ch.advance >> 6) * scale;
     }
     glBindVertexArray(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    _shader.unuse();
 }
 
 uint32_t	TextRender::strWidth(std::string const &fontName, std::string text, GLfloat scale) {

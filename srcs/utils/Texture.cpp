@@ -1,6 +1,6 @@
 #include "Texture.hpp"
 #define STB_IMAGE_IMPLEMENTATION
-#include "lib/stb_image.h"
+#include "libs/stb_image.h"
 #include "Logging.hpp"
 
 uint32_t	textureFromFile(const std::string path, bool inSpaceSRGB) {
@@ -34,6 +34,7 @@ uint32_t	textureFromFile(const std::string path, bool inSpaceSRGB) {
 			throw TextureFailToLoad();
 		}
 
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, textureID);
 		glTexImage2D(GL_TEXTURE_2D, 0, intFormat, width, height, 0, format, \
 		GL_UNSIGNED_BYTE, data);
@@ -47,6 +48,7 @@ uint32_t	textureFromFile(const std::string path, bool inSpaceSRGB) {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		stbi_image_free(data);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	else {
 		logErr("Texture failed to load at path: " << path);
@@ -87,6 +89,7 @@ uint32_t	textureAtlasFromFile(const std::string path, bool inSpaceSRGB, int tile
 			throw TextureFailToLoad();
 		}
 
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, textureID);
 		glTexImage3D(GL_TEXTURE_2D_ARRAY,
 			0,						// mipmap level
@@ -108,6 +111,7 @@ uint32_t	textureAtlasFromFile(const std::string path, bool inSpaceSRGB, int tile
 		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		stbi_image_free(data);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 	}
 	else {
 		logErr("Texture failed to load at path: " << path);

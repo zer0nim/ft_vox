@@ -56,6 +56,7 @@ class ChunkManager {
 		void	_updateChunkPos(wordFVec3 const &pos);  // update the chunk pos (call each frame)
 		void	_updateChunkPos(wordIVec3 const &pos);  // update the chunk pos (call each frame)
 		bool	_isInChunkLoaded(wordIVec3 const &chunkPos) const;  // return true if the chunk is loaded
+		bool	_isNeededToDelete(wordIVec3 const &chunkPos) const;  // return true if we need to delete the chunk
 		uint8_t	_getID(wordIVec3 const &chunkPos) const;
 		uint8_t	_getID(int32_t const x) const;
 

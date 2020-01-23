@@ -213,6 +213,11 @@ void AChunk::save() {
 	chunkFile.close();
 }
 
+void					AChunk::deleteShader() {
+	_shaderData.reset();
+}
+
+
 Shader					&AChunk::getShader() { return *(_shaderData->shader); }
 AChunk::ChunkData const	&AChunk::getData() const { return _data; }
 AChunk::ChunkData		&AChunk::getData() { return _data; }

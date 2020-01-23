@@ -58,7 +58,7 @@ TextureManager::TextureManager(std::string const &texturesSettings) {
 
 		if (fileStream.is_open()) {
 			nlohmann::json	data;
-			data << fileStream;
+			fileStream >> data;
 			loadBlocksTextures(data);
 		}
 		else {
@@ -216,8 +216,8 @@ void	TextureManager::loadBlocksTextures(nlohmann::json const &data) {
 
 void	TextureManager::setUniform(Shader &sh) const {
 	// activate textures
-	glActiveTexture(GL_TEXTURE0);
 	sh.setInt("textureAtlas", 0);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, _textureAtlas->id);
 
 	// set uniforms textures
@@ -240,6 +240,7 @@ void	TextureManager::setUniform(Shader &sh) const {
 			sh.setInt("blockTexturesInfo[" + std::to_string(i) + "].textureBottom", _blocks[i]->side);
 		}
 	}
+	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 }
 
 void	TextureManager::activateTextures() const {

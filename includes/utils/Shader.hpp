@@ -23,6 +23,7 @@ class Shader {
 		Shader &operator=(Shader const &rhs);
 
 		void	use();
+		void	unuse();
 		void	setBool(const std::string &name, bool value) const;
 		void	setInt(const std::string &name, int value) const;
 		void	setFloat(const std::string &name, float value) const;
