@@ -287,7 +287,7 @@ endif
 
 install:
 	@printf $(YELLOW)$(BOLD)"INSTALL $(PROJECT_NAME)\n--------------------\n"$(NORMAL)
-	@./configure
+	@./configure.sh
 	@printf $(YELLOW)$(BOLD)"--------------------\n"$(NORMAL)
 	@$(MAKE) $(MAKE_OPT) init
 
