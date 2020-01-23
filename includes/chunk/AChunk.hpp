@@ -38,6 +38,7 @@ class AChunk {
 		ChunkManager			&getChunkManager() const;
 		bool					isModifiedFromBegining() const;
 		virtual uint32_t		getNbSquareRendered() const { return 0; }
+		static void				deleteShader();
 
 		mutable std::mutex		mutexChunk;
 

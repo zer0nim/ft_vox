@@ -306,137 +306,140 @@ bool	init(GLFWwindow **window, const char *name, tWinUser *winU, Camera *camCrea
 }
 
 int		main(int ac, char const **av) {
-	// init logging
-	#if DEBUG
-		logging.setLoglevel(LOGDEBUG);
-		logging.setPrintFileLine(LOGWARN, true);
-		logging.setPrintFileLine(LOGERROR, true);
-		logging.setPrintFileLine(LOGFATAL, true);
-	#else
-		logging.setLoglevel(LOGINFO);
-	#endif
-	setDefaultSettings();
+	GLFWwindow		*window = nullptr;
+    {
+		// init logging
+		#if DEBUG
+			logging.setLoglevel(LOGDEBUG);
+			logging.setPrintFileLine(LOGWARN, true);
+			logging.setPrintFileLine(LOGERROR, true);
+			logging.setPrintFileLine(LOGFATAL, true);
+		#else
+			logging.setLoglevel(LOGINFO);
+		#endif
+		setDefaultSettings();
 
-	if (argparse(ac - 1, av + 1, true) == false) {
-		return 0;
-	}
-
-	try {
-		loadSettings(s.g.files.settingsFile);
-	}
-	catch (Settings::SettingsError &e) {
-		return 1;
-	}
-	if (s.m.seed == 0) {
-		uint32_t seedRand = time(nullptr);
-		s.m.seed = rand_r(&seedRand);
-	}
-
-	if (argparse(ac - 1, av + 1, false) == false) {
-		return 0;
-	}
-
-	if (s.m.mapName == "") {  // load without mapName
-		logWarn("no mapname -> you can't save the map");
-		if (s.m.cameraStartPos.pos.y < 0) {
-			setSeed(s.m.seed);
-			s.m.cameraStartPos.pos.x += 0.5;
-			s.m.cameraStartPos.pos.z += 0.5;
-			s.m.cameraStartPos.pos.y = getDefaultElevation(s.m.cameraStartPos.pos.x, s.m.cameraStartPos.pos.z);
+		if (argparse(ac - 1, av + 1, true) == false) {
+			return 0;
 		}
-	}
-	else {
-		if (createMapFiles() == false) {
+
+		try {
+			loadSettings(s.g.files.settingsFile);
+		}
+		catch (Settings::SettingsError &e) {
 			return 1;
 		}
-	}
-	setSeed(s.m.seed);
+		if (s.m.seed == 0) {
+			uint32_t seedRand = time(nullptr);
+			s.m.seed = rand_r(&seedRand);
+		}
 
-	GLFWwindow		*window = nullptr;
-	tWinUser		winU;
-	Camera			*camCrea = new CameraCreative(s.m.cameraStartPos.pos, glm::vec3(0, 1, 0),
-		s.m.cameraStartPos.yaw, s.m.cameraStartPos.pitch);
-	camCrea->movementSpeed = s.g.player.creative.movementSpeed;
-	camCrea->mouseSensitivity = s.g.player.mouseSensitivity;
-	camCrea->runFactor = s.g.player.creative.runFactor;
-	Camera			*camSurv = new CameraSurvival(&winU, s.m.cameraStartPos.pos, glm::vec3(0, 1, 0),
-		s.m.cameraStartPos.yaw, s.m.cameraStartPos.pitch);
-	camSurv->movementSpeed = s.g.player.survival.movementSpeed;
-	camSurv->mouseSensitivity = s.g.player.mouseSensitivity;
-	camSurv->runFactor = s.g.player.survival.runFactor;
-	dynamic_cast<CameraSurvival *>(camSurv)->gravity = s.g.player.survival.gravity;
-	dynamic_cast<CameraSurvival *>(camSurv)->jumpHeight = s.g.player.survival.jumpHeight;
-	dynamic_cast<CameraSurvival *>(camSurv)->jumpSpeed = s.g.player.survival.jumpSpeed;
-	dynamic_cast<CameraSurvival *>(camSurv)->height = s.g.player.survival.height;
-	dynamic_cast<CameraSurvival *>(camSurv)->eyeHeight = s.g.player.survival.eyeHeight;
-	dynamic_cast<CameraSurvival *>(camSurv)->radius = s.g.player.survival.radius;
-	TextureManager	*textureManager = nullptr;
+		if (argparse(ac - 1, av + 1, false) == false) {
+			return 0;
+		}
 
-	logInfo("chunk size " << CHUNK_SZ_X << " " << CHUNK_SZ_Y << " " << CHUNK_SZ_Z
-		<< " -> render distance " << s.g.perf.renderDist << " chunks");
-
-	if (!init(&window, "ft_vox (F3 to show debug module)", &winU, camCrea, camSurv))
-		return (1);
-	logInfo("window size " << s.g.screen.width << " * " << s.g.screen.height);
-
-	try {
-		// load textures
-		textureManager = new TextureManager("./assets/textures.json");
-
-		// load all fonts
-		TextRender textRender(s.g.screen.width, s.g.screen.height);
-		textRender.loadFont("title", s.g.screen.text["title"].path, s.g.screen.text["title"].size);
-		textRender.loadFont("normal", s.g.screen.text["normal"].path, s.g.screen.text["normal"].size);
-		textRender.loadFont("courrier_new", s.g.screen.text["courrier_new"].path, s.g.screen.text["courrier_new"].size);
-
-		// load image render
-		ImageRender imageRender(*textureManager, s.g.screen.width, s.g.screen.height);
-		imageRender.getShader().use();
-		textureManager->setUniform(imageRender.getShader());
-		imageRender.getShader().unuse();
-
-		// load skybox
-		Skybox skybox;
-
-		// create chunkManager
-		ChunkManager chunkManager(*textureManager, &winU);
-		winU.chunkManager = &chunkManager;
-
-		// run the game
-		gameLoop(window, skybox, textRender, chunkManager, imageRender, *textureManager);
-
-		// save and quit all chunks
-		chunkManager.saveAndQuit();
-	}
-	catch(const TextureManager::TextureManagerError& e) {
-		logErr("when loading textures: " << e.what());
-
-		glfwDestroyWindow(window);
-		window = nullptr;
-		glfwPollEvents();
-		// glfwTerminate();
-		return 1;
-	}
-	catch(const Shader::ShaderError& e) {
-		logErr("when loading shader: " << e.what());
-	}
-	catch (const TextRender::TextRenderError & e) {
-		logErr("when loading TextRender: " << e.what());
-	}
-
-	if (s.m.mapName != "") {  // if we have a map
-		logInfo("saving...");
-		if (saveMap(window, winU.cam)) {
-			logInfo("settings saved");
+		if (s.m.mapName == "") {  // load without mapName
+			logWarn("no mapname -> you can't save the map");
+			if (s.m.cameraStartPos.pos.y < 0) {
+				setSeed(s.m.seed);
+				s.m.cameraStartPos.pos.x += 0.5;
+				s.m.cameraStartPos.pos.z += 0.5;
+				s.m.cameraStartPos.pos.y = getDefaultElevation(s.m.cameraStartPos.pos.x, s.m.cameraStartPos.pos.z);
+			}
 		}
 		else {
-			logWarn("unable to save settings");
+			if (createMapFiles() == false) {
+				return 1;
+			}
 		}
-	}
+		setSeed(s.m.seed);
 
-	delete textureManager;
-	delete winU.camCrea;
-	delete winU.camSurv;
+		tWinUser		winU;
+		Camera			*camCrea = new CameraCreative(s.m.cameraStartPos.pos, glm::vec3(0, 1, 0),
+			s.m.cameraStartPos.yaw, s.m.cameraStartPos.pitch);
+		camCrea->movementSpeed = s.g.player.creative.movementSpeed;
+		camCrea->mouseSensitivity = s.g.player.mouseSensitivity;
+		camCrea->runFactor = s.g.player.creative.runFactor;
+		Camera			*camSurv = new CameraSurvival(&winU, s.m.cameraStartPos.pos, glm::vec3(0, 1, 0),
+			s.m.cameraStartPos.yaw, s.m.cameraStartPos.pitch);
+		camSurv->movementSpeed = s.g.player.survival.movementSpeed;
+		camSurv->mouseSensitivity = s.g.player.mouseSensitivity;
+		camSurv->runFactor = s.g.player.survival.runFactor;
+		dynamic_cast<CameraSurvival *>(camSurv)->gravity = s.g.player.survival.gravity;
+		dynamic_cast<CameraSurvival *>(camSurv)->jumpHeight = s.g.player.survival.jumpHeight;
+		dynamic_cast<CameraSurvival *>(camSurv)->jumpSpeed = s.g.player.survival.jumpSpeed;
+		dynamic_cast<CameraSurvival *>(camSurv)->height = s.g.player.survival.height;
+		dynamic_cast<CameraSurvival *>(camSurv)->eyeHeight = s.g.player.survival.eyeHeight;
+		dynamic_cast<CameraSurvival *>(camSurv)->radius = s.g.player.survival.radius;
+		TextureManager	*textureManager = nullptr;
+
+		logInfo("chunk size " << CHUNK_SZ_X << " " << CHUNK_SZ_Y << " " << CHUNK_SZ_Z
+			<< " -> render distance " << s.g.perf.renderDist << " chunks");
+
+		if (!init(&window, "ft_vox (F3 to show debug module)", &winU, camCrea, camSurv))
+			return (1);
+		logInfo("window size " << s.g.screen.width << " * " << s.g.screen.height);
+
+		try {
+			// load textures
+			textureManager = new TextureManager("./assets/textures.json");
+
+			// load all fonts
+			TextRender textRender(s.g.screen.width, s.g.screen.height);
+			textRender.loadFont("title", s.g.screen.text["title"].path, s.g.screen.text["title"].size);
+			textRender.loadFont("normal", s.g.screen.text["normal"].path, s.g.screen.text["normal"].size);
+			textRender.loadFont("courrier_new", s.g.screen.text["courrier_new"].path, s.g.screen.text["courrier_new"].size);
+
+			// load image render
+			ImageRender imageRender(*textureManager, s.g.screen.width, s.g.screen.height);
+			imageRender.getShader().use();
+			textureManager->setUniform(imageRender.getShader());
+			imageRender.getShader().unuse();
+
+			// load skybox
+			Skybox skybox;
+
+			// create chunkManager
+			ChunkManager chunkManager(*textureManager, &winU);
+			winU.chunkManager = &chunkManager;
+
+			// run the game
+			gameLoop(window, skybox, textRender, chunkManager, imageRender, *textureManager);
+
+			// save and quit all chunks
+			chunkManager.saveAndQuit();
+		}
+		catch(const TextureManager::TextureManagerError& e) {
+			logErr("when loading textures: " << e.what());
+
+			glfwDestroyWindow(window);
+			window = nullptr;
+			glfwPollEvents();
+			// glfwTerminate();
+			return 1;
+		}
+		catch(const Shader::ShaderError& e) {
+			logErr("when loading shader: " << e.what());
+		}
+		catch (const TextRender::TextRenderError & e) {
+			logErr("when loading TextRender: " << e.what());
+		}
+
+		if (s.m.mapName != "") {  // if we have a map
+			logInfo("saving...");
+			if (saveMap(window, winU.cam)) {
+				logInfo("settings saved");
+			}
+			else {
+				logWarn("unable to save settings");
+			}
+		}
+
+		delete textureManager;
+		delete winU.camCrea;
+		delete winU.camSurv;
+		AChunk::deleteShader();
+	}
 
 	glfwDestroyWindow(window);
 	window = nullptr;
