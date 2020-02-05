@@ -2,7 +2,7 @@
 	"global": {
 		"perf": {
 			"fps": 120,
-			"renderDist": 10,
+			"renderDist": 16,
 			"enableFacesOptimizer": true,
 			"speedFacesOptimizer": 1,
 			"speedCreationChunk": 1,
